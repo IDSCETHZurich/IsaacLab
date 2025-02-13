@@ -1,0 +1,23 @@
+seed: 42
+
+n_timesteps: !!float 10e6
+algorithm: 'PPO'
+#policy: 'MultiInputPolicy'
+policy: 'MlpPolicy'
+her: false
+#bootstrap: 'random'
+#opponent_action: 'model'
+device: "cuda:0"
+normalize_input: false
+gamma: 0.99
+#learning_starts: 10000
+rewards:
+  player_in_goal: !!float 0.0
+  goal_scored: !!float 0.0
+  goal_conceded: !!float 0.0
+  distance_ball_opponent_goal: !!float 1.0
+  ball_speed: !!float 0.0
+  distance_player_ball_own_half: !!float 0.0
+  ball_stationary: !!float 0.0
+  collision_player_ball: !!float 0.0
+

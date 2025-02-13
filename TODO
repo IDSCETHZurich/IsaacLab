@@ -1,0 +1,31 @@
+isaacsim omni.isaac.sim.kit
+
+Implementation:
+- possibly use curriculum manager instead of curriculum wrapper
+
+Hyperparameters:
+- (rl_games) network/separate: try True (seperate actor and critic networks; supposedly works better for continuous control)
+- (rl_games) config/normalize_input: try True (normalize observations)
+- (rl_games) env/clip_observations: check if current value (5.0) is good
+
+Experiments:
+- algorithms: PPO / SAC
+- curricula: 
+    - distance ball opponent goal -> + goal scored/conceded -> + time to goal scored
+    - distance ball opponent goal + player in goal -> + goal scored/conceded -> + time to goal scored
+    - collision player ball -> distance ball opponent goal -> + goal scored/conceded
+- opponents: random / self-play current policy / self-play multiple checkpoints
+- resets: only timeout / goal scored/conceded, player in goal, timeout
+
+SimToReal:
+- domain randomization: object dimensionss, friction, restitution
+- add noise to observations
+- (action smoothness penalty)
+- delay: include actions from last 200 ms in observations
+- include collision avoidance in sim
+- (model magnetic interaction)
+
+Performance:
+- sbx: 22k fps
+- sb3: 23k fps
+- rl_games: 60k fps

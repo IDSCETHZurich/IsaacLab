@@ -1,0 +1,35 @@
+eee
+
+
+
+
+
+
+
+
+
+seed: 42
+
+n_timesteps: !!float 10e6
+algorithm: 'PPO'
+#policy: 'MultiInputPolicy'
+policy: 'MlpPolicy'
+her: false
+#bootstrap: 'random'
+#opponent_action: 'model'
+device: "cuda:0"
+normalize_input: false
+gamma: 0.99
+#learning_starts: 10000uuwdhjdsjkd
+d
+d
+
+
+
+
+
+
+
+
+
+
