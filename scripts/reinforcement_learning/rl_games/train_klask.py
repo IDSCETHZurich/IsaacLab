@@ -140,7 +140,10 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     dump_pickle(os.path.join(log_root_path, log_dir, "params", "agent.pkl"), agent_cfg)
 
     # read configurations about the agent-training
-    rl_device = args_cli.device if args_cli.device is not None else agent_cfg["params"]["config"]["device"]
+    if args_cli.device is not None:
+        agent_cfg["params"]["config"]["device"] = args_cli.device
+        agent_cfg["params"]["config"]["device_name"] = args_cli.device
+    rl_device = agent_cfg["params"]["config"]["device"]
     clip_obs = agent_cfg["params"]["env"].get("clip_observations", math.inf)
     clip_actions = agent_cfg["params"]["env"].get("clip_actions", math.inf)
 
