@@ -151,7 +151,7 @@ def ball_stationary(env: ManagerBasedRLEnv, ball_cfg: SceneEntityCfg, eps=5e-3) 
 
 
 def collision_player_ball(env: ManagerBasedRLEnv, player_cfg: SceneEntityCfg, ball_cfg: SceneEntityCfg, eps=0.02) -> torch.Tensor:
-    return (distance_player_ball(env, player_cfg, ball_cfg) < eps) * ((player_speed(env, player_cfg) - ball_speed(env, ball_cfg)) ** 2)
+    return (distance_player_ball(env, player_cfg, ball_cfg) < eps) * player_speed(env, player_cfg)
 
 
 def ball_in_own_half(env: ManagerBasedRLEnv, ball_cfg: SceneEntityCfg):

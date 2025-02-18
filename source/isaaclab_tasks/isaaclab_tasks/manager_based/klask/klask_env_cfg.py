@@ -59,11 +59,6 @@ class KlaskSceneCfg(InteractiveSceneCfg):
 @configclass
 class ActionsCfg:
     """Action specifications for the environment."""
-    #player_actions = mdp.JointEffortActionCfg(asset_name="klask", 
-    #                                           joint_names=["slider_to_peg_1", "ground_to_slider_1"],)
-
-    #opponent_actions = mdp.JointEffortActionCfg(asset_name="klask", 
-    #                                           joint_names=["slider_to_peg_2", "ground_to_slider_2"],)
 
     player_x = mdp.JointVelocityActionCfg(
         asset_name="klask", 
@@ -84,6 +79,16 @@ class ActionsCfg:
         asset_name="klask", 
         joint_names=["ground_to_slider_2"]
     )
+    
+    """ player = mdp.JointVelocityActionCfg(
+        asset_name="klask", 
+        joint_names=["board_to_peg_1"]
+    )
+
+    opponent = mdp.JointVelocityActionCfg(
+        asset_name="klask", 
+        joint_names=["board_to_peg_2"]
+    ) """
 
 
 @configclass
@@ -99,16 +104,31 @@ class ObservationsCfg:
         peg_1_pos = ObsTerm(func=body_xy_pos_w, params={"asset_cfg": SceneEntityCfg(
             name="klask", 
             body_names=["Peg_1"]
-        )}, )#scale=2/BOARD_WIDTH)
+        )},)
+        
+        peg_1_x_vel = ObsTerm(func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg(
+            name="klask", 
+            joint_names=["slider_to_peg_1"]
+        )}, )
+
+        peg_1_y_vel = ObsTerm(func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg(
+            name="klask", 
+            joint_names=["ground_to_slider_1"]
+        )}, )
 
         peg_2_pos = ObsTerm(func=body_xy_pos_w, params={"asset_cfg": SceneEntityCfg(
             name="klask", 
             body_names=["Peg_2"],
-        )}, )#scale=2/BOARD_LENGTH)
+        )}, )
 
-        joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg(
+        peg_2_x_vel = ObsTerm(func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg(
             name="klask", 
-            joint_names=["ground_to_slider_1", "slider_to_peg_1", "ground_to_slider_2", "slider_to_peg_2"]
+            joint_names=["slider_to_peg_2"]
+        )}, )
+
+        peg_2_y_vel = ObsTerm(func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg(
+            name="klask", 
+            joint_names=["ground_to_slider_2"]
         )}, )
 
         ball_pos_rel = ObsTerm(func=root_xy_pos_w, params={"asset_cfg": SceneEntityCfg(name="ball")})
@@ -118,45 +138,6 @@ class ObservationsCfg:
         if KLASK_PARAMS.get("action_history", 0):
             action_history = ObsTerm(func=mdp.last_action, history_length=KLASK_PARAMS["action_history"])
 
-
-        def __post_init__(self) -> None:
-            self.enable_corruption = False
-            self.concatenate_terms = True
-
-    # observation groups
-    policy: PolicyCfg = PolicyCfg()
-
-
-@configclass
-class HistoryObservationsCfg:
-    """Observation specifications for the environment."""
-
-     # TODO: noise corruption
-    @configclass
-    class PolicyCfg(ObsGroup):
-        """Observations for policy group."""
-        
-        # observation terms (order preserved)
-        peg_1_pos = ObsTerm(func=body_xy_pos_w, params={"asset_cfg": SceneEntityCfg(
-            name="klask", 
-            body_names=["Peg_1"]
-        )}, )#scale=2/BOARD_WIDTH)
-
-        peg_2_pos = ObsTerm(func=body_xy_pos_w, params={"asset_cfg": SceneEntityCfg(
-            name="klask", 
-            body_names=["Peg_2"],
-        )}, )#scale=2/BOARD_LENGTH)
-
-        joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg(
-            name="klask", 
-            joint_names=["ground_to_slider_1", "slider_to_peg_1", "ground_to_slider_2", "slider_to_peg_2"]
-        )}, )
-
-        ball_pos_rel = ObsTerm(func=root_xy_pos_w, params={"asset_cfg": SceneEntityCfg(name="ball")})
-        
-        ball_vel_rel = ObsTerm(func=root_lin_xy_vel_w, params={"asset_cfg": SceneEntityCfg(name="ball")})
-
-        action_history = ObsTerm(func=mdp.last_action, history_length=KLASK_PARAMS["action_history"])
 
         def __post_init__(self) -> None:
             self.enable_corruption = False
@@ -181,14 +162,29 @@ class GoalObservationsCfg:
             body_names=["Peg_1"]
         )}, )#scale=2/BOARD_WIDTH)
 
+        peg_1_x_vel = ObsTerm(func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg(
+            name="klask", 
+            joint_names=["slider_to_peg_1"]
+        )}, )
+
+        peg_1_y_vel = ObsTerm(func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg(
+            name="klask", 
+            joint_names=["ground_to_slider_1"]
+        )}, )
+
         peg_2_pos = ObsTerm(func=body_xy_pos_w, params={"asset_cfg": SceneEntityCfg(
             name="klask", 
             body_names=["Peg_2"],
         )}, )#scale=2/BOARD_LENGTH)
 
-        joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg(
+        peg_2_x_vel = ObsTerm(func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg(
             name="klask", 
-            joint_names=["ground_to_slider_1", "slider_to_peg_1", "ground_to_slider_2", "slider_to_peg_2"]
+            joint_names=["slider_to_peg_2"]
+        )}, )
+
+        peg_2_y_vel = ObsTerm(func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg(
+            name="klask", 
+            joint_names=["ground_to_slider_2"]
         )}, )
 
         ball_pos_rel = ObsTerm(func=root_xy_pos_w, params={"asset_cfg": SceneEntityCfg(name="ball")})
@@ -226,23 +222,61 @@ class GoalObservationsCfg:
 class EventCfg:
     """Configuration for events."""
 
-    # on reset
-    add_ball_mass = EventTerm(
-        func=mdp.randomize_rigid_body_mass,
-        mode="reset",
-        params={
-            "asset_cfg": SceneEntityCfg("ball"),
-            "mass_distribution_params": KLASK_PARAMS["ball_mass_dist"],
-            "operation": "add",
-        },
-    )
+    if KLASK_PARAMS["domain_randomization"]["use_domain_randomization"]:
+        # on reset
+        add_ball_mass = EventTerm(
+            func=mdp.randomize_rigid_body_mass,
+            mode="reset",
+            params={
+                "asset_cfg": SceneEntityCfg("ball"),
+                "mass_distribution_params": KLASK_PARAMS["domain_randomization"]["ball_mass_range"],
+                "operation": "abs",
+            },
+        )
+
+        randomize_material_ball = EventTerm(
+            func=mdp.randomize_rigid_body_material,
+            mode="reset",
+            params={
+                "asset_cfg": SceneEntityCfg("ball"),
+                "static_friction_range": KLASK_PARAMS["domain_randomization"]["static_friction_range"],
+                "dynamic_friction_range": KLASK_PARAMS["domain_randomization"]["dynamic_friction_range"],
+                "restitution_range": KLASK_PARAMS["domain_randomization"]["restitution_range"],
+                "num_buckets": 100,
+                "make_consistent": True
+            }
+        )
+
+        randomize_material_klask = EventTerm(
+            func=mdp.randomize_rigid_body_material,
+            mode="reset",
+            params={
+                "asset_cfg": SceneEntityCfg("klask"),
+                "static_friction_range": KLASK_PARAMS["domain_randomization"]["static_friction_range"],
+                "dynamic_friction_range": KLASK_PARAMS["domain_randomization"]["dynamic_friction_range"],
+                "restitution_range": KLASK_PARAMS["domain_randomization"]["restitution_range"],
+                "num_buckets": 100,
+                "make_consistent": True
+            }
+        )
+
+        randomize_actuator = EventTerm(
+            func=mdp.randomize_actuator_gains,
+            mode="reset",
+            params={
+                "asset_cfg": SceneEntityCfg("klask"),
+                "stiffness_distribution_params": KLASK_PARAMS["domain_randomization"]["stiffness_range"],
+                "damping_distribution_params": KLASK_PARAMS["domain_randomization"]["damping_range"],
+                "operation": "abs",
+            },
+        )
 
     reset_x_position_peg_1 = EventTerm(
         func=reset_joints_by_offset,
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("klask", joint_names=["slider_to_peg_1"]),
-            "position_range": (-0.14, 0.14),
+            "position_range": (-0.15, 0.15),
             "velocity_range": (0.0, 0.0),
         },
     )
@@ -252,7 +286,7 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("klask", joint_names=["slider_to_peg_2"]),
-            "position_range": (-0.14, 0.14),
+            "position_range": (-0.15, 0.15),
             "velocity_range": (0.0, 0.0),
         },
     )
@@ -262,7 +296,7 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("klask", joint_names=["ground_to_slider_1"]),
-            "position_range": (-0.2, -0.01),
+            "position_range": (-0.2, -0.03),
             "velocity_range": (0.0, 0.0),
         },
     )
@@ -272,7 +306,7 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("klask", joint_names=["ground_to_slider_2"]),
-            "position_range": (0.01, 0.2),
+            "position_range": (0.03, 0.2),
             "velocity_range": (0.0, 0.0),
         },
     )
@@ -282,8 +316,8 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("ball"),
-            "pose_range": {"x": (-0.1, 0.1), "y": (-0.16, 0.0)},
-            "velocity_range": {"x": (-1.0, 1.0), "y": (-1.0, 0.0)}
+            "pose_range": {"x": (-0.15, 0.15), "y": (-0.21, -0.02)},
+            "velocity_range": {"x": (-1.0, 1.0), "y": (-1.0, 1.0)}
         },
     )
 
@@ -298,7 +332,7 @@ class RewardsCfg:
             "asset_cfg": SceneEntityCfg("klask", body_names=["Peg_1"]),
             "goal": KLASK_PARAMS["player_goal"]
         },
-        weight=KLASK_PARAMS["rewards"]["player_in_goal"] / (KLASK_PARAMS["decimation"] * KLASK_PARAMS["physics_dt"])
+        weight=0.0
     )
 
     goal_scored = RewTerm(
@@ -308,7 +342,7 @@ class RewardsCfg:
             "goal": KLASK_PARAMS["opponent_goal"],
             "max_ball_vel": KLASK_PARAMS["max_ball_vel"]
         },
-        weight=KLASK_PARAMS["rewards"]["goal_scored"] / (KLASK_PARAMS["decimation"] * KLASK_PARAMS["physics_dt"])
+        weight=0.0
     )
 
     goal_conceded = RewTerm(
@@ -318,7 +352,7 @@ class RewardsCfg:
             "goal": KLASK_PARAMS["player_goal"],
             "max_ball_vel": KLASK_PARAMS["max_ball_vel"]
         },
-        weight=KLASK_PARAMS["rewards"]["goal_conceded"] / (KLASK_PARAMS["decimation"] * KLASK_PARAMS["physics_dt"])
+        weight=0.0
     )
 
     distance_player_ball = RewTerm(
@@ -327,7 +361,7 @@ class RewardsCfg:
             "player_cfg": SceneEntityCfg("klask", body_names=["Peg_1"]),
             "ball_cfg": SceneEntityCfg("ball"),
         },
-        weight=KLASK_PARAMS["rewards"]["distance_player_goal"] / (KLASK_PARAMS["decimation"] * KLASK_PARAMS["physics_dt"])
+        weight=0.0
     )
 
     distance_player_ball_own_half = RewTerm(
@@ -336,7 +370,7 @@ class RewardsCfg:
             "player_cfg": SceneEntityCfg("klask", body_names=["Peg_1"]),
             "ball_cfg": SceneEntityCfg("ball"),
         },
-        weight=KLASK_PARAMS["rewards"]["distance_player_ball_own_half"] / (KLASK_PARAMS["decimation"] * KLASK_PARAMS["physics_dt"])
+        weight=0.0
     )
 
     distance_ball_opponent_goal = RewTerm(
@@ -345,7 +379,7 @@ class RewardsCfg:
             "ball_cfg": SceneEntityCfg("ball"),
             "goal": KLASK_PARAMS["opponent_goal"]
         },
-        weight=KLASK_PARAMS["rewards"]["distance_ball_opponent_goal"] / (KLASK_PARAMS["decimation"] * KLASK_PARAMS["physics_dt"])
+        weight=0.0
     )
 
     ball_speed = RewTerm(
@@ -353,7 +387,7 @@ class RewardsCfg:
         params={
             "ball_cfg": SceneEntityCfg("ball"),
         },
-        weight=KLASK_PARAMS["rewards"]["ball_speed"] / (KLASK_PARAMS["decimation"] * KLASK_PARAMS["physics_dt"])
+        weight=0.0
     )
 
     ball_stationary = RewTerm(
@@ -361,7 +395,7 @@ class RewardsCfg:
         params={
             "ball_cfg": SceneEntityCfg("ball"),
         },
-        weight=KLASK_PARAMS["rewards"]["ball_stationary"] / (KLASK_PARAMS["decimation"] * KLASK_PARAMS["physics_dt"])
+        weight=0.0
     )
 
     collision_player_ball = RewTerm(
@@ -370,7 +404,7 @@ class RewardsCfg:
             "player_cfg": SceneEntityCfg("klask", body_names=["Peg_1"]),
             "ball_cfg": SceneEntityCfg("ball"),
         },
-        weight=KLASK_PARAMS["rewards"]["collision_player_ball"] / (KLASK_PARAMS["decimation"] * KLASK_PARAMS["physics_dt"])
+        weight=0.0
     )
 
     ball_in_own_half = RewTerm(
@@ -378,7 +412,7 @@ class RewardsCfg:
         params={
             "ball_cfg": SceneEntityCfg("ball")
         },
-        weight=KLASK_PARAMS["rewards"]["ball_in_own_half"]
+        weight=0.0
     )
 
     
@@ -414,11 +448,6 @@ class TerminationsCfg:
                 "goal": KLASK_PARAMS["player_goal"]
             }
         )
-
-
-@configclass
-class CurriculumCfg:
-    pass
     
 
 @configclass
@@ -434,38 +463,12 @@ class KlaskEnvCfg(ManagerBasedRLEnvCfg):
     events = EventCfg()
     rewards = RewardsCfg()
     terminations = TerminationsCfg()
-    episode_length_s = 5.0
+    episode_length_s = 2.0
 
     def __post_init__(self):
         """Post initialization."""
         # viewer settings
-        self.viewer.eye = (0.0, 0.0, 2.0)
-        self.viewer.lookat = (0.0, 0.0, 0.0)
-        # step settings
-        self.decimation = KLASK_PARAMS['decimation']  # env step every 4 sim steps: 200Hz / 4 = 50Hz
-        # simulation settings
-        self.sim.dt = KLASK_PARAMS['physics_dt']  # sim step every 5ms: 200Hz
-
-
-@configclass
-class KlaskHistoryEnvCfg(ManagerBasedRLEnvCfg):
-    """Configuration for the cartpole environment."""
-
-    sim = SimulationCfg(physx=PhysxCfg(bounce_threshold_velocity=0.0))
-    # Scene settings
-    scene = KlaskSceneCfg(num_envs=1, env_spacing=1.0)
-    # Basic settings
-    observations = ObservationsCfg()
-    actions = ActionsCfg()
-    events = EventCfg()
-    rewards = RewardsCfg()
-    terminations = TerminationsCfg()
-    episode_length_s = 5.0
-
-    def __post_init__(self):
-        """Post initialization."""
-        # viewer settings
-        self.viewer.eye = (0.0, 0.0, 2.0)
+        self.viewer.eye = (0.0, 0.0, 1.0)
         self.viewer.lookat = (0.0, 0.0, 0.0)
         # step settings
         self.decimation = KLASK_PARAMS['decimation']  # env step every 4 sim steps: 200Hz / 4 = 50Hz
@@ -486,7 +489,7 @@ class KlaskGoalEnvCfg(ManagerBasedRLEnvCfg):
     events = EventCfg()
     rewards = RewardsCfg()
     terminations = TerminationsCfg()
-    episode_length_s = 5.0
+    episode_length_s = KLASK_PARAMS["timeout"]
 
     def __post_init__(self):
         """Post initialization."""

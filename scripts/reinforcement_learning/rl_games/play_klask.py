@@ -42,7 +42,6 @@ simulation_app = app_launcher.app
 
 """Rest everything follows."""
 
-
 import gymnasium as gym
 import math
 import os
@@ -67,7 +66,8 @@ from isaaclab_tasks.manager_based.klask import (
     KlaskRandomOpponentWrapper,
     CurriculumWrapper,
     RlGamesGpuEnvSelfPlay,
-    KlaskAgentOpponentWrapper
+    KlaskAgentOpponentWrapper,
+    ObservationNoiseWrapper
 )
 
 def main():
@@ -107,7 +107,7 @@ def main():
     rl_device = agent_cfg["params"]["config"]["device"]
     clip_obs = agent_cfg["params"]["env"].get("clip_observations", math.inf)
     clip_actions = agent_cfg["params"]["env"].get("clip_actions", math.inf)
-
+    
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
     # wrap for video recording
@@ -126,6 +126,8 @@ def main():
     if isinstance(env.unwrapped, DirectMARLEnv):
         env = multi_agent_to_single_agent(env)
 
+    obs_noise = agent_cfg["env"].get("obs_noise", 0.0)
+    env = ObservationNoiseWrapper(env, obs_noise)
     if agent_cfg["params"]["config"].get("self_play", False):
         env = KlaskAgentOpponentWrapper(env)
     else:
@@ -197,7 +199,7 @@ def main():
     #   attempt to have complete control over environment stepping. However, this removes other
     #   operations such as masking that is used for multi-agent learning by RL-Games.
     start_time = time.time()
-    while simulation_app.is_running() and time.time() - start_time < 30.0:
+    while simulation_app.is_running() and time.time() - start_time < 1000.0:
         # run everything in inference mode
         with torch.inference_mode():
             # convert obs to agent format

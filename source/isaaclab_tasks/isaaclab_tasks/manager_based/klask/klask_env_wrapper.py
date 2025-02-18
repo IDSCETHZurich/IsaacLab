@@ -259,6 +259,26 @@ class KlaskTDMPCWrapper(Wrapper):
         return obs.cpu()
     
 
+class ObservationNoiseWrapper(ObservationWrapper):
+
+    def __init__(self, env, noise_std, indices=None):
+        super().__init__(env)
+        self.noise_std = noise_std
+        self.indices = indices
+        if self.indices is None:
+            self.indices = env.unwrapped.single_action_space.shape[-1]
+    
+    def observation(self, observation):
+        if type(observation) is dict:
+            for k, v in observation.items():
+                noise = self.noise_std * torch.randn_like(v)
+                observation[k][:, self.indices] += noise[:, self.indices]
+        else:
+            noise = self.noise_std * torch.randn_like(observation)
+            observation[:, self.indices] += noise[:, self.indices]
+        return observation
+    
+
 class CurriculumWrapper(Wrapper):
 
     def __init__(self, env, cfg, num_steps=None, mode="train"):
@@ -338,11 +358,8 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
 
     def get_opponent_obs(self, obs):
         opponent_obs = obs.detach().clone()
-        opponent_obs *= -1
-        opponent_obs[:, :2] = -obs[:, 2:4]
-        opponent_obs[:, 2:4] = -obs[:, :2]
-        opponent_obs[:, 4:6] = -obs[:, 6:8]
-        opponent_obs[:, 6:8] = -obs[:, 4:6]
+        opponent_obs[:, :4] = -obs[:, 4:8]
+        opponent_obs[:, 4:8] = -obs[:, :4]
         opponent_obs[:, 8:] = -obs[:, 8:]
         return opponent_obs
     
@@ -389,11 +406,8 @@ class KlaskAgentOpponentWrapper(Wrapper):
     
     def get_opponent_obs(self, obs):
         opponent_obs = obs.detach().clone()
-        opponent_obs *= -1
-        opponent_obs[:, :2] = -obs[:, 2:4]
-        opponent_obs[:, 2:4] = -obs[:, :2]
-        opponent_obs[:, 4:6] = -obs[:, 6:8]
-        opponent_obs[:, 6:8] = -obs[:, 4:6]
+        opponent_obs[:, :4] = -obs[:, 4:8]
+        opponent_obs[:, 4:8] = -obs[:, :4]
         opponent_obs[:, 8:] = -obs[:, 8:]
         return opponent_obs
 

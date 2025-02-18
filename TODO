@@ -1,4 +1,4 @@
-isaacsim omni.isaac.sim.kit
+isaacsim isaacsim.exp.full.kit
 
 Implementation:
 - possibly use curriculum manager instead of curriculum wrapper
@@ -18,14 +18,28 @@ Experiments:
 - resets: only timeout / goal scored/conceded, player in goal, timeout
 
 SimToReal:
-- domain randomization: object dimensionss, friction, restitution
+- domain randomization: object dimensions, friction, restitution
 - add noise to observations
 - (action smoothness penalty)
 - delay: include actions from last 200 ms in observations
 - include collision avoidance in sim
 - (model magnetic interaction)
+- how to deal with differences in simulation  and real time step?
 
 Performance:
 - sbx: 22k fps
 - sb3: 23k fps
 - rl_games: 60k fps
+
+Sweep:
+- no sim-to-real (ideal PD actuator, no domain randomization):
+    - collision -> distance to goal + sparse
+    - MLP layers
+    - PPO horizon
+    - random opponent / self-play
+    - action history / no action history
+- sim-to-real:
+    - domain randomization ranges
+    - ideal PD actuator / delayed PD actuator
+    - wall hit penalty
+    - action history / no action history

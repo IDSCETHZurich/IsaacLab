@@ -1,0 +1,3 @@
+Peg x velocity:
+- for sim_dt=0.005: PD actuator moves peg to left or right despite 0.0 action input (or jitter left to right if effort_limit is high) 
+- 

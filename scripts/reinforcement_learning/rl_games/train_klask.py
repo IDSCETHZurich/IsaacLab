@@ -28,6 +28,8 @@ parser.add_argument("--sigma", type=str, default=None, help="The policy's initia
 parser.add_argument("--max_iterations", type=int, default=None, help="RL Policy training iterations.")
 
 parser.add_argument("--config", type=str, default=None, help="config.yaml file, rl_games_cfg_entry_point used when not provided")
+parser.add_argument("--wandb-project-name", type=str, default=None, help="the wandb's project name")
+parser.add_argument("--wandb-entity", type=str, default=None, help="the entity (team) of wandb's project")
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
@@ -76,8 +78,10 @@ from isaaclab_rl.rl_games import RlGamesGpuEnv, RlGamesVecEnvWrapper
 from isaaclab_tasks.manager_based.klask import (
     KlaskRandomOpponentWrapper,
     CurriculumWrapper,
-    RlGamesGpuEnvSelfPlay
+    RlGamesGpuEnvSelfPlay,
+    ObservationNoiseWrapper
 )
+from isaaclab_assets.robots.klask import KLASK_PARAMS
 
 @hydra_task_config(args_cli.task, "rl_games_cfg_entry_point")
 def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agent_cfg: dict):
@@ -128,7 +132,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # logging directory path: <train_dir>/<full_experiment_name>
     agent_cfg["params"]["config"]["train_dir"] = log_root_path
     agent_cfg["params"]["config"]["full_experiment_name"] = log_dir
-
+    
     # dump the configuration into log-directory
     dump_yaml(os.path.join(log_root_path, log_dir, "params", "env.yaml"), env_cfg)
     dump_yaml(os.path.join(log_root_path, log_dir, "params", "agent.yaml"), agent_cfg)
@@ -158,6 +162,8 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     if isinstance(env.unwrapped, DirectMARLEnv):
         env = multi_agent_to_single_agent(env)
 
+    obs_noise = agent_cfg["env"].get("obs_noise", 0.0)
+    env = ObservationNoiseWrapper(env, obs_noise, list(range(12)))
     if not agent_cfg["params"]["config"].get("self_play", False):
         env = KlaskRandomOpponentWrapper(env)
     if "rewards" in agent_cfg.keys():
@@ -187,6 +193,23 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     runner = Runner(IsaacAlgoObserver())
     runner.load(agent_cfg)
 
+    if "env" in agent_cfg.keys():
+        agent_cfg["env"].update(KLASK_PARAMS)
+    else:
+        agent_cfg["env"] = KLASK_PARAMS
+    
+    if args_cli.wandb_project_name is not None:
+        import wandb
+        config = {"agent": agent_cfg, "env": env_cfg.to_dict()}
+        wandb.init(
+            project=args_cli.wandb_project_name,
+            entity=args_cli.wandb_entity,
+            sync_tensorboard=True,
+            config=config,
+            monitor_gym=True,
+            save_code=True,
+        )
+    
     # reset the agent and env
     runner.reset()
     start_time = time.time()
@@ -197,12 +220,18 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         runner.run({"train": True, "play": False, "sigma": train_sigma})
     print(f"Total training time: {time.time() - start_time}")
 
+    if args_cli.wandb_project_name is not None:
+        model = wandb.Artifact("model", type="model")
+        model.add_file(os.path.join(log_root_path, log_dir, "nn", f"{agent_cfg['params']['config']['name']}.pth"))
+        wandb.log_artifact(model)
+        wandb.finish()
+
     # close the simulator
     env.close()
 
 
 if __name__ == "__main__":
     # run the main function
-    main()
+    main()        
     # close sim app
     simulation_app.close()

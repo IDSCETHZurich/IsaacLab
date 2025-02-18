@@ -30,7 +30,7 @@ params:
           val: 0
         fixed_sigma: True
     mlp:
-      units: [32, 32]
+      units: [512, 256, 128]
       activation: elu
       d2rl: False
 
@@ -43,7 +43,7 @@ params:
   load_path: '' # path to the checkpoint to load
 
   config:
-    full_experiment_name: collision_new_delayedPD_15
+    full_experiment_name: collision_new_delayedPD_history_mlp2
     name: klask
     env_name: rlgpu
     device: 'cuda:0'
@@ -64,7 +64,7 @@ params:
     kl_threshold: 0.008
     #score_to_win: 20000
     max_epochs: -1
-    max_frames: 40000000
+    max_frames: 1000000
     save_best_after: 50
     save_frequency: 25
     grad_norm: 1.0

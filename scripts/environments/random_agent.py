@@ -31,9 +31,13 @@ simulation_app = app_launcher.app
 
 import gymnasium as gym
 import torch
+import matplotlib.pyplot as plt
+import time
 
 import isaaclab_tasks  # noqa: F401
 from isaaclab_tasks.utils import parse_env_cfg
+
+from isaaclab_tasks.manager_based.klask import ObservationNoiseWrapper
 
 
 def main():
@@ -44,23 +48,67 @@ def main():
     )
     # create environment
     env = gym.make(args_cli.task, cfg=env_cfg)
+    env = ObservationNoiseWrapper(env, 0.01)
 
     # print info (this is vectorized environment)
     print(f"[INFO]: Gym observation space: {env.observation_space}")
     print(f"[INFO]: Gym action space: {env.action_space}")
     # reset environment
-    env.reset()
-    # simulate environment
-    while simulation_app.is_running():
-        # run everything in inference mode
-        with torch.inference_mode():
-            # sample actions from -1 to 1
-            actions = 2 * torch.rand(env.action_space.shape, device=env.unwrapped.device) - 1
-            # apply actions
-            obs, rew, terminated, truncated, info = env.step(actions)
+    obs, info = env.reset()
 
-    # close the simulator
-    env.close()
+    peg_1_x_pos = []
+    peg_1_x_vel = []
+    peg_1_body_x_pos = []
+    peg_1_body_x_vel = []
+    obs_x_pos = []
+    obs_x_vel = []
+    obs_y_pos = []
+    obs_y_vel = []
+    resting = []
+
+    start_time = time.time()
+    try:
+        # simulate environment
+        dir = "left"
+        stop = False
+        stop_counter = 20
+        step = 0
+        while simulation_app.is_running() and time.time() - start_time < 5.0:
+            # run everything in inference mode
+            with torch.inference_mode():
+                #peg_1_x_pos.append(env.unwrapped.scene.articulations["klask"].data.joint_pos[0, -1].item())
+                #peg_1_x_vel.append(env.unwrapped.scene.articulations["klask"].data.joint_vel[0, -1].item())
+                #peg_1_body_x_pos.append(env.unwrapped.scene.articulations["klask"].data.body_pos_w[0, -1, 0].item())
+                #obs_x_vel.append(env.unwrapped.scene.articulations["klask"].data.body_lin_vel_w[0, -1, 0].item())
+                
+                obs_x_pos.append(obs["policy"][0, 0].item())
+                obs_x_vel.append(obs["policy"][0, 2].item())
+                obs_y_pos.append(obs["policy"][0, 1].item())
+                obs_y_vel.append(obs["policy"][0, 3].item())
+
+                # sample actions from -1 to 1
+                #actions = 2 * torch.rand(env.action_space.shape, device=env.unwrapped.device) - 1
+                actions = torch.zeros(*env.action_space.shape, device=env.unwrapped.device, dtype=float)
+                actions[:, 0] = -1.0
+                
+                # apply actions
+                obs, rew, terminated, truncated, info = env.step(actions)
+
+    finally:
+        # close the simulator
+        env.close()
+        fig, ax = plt.subplots()
+        #ax[0].plot(obs_x_pos, label="Obs x")
+        #ax[0].plot(obs_y_pos, label="Obs y")
+
+        ax.axhline(y=0, color='red', linestyle='--')      
+        ax.plot(obs_x_vel, label="Peg x vel")
+        ax.plot(obs_y_vel, label="Peg y vel")
+        #ax.plot(obs_y_vel, label="Peg y vel")
+        #ax[0].eventplot(events)
+        #ax[0].legend()
+        ax.legend()
+        plt.show()
 
 
 if __name__ == "__main__":
