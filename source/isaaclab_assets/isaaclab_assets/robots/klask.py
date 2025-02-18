@@ -27,7 +27,7 @@ KLASK_PARAMS = {
         "player_in_goal": False
     },
     "domain_randomization": {
-        "use_domain_randomization": True,
+        "use_domain_randomization": False,
         "static_friction_range": (0.1, 0.5),
         "dynamic_friction_range": (0.0, 0.4),
         "restitution_range": (0.7, 0.95),
