@@ -29,6 +29,7 @@ params:
         name: default
       regularizer:
         name: None
+    log_std_bounds: [-5, 2]
 
   load_checkpoint: False # flag which sets whether to load the checkpoint
   load_path: '' # path to the checkpoint to load

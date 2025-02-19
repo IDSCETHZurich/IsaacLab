@@ -67,7 +67,8 @@ from isaaclab_tasks.manager_based.klask import (
     CurriculumWrapper,
     RlGamesGpuEnvSelfPlay,
     KlaskAgentOpponentWrapper,
-    ObservationNoiseWrapper
+    ObservationNoiseWrapper,
+    find_wrapper
 )
 
 def main():
@@ -181,15 +182,6 @@ def main():
         agent.init_rnn()
 
     if agent_cfg["params"]["config"].get("self_play", False):
-        
-        def find_wrapper(env, wrapper_type):
-            """Recursively searches for a wrapper of a given type."""
-            while not isinstance(env, wrapper_type):
-                env = env.env  # Move to the next layer
-            if isinstance(env, wrapper_type):
-                    return env  # Found the wrapper
-            return None  # Wrapper not found
-        
         opponent = runner.create_player()
         opponent.set_weights(agent.get_weights())
         find_wrapper(env, KlaskAgentOpponentWrapper).add_opponent(opponent)

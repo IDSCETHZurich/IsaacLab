@@ -136,15 +136,71 @@ class ObservationsCfg:
         ball_vel_rel = ObsTerm(func=root_lin_xy_vel_w, params={"asset_cfg": SceneEntityCfg(name="ball")})
 
         if KLASK_PARAMS.get("action_history", 0):
-            action_history = ObsTerm(func=mdp.last_action, history_length=KLASK_PARAMS["action_history"])
+            action_history_x = ObsTerm(func=mdp.last_action, params={"action_name": "player_x"}, 
+                                     history_length=KLASK_PARAMS["action_history"])
+            
+            action_history_y = ObsTerm(func=mdp.last_action, params={"action_name": "player_y"}, 
+                                     history_length=KLASK_PARAMS["action_history"])
 
 
         def __post_init__(self) -> None:
             self.enable_corruption = False
             self.concatenate_terms = True
 
+
+    @configclass
+    class OpponentCfg(ObsGroup):
+        """Observations for opponent"""
+
+        # observation terms (order preserved)
+        peg_1_pos = ObsTerm(func=body_xy_pos_w, params={"asset_cfg": SceneEntityCfg(
+            name="klask", 
+            body_names=["Peg_1"]
+        )},)
+        
+        peg_1_x_vel = ObsTerm(func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg(
+            name="klask", 
+            joint_names=["slider_to_peg_1"]
+        )}, )
+
+        peg_1_y_vel = ObsTerm(func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg(
+            name="klask", 
+            joint_names=["ground_to_slider_1"]
+        )}, )
+
+        peg_2_pos = ObsTerm(func=body_xy_pos_w, params={"asset_cfg": SceneEntityCfg(
+            name="klask", 
+            body_names=["Peg_2"],
+        )}, )
+
+        peg_2_x_vel = ObsTerm(func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg(
+            name="klask", 
+            joint_names=["slider_to_peg_2"]
+        )}, )
+
+        peg_2_y_vel = ObsTerm(func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg(
+            name="klask", 
+            joint_names=["ground_to_slider_2"]
+        )}, )
+
+        ball_pos_rel = ObsTerm(func=root_xy_pos_w, params={"asset_cfg": SceneEntityCfg(name="ball")})
+        
+        ball_vel_rel = ObsTerm(func=root_lin_xy_vel_w, params={"asset_cfg": SceneEntityCfg(name="ball")})
+        
+        if KLASK_PARAMS.get("action_history", 0):
+            action_history_x = ObsTerm(func=mdp.last_action, params={"action_name": "opponent_x"}, 
+                                     history_length=KLASK_PARAMS["action_history"])
+            
+            action_history_y = ObsTerm(func=mdp.last_action, params={"action_name": "opponent_y"}, 
+                                     history_length=KLASK_PARAMS["action_history"])
+            
+        def __post_init__(self) -> None:
+            self.enable_corruption = False
+            self.concatenate_terms = True
+
     # observation groups
     policy: PolicyCfg = PolicyCfg()
+    opponent: OpponentCfg = OpponentCfg()
 
 
 @configclass

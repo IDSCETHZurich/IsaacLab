@@ -15,6 +15,15 @@ from isaaclab_rl.sb3 import Sb3VecEnvWrapper, process_sb3_cfg
 from isaaclab.envs import DirectRLEnv, ManagerBasedRLEnv
 
 
+def find_wrapper(env, wrapper_type):
+    """Recursively searches for a wrapper of a given type."""
+    while not isinstance(env, wrapper_type):
+        env = env.env  # Move to the next layer
+    if isinstance(env, wrapper_type):
+            return env  # Found the wrapper
+    return None  # Wrapper not found
+
+
 class KlaskGoalEnvWrapper(Wrapper):
 
     def __init__(self, env):
@@ -76,29 +85,6 @@ class KlaskGoalEnvWrapper(Wrapper):
         cx, cy, r = KLASK_PARAMS["player_goal"]
         distance_ball_opponent_goal = torch.sqrt((observation[:, 8] - cx) ** 2 + (observation[:, 9] - cy) ** 2)
         return self.distance_ball_opponent_goal_weight * distance_ball_opponent_goal
-
-
-class KlaskSimpleEnvWrapper(Wrapper):
-
-    def __init__(self, env):
-        super().__init__(env)
-        
-        self.single_observation_space = self.unwrapped.single_observation_space["observation"]
-        self.single_action_space = self.unwrapped.single_action_space
-        #self.single_action_space = spaces.Box(
-        #    self.unwrapped.single_action_space.low[:2], 
-        #    self.unwrapped.single_action_space.high[:2],
-        #    shape=(2,), 
-        #    dtype=self.unwrapped.single_action_space.dtype
-        #)
-    
-    def step(self, actions, **kwargs):
-        obs, rew, terminated, truncated, info = self.env.step(actions)
-        return obs["observation"], rew, terminated, truncated, info
-    
-    def reset(self, **kwargs):
-        obs, info = self.env.reset()
-        return obs["observation"], info
     
 
 class KlaskRandomOpponentWrapper(Wrapper):
@@ -109,36 +95,11 @@ class KlaskRandomOpponentWrapper(Wrapper):
     
     def reset(self, *args, **kwargs):
         return self.env.reset(*args, **kwargs)
-    
-
-class OpponentObservationWrapper(ObservationWrapper):
-
-    def observation(self, observation):
-        if isinstance(observation, torch.Tensor):
-            obs_opponent = observation.detach().clone()
-        else:
-            obs_opponent = observation.copy()
-        if type(obs_opponent) is dict:
-            obs_opponent["observation"] *= -1
-            obs_opponent["achieved_goal"] *= -1
-            obs_opponent["observation"][:, :2] = -observation["observation"][:, 2:4]
-            obs_opponent["observation"][:, 2:4] = -observation["observation"][:, :2]
-            obs_opponent["observation"][:, 4:6] = -observation["observation"][:, 6:8]
-            obs_opponent["observation"][:, 6:8] = -observation["observation"][:, 4:6]
-        
-        else:
-            obs_opponent *= -1
-            obs_opponent[:, :2] = -observation[:, 2:4]
-            obs_opponent[:, 2:4] = -observation[:, :2]
-            obs_opponent[:, 4:6] = -observation[:, 6:8]
-            obs_opponent[:, 6:8] = -observation[:, 4:6]
-
-        return {"player": observation, "opponent": obs_opponent}
 
 
 class KlaskSb3VecEnvWrapper(Sb3VecEnvWrapper):
     
-    def __init__(self, env: KlaskGoalEnvWrapper | KlaskSimpleEnvWrapper):
+    def __init__(self, env: KlaskGoalEnvWrapper):
         """Initialize the wrapper.
 
         Args:
@@ -188,75 +149,6 @@ class KlaskSb3VecEnvWrapper(Sb3VecEnvWrapper):
         else:
             raise NotImplementedError(f"Unsupported data type: {type(obs)}")
         return obs
-        
-
-class KlaskSingleEnvWrapper(Wrapper):
-
-    def __init__(self, env: ManagerBasedRLEnv, single_player=True):
-        super().__init__(env)
-        self.single_player = single_player
-        assert env.unwrapped.num_envs == 1
-        if single_player:
-            self._action_space = spaces.Box(
-                self.unwrapped.single_action_space.low[:2], 
-                self.unwrapped.single_action_space.high[:2],
-                shape=(2,), 
-                dtype=self.unwrapped.single_action_space.dtype
-            )
-        else:
-            self._action_space = self.unwrapped.single_action_space
-
-    def step(self, actions):
-        actions = torch.from_numpy(actions).unsqueeze(0)
-        if self.single_player:
-            opponent_actions = 20.0 * (2 * torch.rand(actions.shape, device=actions.device) - 1)
-            actions = torch.cat([actions, opponent_actions], dim=-1)
-        obs, rew, terminated, truncated, info = self.env.step(actions)
-        terminated = terminated[0] | truncated[0]
-        if type(obs) is dict:
-            if 'observation' in obs.keys():
-                obs = obs['observation']
-            else:
-                obs = obs['policy']
-        return obs[0].cpu().numpy(), rew[0].cpu().numpy(), terminated.cpu().numpy(), info
-    
-    def reset(self):
-        obs, _ = self.env.reset()
-        if type(obs) is dict:
-            if 'observation' in obs.keys():
-                obs = obs['observation']
-            else:
-                obs = obs['policy']
-        return obs[0].cpu().numpy()
-    
-
-class KlaskTDMPCWrapper(Wrapper):
-
-    def __init__(self, env: ManagerBasedRLEnv, single_player=True):
-        super().__init__(env)
-        self.single_player = single_player
-    
-    def step(self, actions):
-        if self.single_player:
-            opponent_actions = 2 * torch.rand(actions.shape, device=actions.device) - 1
-            actions = torch.cat([actions, opponent_actions], dim=-1)
-        obs, rew, terminated, truncated, info = self.env.step(actions)
-        terminated = terminated | truncated
-        if type(obs) is dict:
-            if 'observation' in obs.keys():
-                obs = obs['observation']
-            else:
-                obs = obs['policy']
-        return obs.cpu(), rew.cpu(), terminated, info
-    
-    def reset(self):
-        obs, _ = self.env.reset()
-        if type(obs) is dict:
-            if 'observation' in obs.keys():
-                return obs['observation'].cpu()
-            else:
-                return obs['policy'].cpu()
-        return obs.cpu()
     
 
 class ObservationNoiseWrapper(ObservationWrapper):
@@ -312,40 +204,27 @@ class CurriculumWrapper(Wrapper):
                     self.env.unwrapped.reward_manager._term_cfgs[term_idx].weight += weight_step
         
         return self.env.step(actions)
-
-
-class RewardShapingWrapper(Wrapper):
-    def __init__(self, env, potential_function, gamma=0.99):
-        super().__init__(env)
-        self.potential_function = potential_function
-        self.gamma = gamma
-        self.prev_state = None
-
-    def reset(self, **kwargs):
-        # Reset the environment and store the initial state
-        state = self.env.reset(**kwargs)
-        self.prev_state = state
-        return state
-
-    def step(self, action):
-        # Take a step in the environment
-        next_state, original_reward, terminated, truncated, info = self.env.step(action)
-        
-        # Calculate potential-based shaping reward
-        current_potential = self.potential_function(next_state)
-        if self.prev_state is not None:
-            prev_potential = self.potential_function(self.prev_state)
-            shaping_reward = self.gamma * current_potential - prev_potential
-        else:
-            shaping_reward = 0  # No shaping reward for the first step
-
-        # Update the previous state
-        self.prev_state = next_state
-
-        # Combine the original reward with the shaping reward
-        total_reward = original_reward + shaping_reward
-        return next_state, total_reward, terminated, truncated, info    
                   
+
+class OpponentObservationWrapper(Wrapper):
+
+    def get_opponent_obs(self, obs):
+        opponent_obs = obs.detach().clone()
+        opponent_obs[:, :4] = -obs[:, 4:8]
+        opponent_obs[:, 4:8] = -obs[:, :4]
+        opponent_obs[:, 8:12] = -obs[:, 8:12]
+        return opponent_obs
+    
+    def reset(self):
+        obs_dict, extras = self.env.reset()
+        self.opponent_obs = self.get_opponent_obs(obs_dict["opponent"])
+        return obs_dict, extras
+    
+    def step(self, actions):
+        obs_dict, rew, terminated, truncated, extras = self.env.step(actions)
+        self.opponent_obs = self.get_opponent_obs(obs_dict["opponent"])
+        return obs_dict, rew, terminated, truncated, extras 
+
 
 class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
 
@@ -355,19 +234,13 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
         self.is_deterministic = is_deterministic
         self.sum_rewards = 0
         super().__init__(config_name, num_actors, **kwargs)
-
-    def get_opponent_obs(self, obs):
-        opponent_obs = obs.detach().clone()
-        opponent_obs[:, :4] = -obs[:, 4:8]
-        opponent_obs[:, 4:8] = -obs[:, :4]
-        opponent_obs[:, 8:] = -obs[:, 8:]
-        return opponent_obs
     
     def reset(self):
         if self.agent == None:
             self.create_agent()
         obs = self.env.reset()
-        self.opponent_obs = self.get_opponent_obs(obs)
+        #self.opponent_obs = self.get_opponent_obs(obs)
+        self.opponent_obs = find_wrapper(self.env, OpponentObservationWrapper).opponent_obs
         self.sum_rewards = 0
         return obs
 
@@ -385,7 +258,8 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
         opponent_action = self.agent.get_action(opponent_obs, self.is_deterministic)
         action[:, 2:] = -opponent_action[:, :2]
         obs, reward, dones, info = self.env.step(action, *args, **kwargs)
-        self.opponent_obs = self.get_opponent_obs(obs)
+        #self.opponent_obs = self.get_opponent_obs(obs)
+        self.opponent_obs = find_wrapper(self.env, OpponentObservationWrapper).opponent_obs
         return obs, reward, dones, info
     
     def set_weights(self, indices, weigths):
@@ -408,12 +282,12 @@ class KlaskAgentOpponentWrapper(Wrapper):
         opponent_obs = obs.detach().clone()
         opponent_obs[:, :4] = -obs[:, 4:8]
         opponent_obs[:, 4:8] = -obs[:, :4]
-        opponent_obs[:, 8:] = -obs[:, 8:]
+        opponent_obs[:, 8:12] = -obs[:, 8:12]
         return opponent_obs
 
     def reset(self, *args, **kwargs):
         obs, info = self.env.reset(*args, **kwargs)
-        self.opponent_obs = self.get_opponent_obs(obs["policy"])
+        self.opponent_obs = self.get_opponent_obs(obs["opponent"])
         return obs, info
     
     def step(self, action, *args, **kwargs):
@@ -421,6 +295,6 @@ class KlaskAgentOpponentWrapper(Wrapper):
         opponent_action = self.opponent.get_action(opponent_obs, self.is_deterministic)
         action[:, 2:] = -opponent_action[:, :2]
         obs, reward, terminated, truncated, info = self.env.step(action, *args, **kwargs)
-        self.opponent_obs = self.get_opponent_obs(obs["policy"])
+        self.opponent_obs = self.get_opponent_obs(obs["opponent"])
         return obs, reward, terminated, truncated, info
-    
+        

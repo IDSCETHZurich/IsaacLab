@@ -159,8 +159,6 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     #env = KlaskGoalEnvWrapper(env)
     if use_her:
         env = KlaskGoalEnvWrapper(env)
-    #else:
-    #    env = KlaskSimpleEnvWrapper(env)
     env = KlaskRandomOpponentWrapper(env)
     if "rewards" in agent_cfg.keys():
         env = CurriculumWrapper(env, agent_cfg["rewards"])

@@ -80,7 +80,8 @@ from isaaclab_tasks.manager_based.klask import (
     KlaskRandomOpponentWrapper,
     CurriculumWrapper,
     RlGamesGpuEnvSelfPlay,
-    ObservationNoiseWrapper
+    ObservationNoiseWrapper,
+    OpponentObservationWrapper
 )
 from isaaclab_assets.robots.klask import KLASK_PARAMS
 
@@ -174,7 +175,9 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         env = KlaskRandomOpponentWrapper(env)
     if "rewards" in agent_cfg.keys():
         env = CurriculumWrapper(env, agent_cfg["rewards"], agent_cfg["params"]["config"]["max_frames"] / env_cfg.scene.num_envs)
-
+    if agent_cfg["params"]["config"].get("self_play", False):
+        env = OpponentObservationWrapper(env)
+    
     # wrap around environment for rl-games
     env = RlGamesVecEnvWrapper(env, rl_device, clip_obs, clip_actions)
 
