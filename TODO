@@ -43,3 +43,10 @@ Sweep:
     - ideal PD actuator / delayed PD actuator
     - wall hit penalty
     - action history / no action history
+
+
+ACTUATOR MODEL:
+- dataloader:
+    - inputs: history of commands (+ states) + delta_t; window [t-300ms, t] or [t-300ms, t-200ms]
+    - outputs: peg velocity at time t
+    - interpolation: randomly select points inbetween timestamps and linearly interpolate states (use nearest command)
