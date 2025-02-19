@@ -33,6 +33,7 @@ import gymnasium as gym
 import torch
 import matplotlib.pyplot as plt
 import time
+import numpy as np
 
 import isaaclab_tasks  # noqa: F401
 from isaaclab_tasks.utils import parse_env_cfg
@@ -73,14 +74,15 @@ def main():
         stop = False
         stop_counter = 20
         step = 0
-        while simulation_app.is_running() and time.time() - start_time < 5.0:
+        max_steps = 20
+        while simulation_app.is_running() and time.time() - start_time < 1000.0 and step < max_steps:
             # run everything in inference mode
             with torch.inference_mode():
                 #peg_1_x_pos.append(env.unwrapped.scene.articulations["klask"].data.joint_pos[0, -1].item())
                 #peg_1_x_vel.append(env.unwrapped.scene.articulations["klask"].data.joint_vel[0, -1].item())
                 #peg_1_body_x_pos.append(env.unwrapped.scene.articulations["klask"].data.body_pos_w[0, -1, 0].item())
                 #obs_x_vel.append(env.unwrapped.scene.articulations["klask"].data.body_lin_vel_w[0, -1, 0].item())
-                
+                            
                 obs_x_pos.append(obs["policy"][0, 0].item())
                 obs_x_vel.append(obs["policy"][0, 2].item())
                 obs_y_pos.append(obs["policy"][0, 1].item())
@@ -89,10 +91,11 @@ def main():
                 # sample actions from -1 to 1
                 #actions = 2 * torch.rand(env.action_space.shape, device=env.unwrapped.device) - 1
                 actions = torch.zeros(*env.action_space.shape, device=env.unwrapped.device, dtype=float)
-                actions[:, 0] = -1.0
+                actions[:, 0] = 1.0
                 
                 # apply actions
                 obs, rew, terminated, truncated, info = env.step(actions)
+                step += 1
 
     finally:
         # close the simulator
@@ -100,6 +103,10 @@ def main():
         fig, ax = plt.subplots()
         #ax[0].plot(obs_x_pos, label="Obs x")
         #ax[0].plot(obs_y_pos, label="Obs y")
+
+        print("Velocity reached at step:")
+        #print(np.argwhere(np.abs(np.array(obs_x_vel) - 1.0 ) < 0.01)[0])
+        print(obs_x_vel)
 
         ax.axhline(y=0, color='red', linestyle='--')      
         ax.plot(obs_x_vel, label="Peg x vel")
