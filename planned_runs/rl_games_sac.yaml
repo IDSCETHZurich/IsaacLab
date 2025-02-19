@@ -1,0 +1,100 @@
+params:
+  seed: 42
+
+  # environment wrapper clipping
+  env:
+    # added to the wrapper
+    clip_observations: 5.0
+    # can make custom wrapper?
+    clip_actions: 1.0
+
+  algo:
+    name: sac
+
+  model:
+    name: soft_actor_critic
+
+  # doesn't have this fine grained control but made it close
+  network:
+    name: soft_actor_critic
+    separate: True
+    space:
+      continuous:
+    mlp:
+      units: [64, 54]
+      activation: elu
+      d2rl: False
+
+      initializer:
+        name: default
+      regularizer:
+        name: None
+
+  load_checkpoint: False # flag which sets whether to load the checkpoint
+  load_path: '' # path to the checkpoint to load
+
+  config:
+    full_experiment_name: test
+    name: klask
+    env_name: rlgpu
+    device: 'cuda:0'
+    device_name: 'cuda:0'
+    multi_gpu: False
+    ppo: False
+    mixed_precision: False
+    normalize_input: False
+    normalize_value: False
+    num_actors: -1  # configured from the script (based on num_envs)
+    reward_shaper:
+      scale_value: 1.0
+    normalize_advantage: False
+    gamma: 0.99
+    tau : 0.95
+    learning_rate: 3e-4
+    lr_schedule: adaptive
+    kl_threshold: 0.008
+    #score_to_win: 20000
+    max_epochs: -1
+    max_frames: !!int 10_000_000
+    save_best_after: 50
+    save_frequency: 25
+    grad_norm: 1.0
+    entropy_coef: 0.0
+    truncate_grads: True
+    e_clip: 0.2
+    horizon_length: 16
+    batch_size: 4096
+    mini_epochs: 8
+    critic_coef: 4
+    clip_value: True
+    seq_length: 4
+    bounds_loss_coef: 0.0001
+    
+    # SAC Params:
+    num_warmup_steps: 10
+    critic_tau: 0.005
+    init_alpha: 1.0
+    learnable_temperature: True
+    replay_buffer_size: 1000000
+    actor_lr: 0.0005
+    critic_lr: 0.0005
+    alpha_lr: 0.005
+
+    self_play: False
+    #self_play_config:
+      #update_score: -100.0
+      #games_to_check: 1
+      #env_update_num: 4096
+
+env:
+  obs_noise: 0.0
+
+rewards:
+  player_in_goal: !!float -10.0
+  goal_scored: !!float 10.0
+  goal_conceded: !!float -10.0
+  distance_ball_opponent_goal: !!float 0.0
+  ball_speed: !!float 0.0
+  distance_player_ball_own_half: !!float 0.0
+  ball_stationary: !!float 0.0
+  collision_player_ball: !!float 1.0
