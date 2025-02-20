@@ -22,9 +22,9 @@ KLASK_PARAMS = {
     "ball_mass_initial": 0.002,
     "max_ball_vel": 5.0,    # maximum speed the ball may have for a goal to be counted
     "terminations": {
-        "goal_scored": False,
-        "goal_conceded": False,
-        "player_in_goal": False
+        "goal_scored": True,
+        "goal_conceded": True,
+        "player_in_goal": True
     },
     "domain_randomization": {
         "use_domain_randomization": False,
