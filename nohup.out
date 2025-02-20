@@ -1,0 +1,2199 @@
+2025-02-18 20:02:50.104787: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1739905370.115878  474425 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1739905370.119263  474425 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-02-18 20:02:50.131823: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+DEBUG:2025-02-18 20:02:50,797:jax._src.path:31: etils.epath found. Using etils.epath for file I/O.
+[Warning] [simulation_app.simulation_app] Modules: ['omni.kit_app'] were loaded before SimulationApp was started and might not be loaded correctly.
+[Warning] [simulation_app.simulation_app] Please check to make sure no extra omniverse or pxr modules are imported before the call to SimulationApp(...)
+Loading user config located at: '/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/omni/data/Kit/Isaac-Sim/4.5/user.config.json'
+[Info] [carb] Logging to file: /home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/omni/logs/Kit/Isaac-Sim/4.5/kit_20250218_200246.log
+2025-02-18 19:02:46 [0ms] [Warning] [omni.kit.app.plugin] No crash reporter present, dumps uploading isn't available.
+2025-02-18 19:02:46 [142ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2025-02-18 19:02:46 [281ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
+2025-02-18 19:02:47 [453ms] [Warning] [omni.datastore] OmniHub is inaccessible
+2025-02-18 19:02:47 [529ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 560.28.03     | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 4090          | Yes: 0 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 77773d38.. |
+|     |                                  |        |     |            | 1         |            |
+|---------------------------------------------------------------------------------------------|
+| 1   | NVIDIA GeForce RTX 4090          | Yes: 1 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | e872ee4d.. |
+|     |                                  |        |     |            | 2d        |            |
+|---------------------------------------------------------------------------------------------|
+| 2   | NVIDIA GeForce RTX 4090          | Yes: 2 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 693155e8.. |
+|     |                                  |        |     |            | 41        |            |
+|---------------------------------------------------------------------------------------------|
+| 3   | NVIDIA GeForce RTX 4090          | Yes: 3 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 2b4da82c.. |
+|     |                                  |        |     |            | 61        |            |
+|=============================================================================================|
+| OS: 22.04.5 LTS (Jammy Jellyfish) ubuntu, Version: 22.04.5, Kernel: 6.8.0-49-generic
+| Processor: AMD Ryzen Threadripper PRO 5995WX 64-Cores
+| Cores: 64 | Logical Cores: 128
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 515572 | Free Memory: 503910
+| Total Page/Swap (MB): 2047 | Free Page/Swap: 2047
+|---------------------------------------------------------------------------------------------|
+2025-02-18 19:02:53 [6,832ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2025-02-18 19:02:53 [6,832ms] [Warning] [gpu.foundation.plugin] Detected IOMMU is enabled. Running CUDA peer-to-peer bandwidth and latency validation.
+Uni[INFO][AppLauncher]: Loading experience file: /home/student/klask_rl/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO]: Parsing configuration from: <class 'isaaclab_tasks.manager_based.klask.klask_env_cfg.KlaskEnvCfg'>
+[INFO]: Parsing configuration from: /home/student/klask_rl/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/manager_based/klask/agents/rl_games_ppo_cfg.yaml
+directional P2P=Enabled Bandwidth (P2P Writes) Matrix (GB/s)
+   D\D     0      1      2      3 
+     0 912.14  22.29  21.87  22.05 
+     1  22.15 923.46  22.30  22.13 
+     2  22.32  22.35 921.29  22.16 
+     3  22.31  22.20  22.41 923.46 
+P2P=Enabled Latency (P2P Writes) Matrix (us)
+   GPU     0      1      2      3 
+     0   1.37  14.13  13.92  15.28 
+     1  11.50   1.39  15.20  11.50 
+     2  13.09  11.18   1.46  10.26 
+     3  13.49  17.41  19.37   1.38 
+
+   CPU     0      1      2      3 
+     0   2.18   6.91   6.38   6.26 
+     1   6.92   2.05   6.29   6.08 
+     2   6.56   6.41   1.88   5.91 
+     3   6.43   6.29   6.94   2.08 
+2025-02-18 19:02:54 [7,363ms] [Warning] [gpu.foundation.plugin] CUDA peer-to-peer observed bandwidth: 21.9 GB/s.
+2025-02-18 19:02:54 [7,363ms] [Warning] [gpu.foundation.plugin] CUDA peer-to-peer observed latency: 19.4 us.
+2025-02-18 19:02:54 [7,363ms] [Warning] [gpu.foundation.plugin] Please verify if observed bandwidth and latency are expected.
+2025-02-18 19:02:54 [8,112ms] [Warning] [isaaclab.envs.manager_based_env] The render interval (1) is smaller than the decimation (20). Multiple render calls will happen for each environment step. If this is not intended, set the render interval to be equal to the decimation.
+2025-02-18 19:02:54 [8,214ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPreviewSurface.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:02:54 [8,215ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdUVTexture.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:02:54 [8,215ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:02:54 [8,215ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float2.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:02:54 [8,215ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float3.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:02:54 [8,215ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float4.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:02:54 [8,215ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_int.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:02:54 [8,215ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_string.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:02:54 [8,216ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_normal.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:02:54 [8,216ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_point.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:02:54 [8,216ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_vector.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:02:54 [8,216ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_matrix.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:02:54 [8,216ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdTransform2d.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+Traceback (most recent call last):
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/asset_base.py", line 94, in <lambda>
+    lambda event, obj=weakref.proxy(self): obj._initialize_callback(event),
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/asset_base.py", line 265, in _initialize_callback
+    self._initialize_impl()
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/articulation/articulation.py", line 1136, in _initialize_impl
+    self._validate_cfg()
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/articulation/articulation.py", line 1465, in _validate_cfg
+    raise ValueError(msg)
+ValueError: The following joints have default positions out of the limits: 
+	- 'ground_to_slider_2': 0.000 not in [0.020, 0.210]
+	- 'ground_to_slider_1': 0.000 not in [-0.210, -0.020]
+
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/wandb/sdk/internal/internal_api.py:13: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+  from pkg_resources import parse_version
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/pkg_resources/__init__.py:3142: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google')`.
+Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+  declare_namespace(pkg)
+wandb: Currently logged in as: schulzj (idsc-rda). Use `wandb login --relogin` to force relogin
+[INFO] Logging experiment in directory: /home/student/klask_rl/IsaacLab/logs/rl_games/klask
+Setting seed: 42
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 42
+	Physics step-size     : 0.001
+	Rendering step-size   : 0.001
+	Environment step-size : 0.02
+[INFO]: Time taken for scene creation : 0.669874 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 4096
+	Environment spacing   : 1.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Time taken for simulation start : 1.809893 seconds
+[INFO] Command Manager:  <CommandManager> contains 0 active terms.
++------------------------+
+|  Active Command Terms  |
++--------+-------+-------+
+| Index  | Name  |  Type |
++--------+-------+-------+
++--------+-------+-------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++---------------------+
+| Active Recorder Terms |
++-----------+---------+
+|   Index   | Name    |
++-----------+---------+
++-----------+---------+
+
+[INFO] Action Manager:  <ActionManager> contains 4 active terms.
++-----------------------------------+
+|   Active Action Terms (shape: 4)  |
++--------+-------------+------------+
+| Index  | Name        |  Dimension |
++--------+-------------+------------+
+|   0    | player_x    |          1 |
+|   1    | player_y    |          1 |
+|   2    | opponent_x  |          1 |
+|   3    | opponent_y  |          1 |
++--------+-------------+------------+
+
+[INFO] Observation Manager: <ObservationManager> contains 1 groups.
++-------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (12,)) |
++-------------+---------------------------+-------------+
+|    Index    | Name                      |    Shape    |
++-------------+---------------------------+-------------+
+|      0      | peg_1_pos                 |     (2,)    |
+|      1      | peg_1_x_vel               |     (1,)    |
+|      2      | peg_1_y_vel               |     (1,)    |
+|      3      | peg_2_pos                 |     (2,)    |
+|      4      | peg_2_x_vel               |     (1,)    |
+|      5      | peg_2_y_vel               |     (1,)    |
+|      6      | ball_pos_rel              |     (2,)    |
+|      7      | ball_vel_rel              |     (2,)    |
++-------------+---------------------------+-------------+
+
+[INFO] Event Manager:  <EventManager> contains 1 active terms.
++--------------------------------------+
+| Active Event Terms in Mode: 'reset'  |
++--------+-----------------------------+
+| Index  | Name                        |
++--------+-----------------------------+
+|   0    | add_ball_mass               |
+|   1    | randomize_material_ball     |
+|   2    | randomize_material_klask    |
+|   3    | randomize_actuator          |
+|   4    | reset_x_position_peg_1      |
+|   5    | reset_x_position_peg_2      |
+|   6    | reset_y_position_peg_1      |
+|   7    | reset_y_position_peg_2      |
+|   8    | reset_ball_position         |
++--------+-----------------------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 1 active terms.
++-----------------------------+
+|   Active Termination Terms  |
++-------+----------+----------+
+| Index | Name     | Time Out |
++-------+----------+----------+
+|   0   | time_out |   True   |
++-------+----------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 10 active terms.
++------------------------------------------------+
+|              Active Reward Terms               |
++-------+-------------------------------+--------+
+| Index | Name                          | Weight |
++-------+-------------------------------+--------+
+|   0   | player_in_goal                |    0.0 |
+|   1   | goal_scored                   |    0.0 |
+|   2   | goal_conceded                 |    0.0 |
+|   3   | distance_player_ball          |    0.0 |
+|   4   | distance_player_ball_own_half |    0.0 |
+|   5   | distance_ball_opponent_goal   |    0.0 |
+|   6   | ball_speed                    |    0.0 |
+|   7   | ball_stationary               |    0.0 |
+|   8   | collision_player_ball         |    0.0 |
+|   9   | ball_in_own_half              |    0.0 |
++-------+-------------------------------+--------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 0 active terms.
++----------------------+
+| Active Curriculum Terms |
++-----------+----------+
+|   Index   | Name     |
++-----------+----------+
++-----------+----------+
+
+[INFO]: Completed setting up the environment...
+self.seed = 42
+wandb: wandb version 0.19.6 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.12.21
+wandb: Run data is saved locally in /home/student/klask_rl/IsaacLab/wandb/run-20250218_200257-ptk5ixgp
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run fine-shape-14
+wandb: ⭐️ View project at https://wandb.ai/idsc-rda/Isaac-Klask
+wandb: 🚀 View run at https://wandb.ai/idsc-rda/Isaac-Klask/runs/ptk5ixgp
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/common/a2c_common.py:254: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = torch.cuda.amp.GradScaler(enabled=self.mixed_precision)
+/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/envs/mdp/events.py:324: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  global_indices = torch.tensor(actuator.joint_indices, device=asset.device)
+2025-02-18 20:03:07.184937: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1739905387.201232  475168 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1739905387.206261  475168 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/a2c_continuous.py:106: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=self.mixed_precision):
+Started to train
+Exact experiment name requested from command line: s2r_collision_ro_a0_2
+seq_length: 4
+current training device: cuda:0
+build mlp: 12
+fps step: 22098 fps step and policy inference: 21439 fps total: 17372 epoch: 1 frames: 0/20000000
+fps step: 20745 fps step and policy inference: 20648 fps total: 17460 epoch: 2 frames: 65536/20000000
+fps step: 20373 fps step and policy inference: 20282 fps total: 17265 epoch: 3 frames: 131072/20000000
+fps step: 20146 fps step and policy inference: 20058 fps total: 17114 epoch: 4 frames: 196608/20000000
+fps step: 20043 fps step and policy inference: 19954 fps total: 17010 epoch: 5 frames: 262144/20000000
+fps step: 20260 fps step and policy inference: 20171 fps total: 17175 epoch: 6 frames: 327680/20000000
+fps step: 18788 fps step and policy inference: 18707 fps total: 16098 epoch: 7 frames: 393216/20000000
+fps step: 19762 fps step and policy inference: 19670 fps total: 16777 epoch: 8 frames: 458752/20000000
+fps step: 19475 fps step and policy inference: 19385 fps total: 16598 epoch: 9 frames: 524288/20000000
+fps step: 19581 fps step and policy inference: 19493 fps total: 16679 epoch: 10 frames: 589824/20000000
+fps step: 19574 fps step and policy inference: 19485 fps total: 16654 epoch: 11 frames: 655360/20000000
+fps step: 19624 fps step and policy inference: 19535 fps total: 16883 epoch: 12 frames: 720896/20000000
+fps step: 20266 fps step and policy inference: 20166 fps total: 17096 epoch: 13 frames: 786432/20000000
+fps step: 20033 fps step and policy inference: 19941 fps total: 16991 epoch: 14 frames: 851968/20000000
+fps step: 19200 fps step and policy inference: 19115 fps total: 16392 epoch: 15 frames: 917504/20000000
+fps step: 19186 fps step and policy inference: 19102 fps total: 16347 epoch: 16 frames: 983040/20000000
+fps step: 19178 fps step and policy inference: 19093 fps total: 16365 epoch: 17 frames: 1048576/20000000
+fps step: 19177 fps step and policy inference: 19092 fps total: 16364 epoch: 18 frames: 1114112/20000000
+fps step: 19444 fps step and policy inference: 19353 fps total: 16562 epoch: 19 frames: 1179648/20000000
+fps step: 20364 fps step and policy inference: 20269 fps total: 17215 epoch: 20 frames: 1245184/20000000
+fps step: 19021 fps step and policy inference: 18937 fps total: 16097 epoch: 21 frames: 1310720/20000000
+fps step: 19007 fps step and policy inference: 18923 fps total: 16224 epoch: 22 frames: 1376256/20000000
+fps step: 19064 fps step and policy inference: 18980 fps total: 16272 epoch: 23 frames: 1441792/20000000
+fps step: 19305 fps step and policy inference: 19219 fps total: 16459 epoch: 24 frames: 1507328/20000000
+fps step: 18694 fps step and policy inference: 18610 fps total: 15994 epoch: 25 frames: 1572864/20000000
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/last_klask_ep_25_rew_6.412289.pth'
+fps step: 21062 fps step and policy inference: 20966 fps total: 17684 epoch: 26 frames: 1638400/20000000
+fps step: 19098 fps step and policy inference: 19014 fps total: 16307 epoch: 27 frames: 1703936/20000000
+fps step: 18965 fps step and policy inference: 18881 fps total: 16209 epoch: 28 frames: 1769472/20000000
+fps step: 18944 fps step and policy inference: 18861 fps total: 16035 epoch: 29 frames: 1835008/20000000
+fps step: 19031 fps step and policy inference: 18948 fps total: 16233 epoch: 30 frames: 1900544/20000000
+fps step: 19093 fps step and policy inference: 19009 fps total: 16292 epoch: 31 frames: 1966080/20000000
+fps step: 20482 fps step and policy inference: 20382 fps total: 17300 epoch: 32 frames: 2031616/20000000
+fps step: 19147 fps step and policy inference: 19063 fps total: 16336 epoch: 33 frames: 2097152/20000000
+fps step: 19021 fps step and policy inference: 18938 fps total: 16090 epoch: 34 frames: 2162688/20000000
+fps step: 19066 fps step and policy inference: 18982 fps total: 16212 epoch: 35 frames: 2228224/20000000
+fps step: 19062 fps step and policy inference: 18979 fps total: 16259 epoch: 36 frames: 2293760/20000000
+fps step: 19112 fps step and policy inference: 19027 fps total: 16280 epoch: 37 frames: 2359296/20000000
+fps step: 19894 fps step and policy inference: 19799 fps total: 16866 epoch: 38 frames: 2424832/20000000
+fps step: 19541 fps step and policy inference: 19452 fps total: 16488 epoch: 39 frames: 2490368/20000000
+fps step: 18998 fps step and policy inference: 18915 fps total: 16132 epoch: 40 frames: 2555904/20000000
+fps step: 18890 fps step and policy inference: 18807 fps total: 16127 epoch: 41 frames: 2621440/20000000
+fps step: 19016 fps step and policy inference: 18932 fps total: 16229 epoch: 42 frames: 2686976/20000000
+fps step: 19000 fps step and policy inference: 18917 fps total: 16217 epoch: 43 frames: 2752512/20000000
+fps step: 19190 fps step and policy inference: 19102 fps total: 16341 epoch: 44 frames: 2818048/20000000
+fps step: 20061 fps step and policy inference: 19968 fps total: 16832 epoch: 45 frames: 2883584/20000000
+fps step: 18894 fps step and policy inference: 18812 fps total: 16121 epoch: 46 frames: 2949120/20000000
+fps step: 18879 fps step and policy inference: 18797 fps total: 16122 epoch: 47 frames: 3014656/20000000
+fps step: 18941 fps step and policy inference: 18858 fps total: 16167 epoch: 48 frames: 3080192/20000000
+fps step: 19019 fps step and policy inference: 18936 fps total: 16110 epoch: 49 frames: 3145728/20000000
+fps step: 18586 fps step and policy inference: 18502 fps total: 15912 epoch: 50 frames: 3211264/20000000
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/last_klask_ep_50_rew_9.315533.pth'
+saving next best rewards:  [9.315533]
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/klask.pth'
+fps step: 20850 fps step and policy inference: 20756 fps total: 17553 epoch: 51 frames: 3276800/20000000
+fps step: 18891 fps step and policy inference: 18809 fps total: 16129 epoch: 52 frames: 3342336/20000000
+fps step: 18854 fps step and policy inference: 18773 fps total: 16270 epoch: 53 frames: 3407872/20000000
+fps step: 18980 fps step and policy inference: 18897 fps total: 16375 epoch: 54 frames: 3473408/20000000
+fps step: 18939 fps step and policy inference: 18856 fps total: 16429 epoch: 55 frames: 3538944/20000000
+fps step: 19010 fps step and policy inference: 18926 fps total: 16410 epoch: 56 frames: 3604480/20000000
+fps step: 20304 fps step and policy inference: 20206 fps total: 17378 epoch: 57 frames: 3670016/20000000
+saving next best rewards:  [9.536703]
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/klask.pth'
+fps step: 19031 fps step and policy inference: 18953 fps total: 16401 epoch: 58 frames: 3735552/20000000
+fps step: 18942 fps step and policy inference: 18858 fps total: 16397 epoch: 59 frames: 3801088/20000000
+fps step: 18908 fps step and policy inference: 18826 fps total: 16338 epoch: 60 frames: 3866624/20000000
+fps step: 19018 fps step and policy inference: 18934 fps total: 16429 epoch: 61 frames: 3932160/20000000
+fps step: 19094 fps step and policy inference: 19010 fps total: 16477 epoch: 62 frames: 3997696/20000000
+fps step: 19812 fps step and policy inference: 19717 fps total: 16996 epoch: 63 frames: 4063232/20000000
+saving next best rewards:  [9.553388]
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/klask.pth'
+fps step: 19512 fps step and policy inference: 19429 fps total: 16759 epoch: 64 frames: 4128768/20000000
+fps step: 18982 fps step and policy inference: 18900 fps total: 16365 epoch: 65 frames: 4194304/20000000
+fps step: 18972 fps step and policy inference: 18888 fps total: 16401 epoch: 66 frames: 4259840/20000000
+fps step: 19064 fps step and policy inference: 18981 fps total: 16449 epoch: 67 frames: 4325376/20000000
+fps step: 19068 fps step and policy inference: 18984 fps total: 16469 epoch: 68 frames: 4390912/20000000
+fps step: 19358 fps step and policy inference: 19268 fps total: 16679 epoch: 69 frames: 4456448/20000000
+fps step: 20189 fps step and policy inference: 20094 fps total: 17298 epoch: 70 frames: 4521984/20000000
+fps step: 18909 fps step and policy inference: 18826 fps total: 16304 epoch: 71 frames: 4587520/20000000
+fps step: 19675 fps step and policy inference: 19586 fps total: 16898 epoch: 72 frames: 4653056/20000000
+fps step: 20214 fps step and policy inference: 20119 fps total: 17245 epoch: 73 frames: 4718592/20000000
+fps step: 20353 fps step and policy inference: 20258 fps total: 17415 epoch: 74 frames: 4784128/20000000
+fps step: 19903 fps step and policy inference: 19808 fps total: 17066 epoch: 75 frames: 4849664/20000000
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/last_klask_ep_75_rew_9.859628.pth'
+saving next best rewards:  [9.859628]
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/klask.pth'
+fps step: 21363 fps step and policy inference: 21266 fps total: 18118 epoch: 76 frames: 4915200/20000000
+fps step: 20227 fps step and policy inference: 20133 fps total: 17304 epoch: 77 frames: 4980736/20000000
+fps step: 20153 fps step and policy inference: 20058 fps total: 17256 epoch: 78 frames: 5046272/20000000
+fps step: 20302 fps step and policy inference: 20208 fps total: 17406 epoch: 79 frames: 5111808/20000000
+fps step: 20229 fps step and policy inference: 20134 fps total: 17287 epoch: 80 frames: 5177344/20000000
+fps step: 20273 fps step and policy inference: 20178 fps total: 17338 epoch: 81 frames: 5242880/20000000
+fps step: 20607 fps step and policy inference: 20505 fps total: 17599 epoch: 82 frames: 5308416/20000000
+saving next best rewards:  [9.954153]
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/klask.pth'
+fps step: 20186 fps step and policy inference: 20098 fps total: 17308 epoch: 83 frames: 5373952/20000000
+fps step: 20078 fps step and policy inference: 19985 fps total: 17179 epoch: 84 frames: 5439488/20000000
+fps step: 20165 fps step and policy inference: 20072 fps total: 17276 epoch: 85 frames: 5505024/20000000
+fps step: 20176 fps step and policy inference: 20082 fps total: 17242 epoch: 86 frames: 5570560/20000000
+fps step: 20232 fps step and policy inference: 20137 fps total: 17315 epoch: 87 frames: 5636096/20000000
+fps step: 20426 fps step and policy inference: 20327 fps total: 17495 epoch: 88 frames: 5701632/20000000
+saving next best rewards:  [10.1106615]
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/klask.pth'
+fps step: 20361 fps step and policy inference: 20272 fps total: 17448 epoch: 89 frames: 5767168/20000000
+fps step: 19994 fps step and policy inference: 19902 fps total: 17106 epoch: 90 frames: 5832704/20000000
+fps step: 20107 fps step and policy inference: 20014 fps total: 17248 epoch: 91 frames: 5898240/20000000
+fps step: 20233 fps step and policy inference: 20140 fps total: 17323 epoch: 92 frames: 5963776/20000000
+fps step: 20252 fps step and policy inference: 20158 fps total: 17340 epoch: 93 frames: 6029312/20000000
+fps step: 20181 fps step and policy inference: 20084 fps total: 17292 epoch: 94 frames: 6094848/20000000
+saving next best rewards:  [10.245689]
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/klask.pth'
+fps step: 20757 fps step and policy inference: 20664 fps total: 17679 epoch: 95 frames: 6160384/20000000
+fps step: 20137 fps step and policy inference: 20044 fps total: 17234 epoch: 96 frames: 6225920/20000000
+fps step: 20158 fps step and policy inference: 20065 fps total: 17206 epoch: 97 frames: 6291456/20000000
+fps step: 20145 fps step and policy inference: 20052 fps total: 17211 epoch: 98 frames: 6356992/20000000
+fps step: 20283 fps step and policy inference: 20189 fps total: 17306 epoch: 99 frames: 6422528/20000000
+fps step: 19808 fps step and policy inference: 19714 fps total: 16991 epoch: 100 frames: 6488064/20000000
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/last_klask_ep_100_rew_10.367666.pth'
+saving next best rewards:  [10.367666]
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/klask.pth'
+fps step: 21279 fps step and policy inference: 21182 fps total: 18051 epoch: 101 frames: 6553600/20000000
+fps step: 20162 fps step and policy inference: 20064 fps total: 17267 epoch: 102 frames: 6619136/20000000
+fps step: 20127 fps step and policy inference: 20033 fps total: 17236 epoch: 103 frames: 6684672/20000000
+fps step: 20176 fps step and policy inference: 20083 fps total: 17251 epoch: 104 frames: 6750208/20000000
+fps step: 20284 fps step and policy inference: 20190 fps total: 17318 epoch: 105 frames: 6815744/20000000
+fps step: 20273 fps step and policy inference: 20178 fps total: 17352 epoch: 106 frames: 6881280/20000000
+fps step: 20783 fps step and policy inference: 20680 fps total: 17716 epoch: 107 frames: 6946816/20000000
+saving next best rewards:  [10.6107235]
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/klask.pth'
+fps step: 20220 fps step and policy inference: 20131 fps total: 17319 epoch: 108 frames: 7012352/20000000
+fps step: 20070 fps step and policy inference: 19978 fps total: 17146 epoch: 109 frames: 7077888/20000000
+fps step: 20188 fps step and policy inference: 20095 fps total: 17269 epoch: 110 frames: 7143424/20000000
+fps step: 20259 fps step and policy inference: 20165 fps total: 17320 epoch: 111 frames: 7208960/20000000
+fps step: 20288 fps step and policy inference: 20193 fps total: 17355 epoch: 112 frames: 7274496/20000000
+fps step: 20691 fps step and policy inference: 20590 fps total: 17662 epoch: 113 frames: 7340032/20000000
+fps step: 20379 fps step and policy inference: 20283 fps total: 17438 epoch: 114 frames: 7405568/20000000
+fps step: 20136 fps step and policy inference: 20044 fps total: 17241 epoch: 115 frames: 7471104/20000000
+fps step: 20178 fps step and policy inference: 20085 fps total: 17291 epoch: 116 frames: 7536640/20000000
+fps step: 20199 fps step and policy inference: 20106 fps total: 17300 epoch: 117 frames: 7602176/20000000
+fps step: 20282 fps step and policy inference: 20189 fps total: 17345 epoch: 118 frames: 7667712/20000000
+fps step: 20216 fps step and policy inference: 20119 fps total: 17319 epoch: 119 frames: 7733248/20000000
+fps step: 20845 fps step and policy inference: 20746 fps total: 17738 epoch: 120 frames: 7798784/20000000
+fps step: 20088 fps step and policy inference: 19995 fps total: 17205 epoch: 121 frames: 7864320/20000000
+fps step: 20111 fps step and policy inference: 20019 fps total: 17248 epoch: 122 frames: 7929856/20000000
+fps step: 20247 fps step and policy inference: 20154 fps total: 17323 epoch: 123 frames: 7995392/20000000
+fps step: 20252 fps step and policy inference: 20158 fps total: 17336 epoch: 124 frames: 8060928/20000000
+fps step: 19815 fps step and policy inference: 19722 fps total: 16999 epoch: 125 frames: 8126464/20000000
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/last_klask_ep_125_rew_9.887205.pth'
+fps step: 21252 fps step and policy inference: 21155 fps total: 18016 epoch: 126 frames: 8192000/20000000
+fps step: 20218 fps step and policy inference: 20125 fps total: 17278 epoch: 127 frames: 8257536/20000000
+fps step: 20143 fps step and policy inference: 20049 fps total: 17197 epoch: 128 frames: 8323072/20000000
+fps step: 20189 fps step and policy inference: 20096 fps total: 17256 epoch: 129 frames: 8388608/20000000
+fps step: 20247 fps step and policy inference: 20154 fps total: 17323 epoch: 130 frames: 8454144/20000000
+fps step: 20307 fps step and policy inference: 20214 fps total: 17376 epoch: 131 frames: 8519680/20000000
+fps step: 20715 fps step and policy inference: 20613 fps total: 17661 epoch: 132 frames: 8585216/20000000
+fps step: 20319 fps step and policy inference: 20226 fps total: 17385 epoch: 133 frames: 8650752/20000000
+fps step: 20065 fps step and policy inference: 19972 fps total: 17176 epoch: 134 frames: 8716288/20000000
+fps step: 20228 fps step and policy inference: 20133 fps total: 17284 epoch: 135 frames: 8781824/20000000
+fps step: 20263 fps step and policy inference: 20169 fps total: 17329 epoch: 136 frames: 8847360/20000000
+fps step: 19990 fps step and policy inference: 19898 fps total: 17137 epoch: 137 frames: 8912896/20000000
+fps step: 20548 fps step and policy inference: 20448 fps total: 17551 epoch: 138 frames: 8978432/20000000
+fps step: 20474 fps step and policy inference: 20378 fps total: 17506 epoch: 139 frames: 9043968/20000000
+fps step: 20070 fps step and policy inference: 19978 fps total: 17166 epoch: 140 frames: 9109504/20000000
+fps step: 20091 fps step and policy inference: 19998 fps total: 17202 epoch: 141 frames: 9175040/20000000
+fps step: 20209 fps step and policy inference: 20116 fps total: 17310 epoch: 142 frames: 9240576/20000000
+fps step: 20225 fps step and policy inference: 20131 fps total: 17263 epoch: 143 frames: 9306112/20000000
+fps step: 20115 fps step and policy inference: 20018 fps total: 17179 epoch: 144 frames: 9371648/20000000
+fps step: 20893 fps step and policy inference: 20793 fps total: 17779 epoch: 145 frames: 9437184/20000000
+fps step: 20125 fps step and policy inference: 20032 fps total: 17236 epoch: 146 frames: 9502720/20000000
+fps step: 20144 fps step and policy inference: 20051 fps total: 17261 epoch: 147 frames: 9568256/20000000
+fps step: 20252 fps step and policy inference: 20158 fps total: 17336 epoch: 148 frames: 9633792/20000000
+fps step: 20220 fps step and policy inference: 20126 fps total: 17273 epoch: 149 frames: 9699328/20000000
+fps step: 19768 fps step and policy inference: 19674 fps total: 16976 epoch: 150 frames: 9764864/20000000
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/last_klask_ep_150_rew_10.560793.pth'
+fps step: 21116 fps step and policy inference: 21020 fps total: 17941 epoch: 151 frames: 9830400/20000000
+fps step: 20097 fps step and policy inference: 20005 fps total: 17222 epoch: 152 frames: 9895936/20000000
+fps step: 20119 fps step and policy inference: 20026 fps total: 17217 epoch: 153 frames: 9961472/20000000
+fps step: 20171 fps step and policy inference: 20078 fps total: 17251 epoch: 154 frames: 10027008/20000000
+fps step: 20206 fps step and policy inference: 20112 fps total: 17285 epoch: 155 frames: 10092544/20000000
+fps step: 20220 fps step and policy inference: 20126 fps total: 17313 epoch: 156 frames: 10158080/20000000
+fps step: 20745 fps step and policy inference: 20641 fps total: 17688 epoch: 157 frames: 10223616/20000000
+fps step: 20265 fps step and policy inference: 20170 fps total: 17340 epoch: 158 frames: 10289152/20000000
+fps step: 20086 fps step and policy inference: 19992 fps total: 17187 epoch: 159 frames: 10354688/20000000
+fps step: 20119 fps step and policy inference: 20025 fps total: 17217 epoch: 160 frames: 10420224/20000000
+fps step: 20245 fps step and policy inference: 20150 fps total: 17337 epoch: 161 frames: 10485760/20000000
+fps step: 20174 fps step and policy inference: 20080 fps total: 17282 epoch: 162 frames: 10551296/20000000
+fps step: 20482 fps step and policy inference: 20381 fps total: 17435 epoch: 163 frames: 10616832/20000000
+saving next best rewards:  [10.806603]
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/klask.pth'
+fps step: 20586 fps step and policy inference: 20494 fps total: 17578 epoch: 164 frames: 10682368/20000000
+fps step: 20124 fps step and policy inference: 20031 fps total: 17229 epoch: 165 frames: 10747904/20000000
+fps step: 20056 fps step and policy inference: 19962 fps total: 17175 epoch: 166 frames: 10813440/20000000
+fps step: 20134 fps step and policy inference: 20039 fps total: 17198 epoch: 167 frames: 10878976/20000000
+fps step: 20218 fps step and policy inference: 20123 fps total: 17257 epoch: 168 frames: 10944512/20000000
+fps step: 20128 fps step and policy inference: 20030 fps total: 17218 epoch: 169 frames: 11010048/20000000
+fps step: 20723 fps step and policy inference: 20624 fps total: 17664 epoch: 170 frames: 11075584/20000000
+fps step: 20154 fps step and policy inference: 20060 fps total: 17248 epoch: 171 frames: 11141120/20000000
+fps step: 20107 fps step and policy inference: 20014 fps total: 17230 epoch: 172 frames: 11206656/20000000
+fps step: 20127 fps step and policy inference: 20033 fps total: 17232 epoch: 173 frames: 11272192/20000000
+fps step: 20226 fps step and policy inference: 20132 fps total: 17321 epoch: 174 frames: 11337728/20000000
+fps step: 19712 fps step and policy inference: 19618 fps total: 16951 epoch: 175 frames: 11403264/20000000
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/last_klask_ep_175_rew_9.83733.pth'
+fps step: 21295 fps step and policy inference: 21192 fps total: 18078 epoch: 176 frames: 11468800/20000000
+fps step: 20112 fps step and policy inference: 20019 fps total: 17209 epoch: 177 frames: 11534336/20000000
+fps step: 20064 fps step and policy inference: 19971 fps total: 17192 epoch: 178 frames: 11599872/20000000
+fps step: 20138 fps step and policy inference: 20043 fps total: 18170 epoch: 179 frames: 11665408/20000000
+fps step: 20385 fps step and policy inference: 20288 fps total: 17231 epoch: 180 frames: 11730944/20000000
+fps step: 20276 fps step and policy inference: 20181 fps total: 17126 epoch: 181 frames: 11796480/20000000
+fps step: 20422 fps step and policy inference: 20321 fps total: 17225 epoch: 182 frames: 11862016/20000000
+fps step: 20168 fps step and policy inference: 20072 fps total: 17056 epoch: 183 frames: 11927552/20000000
+fps step: 20066 fps step and policy inference: 19972 fps total: 16984 epoch: 184 frames: 11993088/20000000
+fps step: 20114 fps step and policy inference: 20020 fps total: 16979 epoch: 185 frames: 12058624/20000000
+fps step: 20179 fps step and policy inference: 20085 fps total: 17087 epoch: 186 frames: 12124160/20000000
+fps step: 20219 fps step and policy inference: 20124 fps total: 17095 epoch: 187 frames: 12189696/20000000
+fps step: 20506 fps step and policy inference: 20404 fps total: 17293 epoch: 188 frames: 12255232/20000000
+fps step: 20545 fps step and policy inference: 20447 fps total: 17323 epoch: 189 frames: 12320768/20000000
+fps step: 20144 fps step and policy inference: 20051 fps total: 17035 epoch: 190 frames: 12386304/20000000
+fps step: 20166 fps step and policy inference: 20071 fps total: 17059 epoch: 191 frames: 12451840/20000000
+fps step: 20227 fps step and policy inference: 20132 fps total: 17094 epoch: 192 frames: 12517376/20000000
+fps step: 20340 fps step and policy inference: 20245 fps total: 17172 epoch: 193 frames: 12582912/20000000
+fps step: 20218 fps step and policy inference: 20120 fps total: 17099 epoch: 194 frames: 12648448/20000000
+fps step: 21065 fps step and policy inference: 20962 fps total: 17698 epoch: 195 frames: 12713984/20000000
+fps step: 20144 fps step and policy inference: 20050 fps total: 17047 epoch: 196 frames: 12779520/20000000
+fps step: 20180 fps step and policy inference: 20087 fps total: 17080 epoch: 197 frames: 12845056/20000000
+fps step: 20162 fps step and policy inference: 20067 fps total: 17055 epoch: 198 frames: 12910592/20000000
+fps step: 20220 fps step and policy inference: 20125 fps total: 17087 epoch: 199 frames: 12976128/20000000
+fps step: 19737 fps step and policy inference: 19643 fps total: 16743 epoch: 200 frames: 13041664/20000000
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/last_klask_ep_200_rew_9.656481.pth'
+fps step: 21317 fps step and policy inference: 21221 fps total: 17879 epoch: 201 frames: 13107200/20000000
+fps step: 20234 fps step and policy inference: 20139 fps total: 17103 epoch: 202 frames: 13172736/20000000
+fps step: 20138 fps step and policy inference: 20045 fps total: 16953 epoch: 203 frames: 13238272/20000000
+fps step: 20296 fps step and policy inference: 20201 fps total: 17154 epoch: 204 frames: 13303808/20000000
+fps step: 20241 fps step and policy inference: 20147 fps total: 17108 epoch: 205 frames: 13369344/20000000
+fps step: 20317 fps step and policy inference: 20223 fps total: 17163 epoch: 206 frames: 13434880/20000000
+fps step: 20795 fps step and policy inference: 20691 fps total: 17388 epoch: 207 frames: 13500416/20000000
+fps step: 20023 fps step and policy inference: 19931 fps total: 16965 epoch: 208 frames: 13565952/20000000
+fps step: 20205 fps step and policy inference: 20111 fps total: 17077 epoch: 209 frames: 13631488/20000000
+fps step: 20147 fps step and policy inference: 20052 fps total: 17037 epoch: 210 frames: 13697024/20000000
+fps step: 20330 fps step and policy inference: 20234 fps total: 17167 epoch: 211 frames: 13762560/20000000
+fps step: 20296 fps step and policy inference: 20201 fps total: 17138 epoch: 212 frames: 13828096/20000000
+fps step: 20552 fps step and policy inference: 20450 fps total: 17326 epoch: 213 frames: 13893632/20000000
+fps step: 20549 fps step and policy inference: 20451 fps total: 17196 epoch: 214 frames: 13959168/20000000
+fps step: 20230 fps step and policy inference: 20136 fps total: 17095 epoch: 215 frames: 14024704/20000000
+fps step: 20265 fps step and policy inference: 20171 fps total: 17128 epoch: 216 frames: 14090240/20000000
+fps step: 20321 fps step and policy inference: 20226 fps total: 17068 epoch: 217 frames: 14155776/20000000
+fps step: 20341 fps step and policy inference: 20246 fps total: 17186 epoch: 218 frames: 14221312/20000000
+fps step: 20208 fps step and policy inference: 20110 fps total: 17103 epoch: 219 frames: 14286848/20000000
+fps step: 20772 fps step and policy inference: 20672 fps total: 17474 epoch: 220 frames: 14352384/20000000
+fps step: 20234 fps step and policy inference: 20140 fps total: 17101 epoch: 221 frames: 14417920/20000000
+fps step: 20229 fps step and policy inference: 20134 fps total: 17096 epoch: 222 frames: 14483456/20000000
+fps step: 20247 fps step and policy inference: 20151 fps total: 17105 epoch: 223 frames: 14548992/20000000
+fps step: 20328 fps step and policy inference: 20232 fps total: 17159 epoch: 224 frames: 14614528/20000000
+fps step: 19899 fps step and policy inference: 19803 fps total: 16870 epoch: 225 frames: 14680064/20000000
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/last_klask_ep_225_rew_8.620783.pth'
+fps step: 21101 fps step and policy inference: 21006 fps total: 17723 epoch: 226 frames: 14745600/20000000
+fps step: 20332 fps step and policy inference: 20236 fps total: 17175 epoch: 227 frames: 14811136/20000000
+fps step: 20230 fps step and policy inference: 20135 fps total: 16983 epoch: 228 frames: 14876672/20000000
+fps step: 20298 fps step and policy inference: 20202 fps total: 17153 epoch: 229 frames: 14942208/20000000
+fps step: 20342 fps step and policy inference: 20246 fps total: 17183 epoch: 230 frames: 15007744/20000000
+fps step: 20478 fps step and policy inference: 20381 fps total: 17275 epoch: 231 frames: 15073280/20000000
+fps step: 20783 fps step and policy inference: 20680 fps total: 17484 epoch: 232 frames: 15138816/20000000
+fps step: 20361 fps step and policy inference: 20265 fps total: 17191 epoch: 233 frames: 15204352/20000000
+fps step: 20265 fps step and policy inference: 20171 fps total: 17118 epoch: 234 frames: 15269888/20000000
+fps step: 20197 fps step and policy inference: 20102 fps total: 17072 epoch: 235 frames: 15335424/20000000
+fps step: 20352 fps step and policy inference: 20257 fps total: 17161 epoch: 236 frames: 15400960/20000000
+fps step: 20370 fps step and policy inference: 20274 fps total: 17198 epoch: 237 frames: 15466496/20000000
+fps step: 20532 fps step and policy inference: 20431 fps total: 17304 epoch: 238 frames: 15532032/20000000
+fps step: 20581 fps step and policy inference: 20483 fps total: 17353 epoch: 239 frames: 15597568/20000000
+fps step: 20194 fps step and policy inference: 20100 fps total: 17069 epoch: 240 frames: 15663104/20000000
+fps step: 20164 fps step and policy inference: 20070 fps total: 17060 epoch: 241 frames: 15728640/20000000
+fps step: 20233 fps step and policy inference: 20138 fps total: 17071 epoch: 242 frames: 15794176/20000000
+fps step: 20310 fps step and policy inference: 20217 fps total: 17155 epoch: 243 frames: 15859712/20000000
+fps step: 20191 fps step and policy inference: 20093 fps total: 17066 epoch: 244 frames: 15925248/20000000
+fps step: 20881 fps step and policy inference: 20780 fps total: 17556 epoch: 245 frames: 15990784/20000000
+fps step: 20180 fps step and policy inference: 20086 fps total: 17069 epoch: 246 frames: 16056320/20000000
+fps step: 20203 fps step and policy inference: 20110 fps total: 17080 epoch: 247 frames: 16121856/20000000
+fps step: 20276 fps step and policy inference: 20181 fps total: 17133 epoch: 248 frames: 16187392/20000000
+fps step: 20345 fps step and policy inference: 20250 fps total: 17186 epoch: 249 frames: 16252928/20000000
+fps step: 19865 fps step and policy inference: 19770 fps total: 16835 epoch: 250 frames: 16318464/20000000
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/last_klask_ep_250_rew_9.849579.pth'
+fps step: 21539 fps step and policy inference: 21435 fps total: 17884 epoch: 251 frames: 16384000/20000000
+fps step: 20274 fps step and policy inference: 20178 fps total: 17148 epoch: 252 frames: 16449536/20000000
+fps step: 20247 fps step and policy inference: 20153 fps total: 17107 epoch: 253 frames: 16515072/20000000
+fps step: 20239 fps step and policy inference: 20144 fps total: 17114 epoch: 254 frames: 16580608/20000000
+fps step: 20286 fps step and policy inference: 20188 fps total: 17139 epoch: 255 frames: 16646144/20000000
+fps step: 20345 fps step and policy inference: 20248 fps total: 17175 epoch: 256 frames: 16711680/20000000
+fps step: 20511 fps step and policy inference: 20409 fps total: 17308 epoch: 257 frames: 16777216/20000000
+fps step: 20368 fps step and policy inference: 20272 fps total: 17216 epoch: 258 frames: 16842752/20000000
+fps step: 20152 fps step and policy inference: 20057 fps total: 17050 epoch: 259 frames: 16908288/20000000
+fps step: 20181 fps step and policy inference: 20087 fps total: 17071 epoch: 260 frames: 16973824/20000000
+fps step: 20221 fps step and policy inference: 20124 fps total: 17104 epoch: 261 frames: 17039360/20000000
+fps step: 20286 fps step and policy inference: 20191 fps total: 17148 epoch: 262 frames: 17104896/20000000
+fps step: 20475 fps step and policy inference: 20375 fps total: 17297 epoch: 263 frames: 17170432/20000000
+fps step: 20519 fps step and policy inference: 20422 fps total: 17714 epoch: 264 frames: 17235968/20000000
+fps step: 20187 fps step and policy inference: 20093 fps total: 17071 epoch: 265 frames: 17301504/20000000
+fps step: 20204 fps step and policy inference: 20111 fps total: 17107 epoch: 266 frames: 17367040/20000000
+fps step: 20232 fps step and policy inference: 20138 fps total: 17114 epoch: 267 frames: 17432576/20000000
+fps step: 20298 fps step and policy inference: 20204 fps total: 17166 epoch: 268 frames: 17498112/20000000
+fps step: 20211 fps step and policy inference: 20114 fps total: 16953 epoch: 269 frames: 17563648/20000000
+fps step: 20812 fps step and policy inference: 20712 fps total: 17516 epoch: 270 frames: 17629184/20000000
+fps step: 20172 fps step and policy inference: 20079 fps total: 17906 epoch: 271 frames: 17694720/20000000
+fps step: 20196 fps step and policy inference: 20102 fps total: 18245 epoch: 272 frames: 17760256/20000000
+fps step: 20389 fps step and policy inference: 20295 fps total: 18359 epoch: 273 frames: 17825792/20000000
+fps step: 20273 fps step and policy inference: 20176 fps total: 17040 epoch: 274 frames: 17891328/20000000
+fps step: 19851 fps step and policy inference: 19760 fps total: 16829 epoch: 275 frames: 17956864/20000000
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/last_klask_ep_275_rew_9.884514.pth'
+fps step: 21547 fps step and policy inference: 21446 fps total: 18038 epoch: 276 frames: 18022400/20000000
+fps step: 20291 fps step and policy inference: 20200 fps total: 17171 epoch: 277 frames: 18087936/20000000
+fps step: 20129 fps step and policy inference: 20040 fps total: 17031 epoch: 278 frames: 18153472/20000000
+fps step: 20234 fps step and policy inference: 20144 fps total: 17106 epoch: 279 frames: 18219008/20000000
+fps step: 19869 fps step and policy inference: 19782 fps total: 16796 epoch: 280 frames: 18284544/20000000
+fps step: 20276 fps step and policy inference: 20186 fps total: 17115 epoch: 281 frames: 18350080/20000000
+fps step: 20509 fps step and policy inference: 20413 fps total: 17300 epoch: 282 frames: 18415616/20000000
+fps step: 20335 fps step and policy inference: 20244 fps total: 17200 epoch: 283 frames: 18481152/20000000
+fps step: 20092 fps step and policy inference: 20003 fps total: 16998 epoch: 284 frames: 18546688/20000000
+fps step: 20169 fps step and policy inference: 20080 fps total: 17057 epoch: 285 frames: 18612224/20000000
+fps step: 20220 fps step and policy inference: 20130 fps total: 17119 epoch: 286 frames: 18677760/20000000
+fps step: 20287 fps step and policy inference: 20197 fps total: 17060 epoch: 287 frames: 18743296/20000000
+fps step: 20518 fps step and policy inference: 20421 fps total: 17311 epoch: 288 frames: 18808832/20000000
+fps step: 20485 fps step and policy inference: 20393 fps total: 17315 epoch: 289 frames: 18874368/20000000
+fps step: 20085 fps step and policy inference: 19996 fps total: 17003 epoch: 290 frames: 18939904/20000000
+fps step: 20194 fps step and policy inference: 20105 fps total: 17075 epoch: 291 frames: 19005440/20000000
+fps step: 20203 fps step and policy inference: 20111 fps total: 17091 epoch: 292 frames: 19070976/20000000
+fps step: 20329 fps step and policy inference: 20238 fps total: 17172 epoch: 293 frames: 19136512/20000000
+fps step: 20218 fps step and policy inference: 20124 fps total: 17085 epoch: 294 frames: 19202048/20000000
+fps step: 21048 fps step and policy inference: 20951 fps total: 17695 epoch: 295 frames: 19267584/20000000
+fps step: 20191 fps step and policy inference: 20101 fps total: 17086 epoch: 296 frames: 19333120/20000000
+fps step: 20196 fps step and policy inference: 20107 fps total: 17080 epoch: 297 frames: 19398656/20000000
+fps step: 20169 fps step and policy inference: 20079 fps total: 16994 epoch: 298 frames: 19464192/20000000
+fps step: 20242 fps step and policy inference: 20152 fps total: 17118 epoch: 299 frames: 19529728/20000000
+fps step: 19845 fps step and policy inference: 19755 fps total: 16841 epoch: 300 frames: 19595264/20000000
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/last_klask_ep_300_rew_9.949063.pth'
+fps step: 21411 fps step and policy inference: 21313 fps total: 17947 epoch: 301 frames: 19660800/20000000
+fps step: 20245 fps step and policy inference: 20154 fps total: 17126 epoch: 302 frames: 19726336/20000000
+fps step: 20192 fps step and policy inference: 20103 fps total: 17071 epoch: 303 frames: 19791872/20000000
+fps step: 20125 fps step and policy inference: 20035 fps total: 17029 epoch: 304 frames: 19857408/20000000
+fps step: 20194 fps step and policy inference: 20104 fps total: 17053 epoch: 305 frames: 19922944/20000000
+fps step: 20230 fps step and policy inference: 20139 fps total: 17099 epoch: 306 frames: 19988480/20000000
+=> saving checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/s2r_collision_ro_a0_2/nn/last_klask_frame_20054016_rew__9.949063_.pth'
+MAX FRAMES NUM!
+Total training time: 1178.6738200187683
+wandb: Waiting for W&B process to finish... (success).
+wandb: - 0.684 MB of 0.684 MB uploaded (0.010 MB deduped)wandb: \ 0.684 MB of 0.684 MB uploaded (0.010 MB deduped)wandb: | 0.684 MB of 0.684 MB uploaded (0.010 MB deduped)wandb: / 0.039 MB of 0.782 MB uploaded (0.010 MB deduped)wandb: - 0.039 MB of 0.782 MB uploaded (0.010 MB deduped)wandb: \ 0.084 MB of 0.782 MB uploaded (0.010 MB deduped)wandb: | 0.579 MB of 0.782 MB uploaded (0.010 MB deduped)wandb: / 0.579 MB of 0.782 MB uploaded (0.010 MB deduped)wandb: - 0.579 MB of 0.782 MB uploaded (0.010 MB deduped)wandb: \ 0.688 MB of 0.782 MB uploaded (0.010 MB deduped)wandb: | 0.688 MB of 0.782 MB uploaded (0.010 MB deduped)wandb: / 0.782 MB of 0.782 MB uploaded (0.010 MB deduped)wandb: - 0.782 MB of 0.782 MB uploaded (0.010 MB deduped)wandb: \ 0.782 MB of 0.782 MB uploaded (0.010 MB deduped)wandb: | 0.782 MB of 0.782 MB uploaded (0.010 MB deduped)wandb: / 0.782 MB of 0.782 MB uploaded (0.010 MB deduped)wandb: - 0.782 MB of 0.782 MB uploaded (0.010 MB deduped)wandb: \ 0.782 MB of 0.782 MB uploaded (0.010 MB deduped)wandb: | 0.782 MB of 0.782 MB uploaded (0.010 MB deduped)wandb:                                                                                
+wandb: W&B sync reduced upload amount by 1.3%             
+wandb: 
+wandb: Run history:
+wandb:              Episode/Episode_Reward/ball_in_own_half ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:                    Episode/Episode_Reward/ball_speed ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:               Episode/Episode_Reward/ball_stationary ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:         Episode/Episode_Reward/collision_player_ball ▁▂▃▄▆▇▇▇▇▇▇██████▇▇███▇▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▇▇
+wandb:   Episode/Episode_Reward/distance_ball_opponent_goal ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:          Episode/Episode_Reward/distance_player_ball ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: Episode/Episode_Reward/distance_player_ball_own_half ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:                 Episode/Episode_Reward/goal_conceded ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:                   Episode/Episode_Reward/goal_scored ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:                Episode/Episode_Reward/player_in_goal ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:                 Episode/Episode_Termination/time_out ▁███████████████████████████████████████
+wandb:                                 episode_lengths/iter ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:                                 episode_lengths/step ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:                                 episode_lengths/time ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:                                          global_step ▁▁▁▁▂▂▂▂▂▃▃▃▃▃▃▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▆▇▇▇▇▇███
+wandb:                                          info/e_clip ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:                                          info/epochs ▁▁▁▁▂▂▂▂▂▃▃▃▃▃▃▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇▇███
+wandb:                                              info/kl ▁▃▃▁▇▆▇▆▆▆▅▇▇▇█▇▆▇▇▇▇▇▆▆▇▆▆▆▂▇▇▆█▇▆▇▇▇▇▇
+wandb:                                         info/last_lr ████▂▆▆█▄▂▆▄▂▁▁▂▃▂▄▂▂▆▃█▄▄█▂█▃▁▁▆▄▆▄▂▄▂▄
+wandb:                                          info/lr_mul ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:                                        losses/a_loss ▂▂▁▁▃▁▁▁▂▁▁▇▁▁▂▂▂▅▁▂▂▂▂▂█▂▂▂▂▂▅▂▂▂▂▁▂▇▂▂
+wandb:                                   losses/bounds_loss ▁▁▁▁▃▃▃▃▃▄▅▅▅▅▄▆▅▄▆▆▇▄█▇▆██▇█▅▄▆▆▆▄█▆▆▆▇
+wandb:                                        losses/c_loss ▁▁▁▁▂▁▁▁▂▁▁▆▂▁▂▂▁▅▂▂▁▂▂▂█▂▂▂▂▁▅▂▂▁▂▂▂▇▂▂
+wandb:                                       losses/entropy ██▇▅▅▄▃▃▃▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▂▂▂▁▂▁▁▁▁▁
+wandb:                           performance/rl_update_time ▇▇▇▇▇█▇▆▆▆▆▆▆▆▆▆▆▆▆▆▆▆▆▇▇▇▇▇▇██▇▇█▅▁█▇▇▇
+wandb:                                 performance/step_fps ▆▄▂▂▇▁▁▁▃▄▆▇▆▆▆▆▆█▅▆▆▇▅▆▇▆▆▅▆▆█▆▆▆▇▆▅▇▆▅
+wandb:                       performance/step_inference_fps ▆▄▂▂▇▁▁▁▃▄▆▇▆▆▆▆▆█▅▆▆▇▅▆▇▆▆▅▆▆█▆▆▆▇▆▅▇▆▆
+wandb:             performance/step_inference_rl_update_fps ▄▃▂▂▅▁▁▂▃▄▅▆▅▅▅▅▅▆▄▅▅▆▅▅▅▄▄▄▄▄▅▄▄▄▆█▃▅▄▄
+wandb:                      performance/step_inference_time ▃▅▇▇▂███▆▅▃▂▃▃▃▃▃▁▄▃▃▂▃▂▂▃▃▄▃▃▁▃▃▃▂▃▄▂▃▃
+wandb:                                performance/step_time ▃▅▇▇▂███▆▅▃▂▃▃▃▃▃▁▄▃▃▂▃▂▂▃▃▄▃▃▁▃▃▃▂▃▄▂▃▃
+wandb:                                         rewards/iter ▁▂▄▅▆▇▇▇▇▇▇▇████▇▇▇███▇▇▇▇▇▇▇▆▆▇▇▇▇▇▇▇▇▇
+wandb:                                         rewards/step ▁▂▄▅▆▇▇▇▇▇▇▇████▇▇▇███▇▇▇▇▇▇▇▆▆▇▇▇▇▇▇▇▇▇
+wandb:                                         rewards/time ▁▂▄▅▆▇▇▇▇▇▇▇████▇▇▇███▇▇▇▇▇▇▇▆▆▇▇▇▇▇▇▇▇▇
+wandb:                                  shaped_rewards/iter ▁▂▄▅▆▇▇▇▇▇▇▇████▇▇▇███▇▇▇▇▇▇▇▆▆▇▇▇▇▇▇▇▇▇
+wandb:                                  shaped_rewards/step ▁▂▄▅▆▇▇▇▇▇▇▇████▇▇▇███▇▇▇▇▇▇▇▆▆▇▇▇▇▇▇▇▇▇
+wandb:                                  shaped_rewards/time ▁▂▄▅▆▇▇▇▇▇▇▇████▇▇▇███▇▇▇▇▇▇▇▆▆▇▇▇▇▇▇▇▇▇
+wandb: 
+wandb: Run summary:
+wandb:              Episode/Episode_Reward/ball_in_own_half 0.0
+wandb:                    Episode/Episode_Reward/ball_speed 0.0
+wandb:               Episode/Episode_Reward/ball_stationary 0.0
+wandb:         Episode/Episode_Reward/collision_player_ball 4.97453
+wandb:   Episode/Episode_Reward/distance_ball_opponent_goal 0.0
+wandb:          Episode/Episode_Reward/distance_player_ball 0.0
+wandb: Episode/Episode_Reward/distance_player_ball_own_half 0.0
+wandb:                 Episode/Episode_Reward/goal_conceded 0.0
+wandb:                   Episode/Episode_Reward/goal_scored 0.0
+wandb:                Episode/Episode_Reward/player_in_goal 0.0
+wandb:                 Episode/Episode_Termination/time_out 4096.0
+wandb:                                 episode_lengths/iter 100.0
+wandb:                                 episode_lengths/step 100.0
+wandb:                                 episode_lengths/time 100.0
+wandb:                                          global_step 19988480
+wandb:                                          info/e_clip 0.2
+wandb:                                          info/epochs 305.0
+wandb:                                              info/kl 0.00923
+wandb:                                         info/last_lr 0.01
+wandb:                                          info/lr_mul 1.0
+wandb:                                        losses/a_loss -0.07025
+wandb:                                   losses/bounds_loss 0.53292
+wandb:                                        losses/c_loss 2.09706
+wandb:                                       losses/entropy 2.5265
+wandb:                           performance/rl_update_time 0.58308
+wandb:                                 performance/step_fps 20229.58594
+wandb:                       performance/step_inference_fps 20138.7793
+wandb:             performance/step_inference_rl_update_fps 17098.57617
+wandb:                      performance/step_inference_time 3.2599
+wandb:                                performance/step_time 3.24534
+wandb:                                         rewards/iter 9.94906
+wandb:                                         rewards/step 9.94906
+wandb:                                         rewards/time 9.94906
+wandb:                                  shaped_rewards/iter 9.94906
+wandb:                                  shaped_rewards/step 9.94906
+wandb:                                  shaped_rewards/time 9.94906
+wandb: 
+wandb: Synced fine-shape-14: https://wandb.ai/idsc-rda/Isaac-Klask/runs/ptk5ixgp
+wandb: Synced 6 W&B file(s), 0 media file(s), 1 artifact file(s) and 2 other file(s)
+wandb: Find logs at: ./wandb/run-20250218_200257-ptk5ixgp/logs
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/multiprocessing/resource_tracker.py:224: UserWarning: resource_tracker: There appear to be 6 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+2025-02-18 20:35:22.525635: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1739907322.536770  475270 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1739907322.540142  475270 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-02-18 20:35:22.552675: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+DEBUG:2025-02-18 20:35:23,213:jax._src.path:31: etils.epath found. Using etils.epath for file I/O.
+[Warning] [simulation_app.simulation_app] Modules: ['omni.kit_app'] were loaded before SimulationApp was started and might not be loaded correctly.
+[Warning] [simulation_app.simulation_app] Please check to make sure no extra omniverse or pxr modules are imported before the call to SimulationApp(...)
+Loading user config located at: '/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/omni/data/Kit/Isaac-Sim/4.5/user.config.json'
+[Info] [carb] Logging to file: /home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/omni/logs/Kit/Isaac-Sim/4.5/kit_20250218_203519.log
+2025-02-18 19:35:19 [0ms] [Warning] [omni.kit.app.plugin] No crash reporter present, dumps uploading isn't available.
+2025-02-18 19:35:19 [141ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2025-02-18 19:35:19 [289ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
+2025-02-18 19:35:19 [470ms] [Warning] [omni.datastore] OmniHub is inaccessible
+2025-02-18 19:35:19 [546ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 560.28.03     | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 4090          | Yes: 0 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 77773d38.. |
+|     |                                  |        |     |            | 1         |            |
+|---------------------------------------------------------------------------------------------|
+| 1   | NVIDIA GeForce RTX 4090          | Yes: 1 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | e872ee4d.. |
+|     |                                  |        |     |            | 2d        |            |
+|---------------------------------------------------------------------------------------------|
+| 2   | NVIDIA GeForce RTX 4090          | Yes: 2 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 693155e8.. |
+|     |                                  |        |     |            | 41        |            |
+|---------------------------------------------------------------------------------------------|
+| 3   | NVIDIA GeForce RTX 4090          | Yes: 3 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 2b4da82c.. |
+|     |                                  |        |     |            | 61        |            |
+|=============================================================================================|
+| OS: 22.04.5 LTS (Jammy Jellyfish) ubuntu, Version: 22.04.5, Kernel: 6.8.0-49-generic
+| Processor: AMD Ryzen Threadripper PRO 5995WX 64-Cores
+| Cores: 64 | Logical Cores: 128
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 515572 | Free Memory: 503950
+| Total Page/Swap (MB): 2047 | Free Page/Swap: 2047
+|---------------------------------------------------------------------------------------------|
+2025-02-18 19:35:25 [6,836ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2025-02-18 19:35:25 [6,836ms] [Warning] [gpu.foundation.plugin] Detected IOMMU is enabled. Running CUDA peer-to-peer bandwidth and latency validation.
+Uni[INFO][AppLauncher]: Loading experience file: /home/student/klask_rl/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO]: Parsing configuration from: <class 'isaaclab_tasks.manager_based.klask.klask_env_cfg.KlaskEnvCfg'>
+[INFO]: Parsing configuration from: /home/student/klask_rl/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/manager_based/klask/agents/rl_games_ppo_cfg.yaml
+directional P2P=Enabled Bandwidth (P2P Writes) Matrix (GB/s)
+   D\D     0      1      2      3 
+     0 912.14  21.95  21.90  22.02 
+     1  22.38 922.48  22.18  22.14 
+     2  22.40  22.19 921.83  22.40 
+     3  22.18  22.46  22.10 922.37 
+P2P=Enabled Latency (P2P Writes) Matrix (us)
+   GPU     0      1      2      3 
+     0   1.43  11.59  11.81  15.25 
+     1  11.28   1.44  11.94  14.81 
+     2  14.99  14.81   1.48  11.67 
+     3  11.64  12.77  19.20   1.33 
+
+   CPU     0      1      2      3 
+     0   2.12   6.69   6.23   6.20 
+     1   6.79   2.05   6.11   6.16 
+     2   6.27   6.24   1.83   5.84 
+     3   6.33   6.19   6.69   2.11 
+2025-02-18 19:35:26 [7,368ms] [Warning] [gpu.foundation.plugin] CUDA peer-to-peer observed bandwidth: 21.9 GB/s.
+2025-02-18 19:35:26 [7,368ms] [Warning] [gpu.foundation.plugin] CUDA peer-to-peer observed latency: 19.2 us.
+2025-02-18 19:35:26 [7,368ms] [Warning] [gpu.foundation.plugin] Please verify if observed bandwidth and latency are expected.
+2025-02-18 19:35:27 [8,084ms] [Warning] [isaaclab.envs.manager_based_env] The render interval (1) is smaller than the decimation (20). Multiple render calls will happen for each environment step. If this is not intended, set the render interval to be equal to the decimation.
+2025-02-18 19:35:27 [8,185ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPreviewSurface.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:35:27 [8,185ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdUVTexture.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:35:27 [8,185ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:35:27 [8,186ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float2.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:35:27 [8,186ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float3.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:35:27 [8,186ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float4.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:35:27 [8,186ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_int.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:35:27 [8,186ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_string.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:35:27 [8,186ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_normal.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:35:27 [8,186ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_point.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:35:27 [8,187ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_vector.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:35:27 [8,187ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_matrix.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:35:27 [8,187ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdTransform2d.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+Traceback (most recent call last):
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/asset_base.py", line 94, in <lambda>
+    lambda event, obj=weakref.proxy(self): obj._initialize_callback(event),
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/asset_base.py", line 265, in _initialize_callback
+    self._initialize_impl()
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/articulation/articulation.py", line 1136, in _initialize_impl
+    self._validate_cfg()
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/articulation/articulation.py", line 1465, in _validate_cfg
+    raise ValueError(msg)
+ValueError: The following joints have default positions out of the limits: 
+	- 'ground_to_slider_2': 0.000 not in [0.020, 0.210]
+	- 'ground_to_slider_1': 0.000 not in [-0.210, -0.020]
+
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/wandb/sdk/internal/internal_api.py:13: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+  from pkg_resources import parse_version
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/pkg_resources/__init__.py:3142: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google')`.
+Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+  declare_namespace(pkg)
+wandb: Currently logged in as: schulzj (idsc-rda). Use `wandb login --relogin` to force relogin
+[INFO]: Loading model checkpoint from: /home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_1/nn/klask.pth
+[INFO] Logging experiment in directory: /home/student/klask_rl/IsaacLab/logs/rl_games/klask
+Setting seed: 42
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 42
+	Physics step-size     : 0.001
+	Rendering step-size   : 0.001
+	Environment step-size : 0.02
+[INFO]: Time taken for scene creation : 0.663431 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 4096
+	Environment spacing   : 1.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Time taken for simulation start : 1.848564 seconds
+[INFO] Command Manager:  <CommandManager> contains 0 active terms.
++------------------------+
+|  Active Command Terms  |
++--------+-------+-------+
+| Index  | Name  |  Type |
++--------+-------+-------+
++--------+-------+-------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++---------------------+
+| Active Recorder Terms |
++-----------+---------+
+|   Index   | Name    |
++-----------+---------+
++-----------+---------+
+
+[INFO] Action Manager:  <ActionManager> contains 4 active terms.
++-----------------------------------+
+|   Active Action Terms (shape: 4)  |
++--------+-------------+------------+
+| Index  | Name        |  Dimension |
++--------+-------------+------------+
+|   0    | player_x    |          1 |
+|   1    | player_y    |          1 |
+|   2    | opponent_x  |          1 |
+|   3    | opponent_y  |          1 |
++--------+-------------+------------+
+
+[INFO] Observation Manager: <ObservationManager> contains 1 groups.
++-------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (12,)) |
++-------------+---------------------------+-------------+
+|    Index    | Name                      |    Shape    |
++-------------+---------------------------+-------------+
+|      0      | peg_1_pos                 |     (2,)    |
+|      1      | peg_1_x_vel               |     (1,)    |
+|      2      | peg_1_y_vel               |     (1,)    |
+|      3      | peg_2_pos                 |     (2,)    |
+|      4      | peg_2_x_vel               |     (1,)    |
+|      5      | peg_2_y_vel               |     (1,)    |
+|      6      | ball_pos_rel              |     (2,)    |
+|      7      | ball_vel_rel              |     (2,)    |
++-------------+---------------------------+-------------+
+
+[INFO] Event Manager:  <EventManager> contains 1 active terms.
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++--------+----------------------------+
+| Index  | Name                       |
++--------+----------------------------+
+|   0    | reset_x_position_peg_1     |
+|   1    | reset_x_position_peg_2     |
+|   2    | reset_y_position_peg_1     |
+|   3    | reset_y_position_peg_2     |
+|   4    | reset_ball_position        |
++--------+----------------------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 1 active terms.
++-----------------------------+
+|   Active Termination Terms  |
++-------+----------+----------+
+| Index | Name     | Time Out |
++-------+----------+----------+
+|   0   | time_out |   True   |
++-------+----------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 10 active terms.
++------------------------------------------------+
+|              Active Reward Terms               |
++-------+-------------------------------+--------+
+| Index | Name                          | Weight |
++-------+-------------------------------+--------+
+|   0   | player_in_goal                |    0.0 |
+|   1   | goal_scored                   |    0.0 |
+|   2   | goal_conceded                 |    0.0 |
+|   3   | distance_player_ball          |    0.0 |
+|   4   | distance_player_ball_own_half |    0.0 |
+|   5   | distance_ball_opponent_goal   |    0.0 |
+|   6   | ball_speed                    |    0.0 |
+|   7   | ball_stationary               |    0.0 |
+|   8   | collision_player_ball         |    0.0 |
+|   9   | ball_in_own_half              |    0.0 |
++-------+-------------------------------+--------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 0 active terms.
++----------------------+
+| Active Curriculum Terms |
++-----------+----------+
+|   Index   | Name     |
++-----------+----------+
++-----------+----------+
+
+[INFO]: Completed setting up the environment...
+self.seed = 42
+wandb: wandb version 0.19.6 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.12.21
+wandb: Run data is saved locally in /home/student/klask_rl/IsaacLab/wandb/run-20250218_203530-i2qcjm2u
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run comfy-cosmos-15
+wandb: ⭐️ View project at https://wandb.ai/idsc-rda/Isaac-Klask
+wandb: 🚀 View run at https://wandb.ai/idsc-rda/Isaac-Klask/runs/i2qcjm2u
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/common/a2c_common.py:254: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = torch.cuda.amp.GradScaler(enabled=self.mixed_precision)
+2025-02-18 20:35:39.335831: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1739907339.349592  476013 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1739907339.353775  476013 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+Started to train
+Exact experiment name requested from command line: sim_distance_ro_a0_1
+seq_length: 4
+current training device: cuda:0
+build mlp: 12
+=> loading checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_1/nn/klask.pth'
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x73d6608f4f70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_1/nn/klask.pth',) and kwargs:{}...
+Waiting 1 before trying again...
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x73d6608f4f70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_1/nn/klask.pth',) and kwargs:{}...
+Waiting 2 before trying again...
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x73d6608f4f70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_1/nn/klask.pth',) and kwargs:{}...
+Waiting 4 before trying again...
+ExError executing job with overrides: []
+ception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x73d6608f4f70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_1/nn/klask.pth',) and kwargs:{}...
+Waiting 8 before trying again...
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x73d6608f4f70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_1/nn/klask.pth',) and kwargs:{}...
+Waiting 16 before trying again...
+Traceback (most recent call last):
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/utils/hydra.py", line 101, in hydra_main
+    func(env_cfg, agent_cfg, *args, **kwargs)
+  File "/home/student/klask_rl/IsaacLab/scripts/reinforcement_learning/rl_games/train_klask.py", line 218, in main
+    runner.run({"train": True, "play": False, "sigma": train_sigma, "checkpoint": resume_path})
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/torch_runner.py", line 133, in run
+    self.run_train(args)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/torch_runner.py", line 114, in run_train
+    _restore(agent, args)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/torch_runner.py", line 20, in _restore
+    agent.restore(args['checkpoint'])
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/a2c_continuous.py", line 71, in restore
+    checkpoint = torch_ext.load_checkpoint(fn)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/torch_ext.py", line 83, in load_checkpoint
+    state = safe_load(filename)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/torch_ext.py", line 75, in safe_load
+    return safe_filesystem_op(torch.load, filename)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/torch_ext.py", line 69, in safe_filesystem_op
+    raise RuntimeError(f'Could not execute {func}, give up after {num_attempts} attempts...')
+RuntimeError: Could not execute <function load at 0x73d6608f4f70>, give up after 5 attempts...
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.
+wandb: - 0.011 MB of 0.011 MB uploaded (0.010 MB deduped)wandb: \ 0.011 MB of 0.011 MB uploaded (0.010 MB deduped)wandb: | 0.011 MB of 0.011 MB uploaded (0.010 MB deduped)wandb: / 0.011 MB of 0.011 MB uploaded (0.010 MB deduped)wandb: - 0.011 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: \ 0.011 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: | 0.011 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: / 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: - 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: \ 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: | 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: / 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: - 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: \ 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb:                                                                                
+wandb: W&B sync reduced upload amount by 14.4%             
+wandb: Synced comfy-cosmos-15: https://wandb.ai/idsc-rda/Isaac-Klask/runs/i2qcjm2u
+wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 2 other file(s)
+wandb: Find logs at: ./wandb/run-20250218_203530-i2qcjm2u/logs
+2025-02-18 19:36:20 [61,826ms] [Warning] [omni.fabric.plugin] gFabricState->gUsdStageToSimStageWithHistoryMap had 1 outstanding SimStageWithHistory(s) at shutdown
+2025-02-18 19:36:21 [62,191ms] [Warning] [carb] Recursive unloadAllPlugins() detected!
+2025-02-18 20:38:25.512449: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1739907505.523865  476026 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1739907505.527328  476026 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-02-18 20:38:25.539992: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+DEBUG:2025-02-18 20:38:26,204:jax._src.path:31: etils.epath found. Using etils.epath for file I/O.
+[Warning] [simulation_app.simulation_app] Modules: ['omni.kit_app'] were loaded before SimulationApp was started and might not be loaded correctly.
+[Warning] [simulation_app.simulation_app] Please check to make sure no extra omniverse or pxr modules are imported before the call to SimulationApp(...)
+Loading user config located at: '/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/omni/data/Kit/Isaac-Sim/4.5/user.config.json'
+[Info] [carb] Logging to file: /home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/omni/logs/Kit/Isaac-Sim/4.5/kit_20250218_203822.log
+2025-02-18 19:38:22 [0ms] [Warning] [omni.kit.app.plugin] No crash reporter present, dumps uploading isn't available.
+2025-02-18 19:38:22 [146ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2025-02-18 19:38:22 [267ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
+2025-02-18 19:38:22 [467ms] [Warning] [omni.datastore] OmniHub is inaccessible
+2025-02-18 19:38:22 [542ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 560.28.03     | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 4090          | Yes: 0 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 77773d38.. |
+|     |                                  |        |     |            | 1         |            |
+|---------------------------------------------------------------------------------------------|
+| 1   | NVIDIA GeForce RTX 4090          | Yes: 1 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | e872ee4d.. |
+|     |                                  |        |     |            | 2d        |            |
+|---------------------------------------------------------------------------------------------|
+| 2   | NVIDIA GeForce RTX 4090          | Yes: 2 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 693155e8.. |
+|     |                                  |        |     |            | 41        |            |
+|---------------------------------------------------------------------------------------------|
+| 3   | NVIDIA GeForce RTX 4090          | Yes: 3 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 2b4da82c.. |
+|     |                                  |        |     |            | 61        |            |
+|=============================================================================================|
+| OS: 22.04.5 LTS (Jammy Jellyfish) ubuntu, Version: 22.04.5, Kernel: 6.8.0-49-generic
+| Processor: AMD Ryzen Threadripper PRO 5995WX 64-Cores
+| Cores: 64 | Logical Cores: 128
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 515572 | Free Memory: 504025
+| Total Page/Swap (MB): 2047 | Free Page/Swap: 2047
+|---------------------------------------------------------------------------------------------|
+2025-02-18 19:38:28 [6,846ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2025-02-18 19:38:28 [6,846ms] [Warning] [gpu.foundation.plugin] Detected IOMMU is enabled. Running CUDA peer-to-peer bandwidth and latency validation.
+Uni[INFO][AppLauncher]: Loading experience file: /home/student/klask_rl/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO]: Parsing configuration from: <class 'isaaclab_tasks.manager_based.klask.klask_env_cfg.KlaskEnvCfg'>
+[INFO]: Parsing configuration from: /home/student/klask_rl/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/manager_based/klask/agents/rl_games_ppo_cfg.yaml
+directional P2P=Enabled Bandwidth (P2P Writes) Matrix (GB/s)
+   D\D     0      1      2      3 
+     0 912.68  22.41  22.15  22.45 
+     1  22.16 918.58  22.10  22.08 
+     2  22.40  22.36 921.29  22.23 
+     3  22.27  22.41  22.17 922.92 
+P2P=Enabled Latency (P2P Writes) Matrix (us)
+   GPU     0      1      2      3 
+     0   1.43  11.63  11.97  11.54 
+     1  15.81   1.46  14.22  14.74 
+     2  14.16  12.55   1.41  10.56 
+     3  14.28  11.18  11.27   1.35 
+
+   CPU     0      1      2      3 
+     0   2.18   6.76   6.16   6.20 
+     1   6.74   2.08   6.16   6.20 
+     2   6.40   6.38   1.84   5.86 
+     3   6.31   6.28   6.78   2.09 
+2025-02-18 19:38:29 [7,374ms] [Warning] [gpu.foundation.plugin] CUDA peer-to-peer observed bandwidth: 22.1 GB/s.
+2025-02-18 19:38:29 [7,374ms] [Warning] [gpu.foundation.plugin] CUDA peer-to-peer observed latency: 15.8 us.
+2025-02-18 19:38:29 [7,374ms] [Warning] [gpu.foundation.plugin] Please verify if observed bandwidth and latency are expected.
+2025-02-18 19:38:30 [8,094ms] [Warning] [isaaclab.envs.manager_based_env] The render interval (1) is smaller than the decimation (20). Multiple render calls will happen for each environment step. If this is not intended, set the render interval to be equal to the decimation.
+2025-02-18 19:38:30 [8,196ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPreviewSurface.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:38:30 [8,196ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdUVTexture.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:38:30 [8,196ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:38:30 [8,196ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float2.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:38:30 [8,197ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float3.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:38:30 [8,197ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float4.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:38:30 [8,197ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_int.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:38:30 [8,197ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_string.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:38:30 [8,197ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_normal.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:38:30 [8,197ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_point.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:38:30 [8,197ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_vector.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:38:30 [8,198ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_matrix.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:38:30 [8,198ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdTransform2d.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+Traceback (most recent call last):
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/asset_base.py", line 94, in <lambda>
+    lambda event, obj=weakref.proxy(self): obj._initialize_callback(event),
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/asset_base.py", line 265, in _initialize_callback
+    self._initialize_impl()
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/articulation/articulation.py", line 1136, in _initialize_impl
+    self._validate_cfg()
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/articulation/articulation.py", line 1465, in _validate_cfg
+    raise ValueError(msg)
+ValueError: The following joints have default positions out of the limits: 
+	- 'ground_to_slider_2': 0.000 not in [0.020, 0.210]
+	- 'ground_to_slider_1': 0.000 not in [-0.210, -0.020]
+
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/wandb/sdk/internal/internal_api.py:13: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+  from pkg_resources import parse_version
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/pkg_resources/__init__.py:3142: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google')`.
+Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+  declare_namespace(pkg)
+wandb: Currently logged in as: schulzj (idsc-rda). Use `wandb login --relogin` to force relogin
+[INFO]: Loading model checkpoint from: /home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_2/nn/klask.pth
+[INFO] Logging experiment in directory: /home/student/klask_rl/IsaacLab/logs/rl_games/klask
+Setting seed: 42
+[INFO]: Base environment:
+	Environment device    : cuda:1
+	Environment seed      : 42
+	Physics step-size     : 0.001
+	Rendering step-size   : 0.001
+	Environment step-size : 0.02
+[INFO]: Time taken for scene creation : 0.666597 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 4096
+	Environment spacing   : 1.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Time taken for simulation start : 1.870495 seconds
+[INFO] Command Manager:  <CommandManager> contains 0 active terms.
++------------------------+
+|  Active Command Terms  |
++--------+-------+-------+
+| Index  | Name  |  Type |
++--------+-------+-------+
++--------+-------+-------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++---------------------+
+| Active Recorder Terms |
++-----------+---------+
+|   Index   | Name    |
++-----------+---------+
++-----------+---------+
+
+[INFO] Action Manager:  <ActionManager> contains 4 active terms.
++-----------------------------------+
+|   Active Action Terms (shape: 4)  |
++--------+-------------+------------+
+| Index  | Name        |  Dimension |
++--------+-------------+------------+
+|   0    | player_x    |          1 |
+|   1    | player_y    |          1 |
+|   2    | opponent_x  |          1 |
+|   3    | opponent_y  |          1 |
++--------+-------------+------------+
+
+[INFO] Observation Manager: <ObservationManager> contains 1 groups.
++-------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (12,)) |
++-------------+---------------------------+-------------+
+|    Index    | Name                      |    Shape    |
++-------------+---------------------------+-------------+
+|      0      | peg_1_pos                 |     (2,)    |
+|      1      | peg_1_x_vel               |     (1,)    |
+|      2      | peg_1_y_vel               |     (1,)    |
+|      3      | peg_2_pos                 |     (2,)    |
+|      4      | peg_2_x_vel               |     (1,)    |
+|      5      | peg_2_y_vel               |     (1,)    |
+|      6      | ball_pos_rel              |     (2,)    |
+|      7      | ball_vel_rel              |     (2,)    |
++-------------+---------------------------+-------------+
+
+[INFO] Event Manager:  <EventManager> contains 1 active terms.
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++--------+----------------------------+
+| Index  | Name                       |
++--------+----------------------------+
+|   0    | reset_x_position_peg_1     |
+|   1    | reset_x_position_peg_2     |
+|   2    | reset_y_position_peg_1     |
+|   3    | reset_y_position_peg_2     |
+|   4    | reset_ball_position        |
++--------+----------------------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 1 active terms.
++-----------------------------+
+|   Active Termination Terms  |
++-------+----------+----------+
+| Index | Name     | Time Out |
++-------+----------+----------+
+|   0   | time_out |   True   |
++-------+----------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 10 active terms.
++------------------------------------------------+
+|              Active Reward Terms               |
++-------+-------------------------------+--------+
+| Index | Name                          | Weight |
++-------+-------------------------------+--------+
+|   0   | player_in_goal                |    0.0 |
+|   1   | goal_scored                   |    0.0 |
+|   2   | goal_conceded                 |    0.0 |
+|   3   | distance_player_ball          |    0.0 |
+|   4   | distance_player_ball_own_half |    0.0 |
+|   5   | distance_ball_opponent_goal   |    0.0 |
+|   6   | ball_speed                    |    0.0 |
+|   7   | ball_stationary               |    0.0 |
+|   8   | collision_player_ball         |    0.0 |
+|   9   | ball_in_own_half              |    0.0 |
++-------+-------------------------------+--------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 0 active terms.
++----------------------+
+| Active Curriculum Terms |
++-----------+----------+
+|   Index   | Name     |
++-----------+----------+
++-----------+----------+
+
+[INFO]: Completed setting up the environment...
+self.seed = 42
+wandb: wandb version 0.19.6 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.12.21
+wandb: Run data is saved locally in /home/student/klask_rl/IsaacLab/wandb/run-20250218_203833-h9wz4kqo
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run earthy-vortex-16
+wandb: ⭐️ View project at https://wandb.ai/idsc-rda/Isaac-Klask
+wandb: 🚀 View run at https://wandb.ai/idsc-rda/Isaac-Klask/runs/h9wz4kqo
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/common/a2c_common.py:254: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = torch.cuda.amp.GradScaler(enabled=self.mixed_precision)
+2025-02-18 20:38:42.429777: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1739907522.443414  476769 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1739907522.447627  476769 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/multiprocessing/resource_tracker.py:224: UserWarning: resource_tracker: There appear to be 6 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+2025-02-18 20:40:49.686535: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1739907649.697968  476782 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1739907649.701510  476782 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-02-18 20:40:49.714272: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+DEBUG:2025-02-18 20:40:50,383:jax._src.path:31: etils.epath found. Using etils.epath for file I/O.
+[Warning] [simulation_app.simulation_app] Modules: ['omni.kit_app'] were loaded before SimulationApp was started and might not be loaded correctly.
+[Warning] [simulation_app.simulation_app] Please check to make sure no extra omniverse or pxr modules are imported before the call to SimulationApp(...)
+Loading user config located at: '/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/omni/data/Kit/Isaac-Sim/4.5/user.config.json'
+[Info] [carb] Logging to file: /home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/omni/logs/Kit/Isaac-Sim/4.5/kit_20250218_204046.log
+2025-02-18 19:40:46 [0ms] [Warning] [omni.kit.app.plugin] No crash reporter present, dumps uploading isn't available.
+2025-02-18 19:40:46 [139ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2025-02-18 19:40:46 [260ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
+2025-02-18 19:40:46 [461ms] [Warning] [omni.datastore] OmniHub is inaccessible
+2025-02-18 19:40:46 [536ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 560.28.03     | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 4090          | Yes: 0 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 77773d38.. |
+|     |                                  |        |     |            | 1         |            |
+|---------------------------------------------------------------------------------------------|
+| 1   | NVIDIA GeForce RTX 4090          | Yes: 1 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | e872ee4d.. |
+|     |                                  |        |     |            | 2d        |            |
+|---------------------------------------------------------------------------------------------|
+| 2   | NVIDIA GeForce RTX 4090          | Yes: 2 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 693155e8.. |
+|     |                                  |        |     |            | 41        |            |
+|---------------------------------------------------------------------------------------------|
+| 3   | NVIDIA GeForce RTX 4090          | Yes: 3 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 2b4da82c.. |
+|     |                                  |        |     |            | 61        |            |
+|=============================================================================================|
+| OS: 22.04.5 LTS (Jammy Jellyfish) ubuntu, Version: 22.04.5, Kernel: 6.8.0-49-generic
+| Processor: AMD Ryzen Threadripper PRO 5995WX 64-Cores
+| Cores: 64 | Logical Cores: 128
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 515572 | Free Memory: 503952
+| Total Page/Swap (MB): 2047 | Free Page/Swap: 2047
+|---------------------------------------------------------------------------------------------|
+2025-02-18 19:40:53 [6,842ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2025-02-18 19:40:53 [6,842ms] [Warning] [gpu.foundation.plugin] Detected IOMMU is enabled. Running CUDA peer-to-peer bandwidth and latency validation.
+Uni[INFO][AppLauncher]: Loading experience file: /home/student/klask_rl/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO]: Parsing configuration from: <class 'isaaclab_tasks.manager_based.klask.klask_env_cfg.KlaskEnvCfg'>
+[INFO]: Parsing configuration from: /home/student/klask_rl/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/manager_based/klask/agents/rl_games_ppo_cfg.yaml
+directional P2P=Enabled Bandwidth (P2P Writes) Matrix (GB/s)
+   D\D     0      1      2      3 
+     0 913.21  22.11  22.22  22.19 
+     1  22.47 923.46  22.17  22.11 
+     2  22.12  22.30 920.20  22.37 
+     3  22.26  21.98  22.29 922.92 
+P2P=Enabled Latency (P2P Writes) Matrix (us)
+   GPU     0      1      2      3 
+     0   1.36  11.34  15.44  13.77 
+     1  12.89   1.36  13.72  14.28 
+     2  11.18  11.36   1.48  10.36 
+     3  13.79  13.02  19.91   1.35 
+
+   CPU     0      1      2      3 
+     0   2.17   6.88   6.32   6.19 
+     1   6.85   2.03   6.23   6.12 
+     2   6.54   6.35   1.88   5.84 
+     3   6.38   6.16   6.86   2.05 
+2025-02-18 19:40:53 [7,372ms] [Warning] [gpu.foundation.plugin] CUDA peer-to-peer observed bandwidth: 22.0 GB/s.
+2025-02-18 19:40:53 [7,372ms] [Warning] [gpu.foundation.plugin] CUDA peer-to-peer observed latency: 19.9 us.
+2025-02-18 19:40:53 [7,372ms] [Warning] [gpu.foundation.plugin] Please verify if observed bandwidth and latency are expected.
+2025-02-18 19:40:54 [8,088ms] [Warning] [isaaclab.envs.manager_based_env] The render interval (1) is smaller than the decimation (20). Multiple render calls will happen for each environment step. If this is not intended, set the render interval to be equal to the decimation.
+2025-02-18 19:40:54 [8,191ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPreviewSurface.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:40:54 [8,191ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdUVTexture.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:40:54 [8,191ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:40:54 [8,191ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float2.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:40:54 [8,191ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float3.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:40:54 [8,191ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float4.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:40:54 [8,192ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_int.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:40:54 [8,192ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_string.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:40:54 [8,192ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_normal.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:40:54 [8,192ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_point.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:40:54 [8,192ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_vector.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:40:54 [8,192ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_matrix.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:40:54 [8,192ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdTransform2d.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+Traceback (most recent call last):
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/asset_base.py", line 94, in <lambda>
+    lambda event, obj=weakref.proxy(self): obj._initialize_callback(event),
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/asset_base.py", line 265, in _initialize_callback
+    self._initialize_impl()
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/articulation/articulation.py", line 1136, in _initialize_impl
+    self._validate_cfg()
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/articulation/articulation.py", line 1465, in _validate_cfg
+    raise ValueError(msg)
+ValueError: The following joints have default positions out of the limits: 
+	- 'ground_to_slider_2': 0.000 not in [0.020, 0.210]
+	- 'ground_to_slider_1': 0.000 not in [-0.210, -0.020]
+
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/wandb/sdk/internal/internal_api.py:13: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+  from pkg_resources import parse_version
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/pkg_resources/__init__.py:3142: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google')`.
+Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+  declare_namespace(pkg)
+wandb: Currently logged in as: schulzj (idsc-rda). Use `wandb login --relogin` to force relogin
+[INFO]: Loading model checkpoint from: /home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_4/nn/klask.pth
+[INFO] Logging experiment in directory: /home/student/klask_rl/IsaacLab/logs/rl_games/klask
+Setting seed: 42
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 42
+	Physics step-size     : 0.001
+	Rendering step-size   : 0.001
+	Environment step-size : 0.02
+[INFO]: Time taken for scene creation : 0.669349 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 4096
+	Environment spacing   : 1.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Time taken for simulation start : 2.173802 seconds
+[INFO] Command Manager:  <CommandManager> contains 0 active terms.
++------------------------+
+|  Active Command Terms  |
++--------+-------+-------+
+| Index  | Name  |  Type |
++--------+-------+-------+
++--------+-------+-------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++---------------------+
+| Active Recorder Terms |
++-----------+---------+
+|   Index   | Name    |
++-----------+---------+
++-----------+---------+
+
+[INFO] Action Manager:  <ActionManager> contains 4 active terms.
++-----------------------------------+
+|   Active Action Terms (shape: 4)  |
++--------+-------------+------------+
+| Index  | Name        |  Dimension |
++--------+-------------+------------+
+|   0    | player_x    |          1 |
+|   1    | player_y    |          1 |
+|   2    | opponent_x  |          1 |
+|   3    | opponent_y  |          1 |
++--------+-------------+------------+
+
+[INFO] Observation Manager: <ObservationManager> contains 1 groups.
++-------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (12,)) |
++-------------+---------------------------+-------------+
+|    Index    | Name                      |    Shape    |
++-------------+---------------------------+-------------+
+|      0      | peg_1_pos                 |     (2,)    |
+|      1      | peg_1_x_vel               |     (1,)    |
+|      2      | peg_1_y_vel               |     (1,)    |
+|      3      | peg_2_pos                 |     (2,)    |
+|      4      | peg_2_x_vel               |     (1,)    |
+|      5      | peg_2_y_vel               |     (1,)    |
+|      6      | ball_pos_rel              |     (2,)    |
+|      7      | ball_vel_rel              |     (2,)    |
++-------------+---------------------------+-------------+
+
+[INFO] Event Manager:  <EventManager> contains 1 active terms.
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++--------+----------------------------+
+| Index  | Name                       |
++--------+----------------------------+
+|   0    | reset_x_position_peg_1     |
+|   1    | reset_x_position_peg_2     |
+|   2    | reset_y_position_peg_1     |
+|   3    | reset_y_position_peg_2     |
+|   4    | reset_ball_position        |
++--------+----------------------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 1 active terms.
++-----------------------------+
+|   Active Termination Terms  |
++-------+----------+----------+
+| Index | Name     | Time Out |
++-------+----------+----------+
+|   0   | time_out |   True   |
++-------+----------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 10 active terms.
++------------------------------------------------+
+|              Active Reward Terms               |
++-------+-------------------------------+--------+
+| Index | Name                          | Weight |
++-------+-------------------------------+--------+
+|   0   | player_in_goal                |    0.0 |
+|   1   | goal_scored                   |    0.0 |
+|   2   | goal_conceded                 |    0.0 |
+|   3   | distance_player_ball          |    0.0 |
+|   4   | distance_player_ball_own_half |    0.0 |
+|   5   | distance_ball_opponent_goal   |    0.0 |
+|   6   | ball_speed                    |    0.0 |
+|   7   | ball_stationary               |    0.0 |
+|   8   | collision_player_ball         |    0.0 |
+|   9   | ball_in_own_half              |    0.0 |
++-------+-------------------------------+--------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 0 active terms.
++----------------------+
+| Active Curriculum Terms |
++-----------+----------+
+|   Index   | Name     |
++-----------+----------+
++-----------+----------+
+
+[INFO]: Completed setting up the environment...
+self.seed = 42
+wandb: wandb version 0.19.6 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.12.21
+wandb: Run data is saved locally in /home/student/klask_rl/IsaacLab/wandb/run-20250218_204057-44okym2n
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run rosy-voice-17
+wandb: ⭐️ View project at https://wandb.ai/idsc-rda/Isaac-Klask
+wandb: 🚀 View run at https://wandb.ai/idsc-rda/Isaac-Klask/runs/44okym2n
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/common/a2c_common.py:254: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = torch.cuda.amp.GradScaler(enabled=self.mixed_precision)
+2025-02-18 20:41:06.893894: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1739907666.909137  477610 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1739907666.913840  477610 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-02-18 20:41:09.691901: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1739907669.703442  477523 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1739907669.706859  477523 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-02-18 20:41:09.718855: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+DEBUG:2025-02-18 20:41:10,389:jax._src.path:31: etils.epath found. Using etils.epath for file I/O.
+[Warning] [simulation_app.simulation_app] Modules: ['omni.kit_app'] were loaded before SimulationApp was started and might not be loaded correctly.
+[Warning] [simulation_app.simulation_app] Please check to make sure no extra omniverse or pxr modules are imported before the call to SimulationApp(...)
+Loading user config located at: '/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/omni/data/Kit/Isaac-Sim/4.5/user.config.json'
+[Info] [carb] Logging to file: /home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/omni/logs/Kit/Isaac-Sim/4.5/kit_20250218_204106.log
+2025-02-18 19:41:06 [0ms] [Warning] [omni.kit.app.plugin] No crash reporter present, dumps uploading isn't available.
+2025-02-18 19:41:07 [145ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2025-02-18 19:41:07 [274ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
+2025-02-18 19:41:07 [462ms] [Warning] [omni.datastore] OmniHub is inaccessible
+2025-02-18 19:41:07 [536ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 560.28.03     | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 4090          | Yes: 0 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 77773d38.. |
+|     |                                  |        |     |            | 1         |            |
+|---------------------------------------------------------------------------------------------|
+| 1   | NVIDIA GeForce RTX 4090          | Yes: 1 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | e872ee4d.. |
+|     |                                  |        |     |            | 2d        |            |
+|---------------------------------------------------------------------------------------------|
+| 2   | NVIDIA GeForce RTX 4090          | Yes: 2 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 693155e8.. |
+|     |                                  |        |     |            | 41        |            |
+|---------------------------------------------------------------------------------------------|
+| 3   | NVIDIA GeForce RTX 4090          | Yes: 3 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 2b4da82c.. |
+|     |                                  |        |     |            | 61        |            |
+|=============================================================================================|
+| OS: 22.04.5 LTS (Jammy Jellyfish) ubuntu, Version: 22.04.5, Kernel: 6.8.0-49-generic
+| Processor: AMD Ryzen Threadripper PRO 5995WX 64-Cores
+| Cores: 64 | Logical Cores: 128
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 515572 | Free Memory: 500264
+| Total Page/Swap (MB): 2047 | Free Page/Swap: 2047
+|---------------------------------------------------------------------------------------------|
+2025-02-18 19:41:13 [6,258ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2025-02-18 19:41:13 [6,259ms] [Warning] [gpu.foundation.plugin] Detected IOMMU is enabled. Running CUDA peer-to-peer bandwidth and latency validation.
+Uni[INFO][AppLauncher]: Loading experience file: /home/student/klask_rl/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO]: Parsing configuration from: <class 'isaaclab_tasks.manager_based.klask.klask_env_cfg.KlaskEnvCfg'>
+[INFO]: Parsing configuration from: /home/student/klask_rl/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/manager_based/klask/agents/rl_games_ppo_cfg.yaml
+directional P2P=Enabled Bandwidth (P2P Writes) Matrix (GB/s)
+   D\D     0      1      2      3 
+     0 912.14  22.17  21.89  22.02 
+     1  21.97 922.37  21.98  21.81 
+     2  22.15  22.04 923.40  22.16 
+     3  22.09  22.22  21.91 922.92 
+P2P=Enabled Latency (P2P Writes) Matrix (us)
+   GPU     0      1      2      3 
+     0   1.41  11.50  12.01  14.67 
+     1  11.65   1.46  14.64  13.46 
+     2  15.00  14.45   1.44  10.55 
+     3  13.77  12.29  20.08   1.41 
+
+   CPU     0      1      2      3 
+     0   2.17   6.83   6.33   6.16 
+     1   6.91   2.03   6.23   6.10 
+     2   6.53   6.30   1.87   5.82 
+     3   6.72   6.16   6.78   2.06 
+2025-02-18 19:41:13 [6,792ms] [Warning] [gpu.foundation.plugin] CUDA peer-to-peer observed bandwidth: 21.8 GB/s.
+2025-02-18 19:41:13 [6,792ms] [Warning] [gpu.foundation.plugin] CUDA peer-to-peer observed latency: 20.1 us.
+2025-02-18 19:41:13 [6,792ms] [Warning] [gpu.foundation.plugin] Please verify if observed bandwidth and latency are expected.
+2025-02-18 19:41:13 [6,817ms] [Warning] [omni.kvdb.plugin] Disabling key-value database because another kit process is locking it
+2025-02-18 19:41:14 [7,501ms] [Warning] [isaaclab.envs.manager_based_env] The render interval (1) is smaller than the decimation (20). Multiple render calls will happen for each environment step. If this is not intended, set the render interval to be equal to the decimation.
+2025-02-18 19:41:14 [7,603ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPreviewSurface.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:41:14 [7,604ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdUVTexture.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:41:14 [7,604ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:41:14 [7,604ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float2.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:41:14 [7,604ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float3.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:41:14 [7,604ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float4.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:41:14 [7,604ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_int.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:41:14 [7,605ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_string.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:41:14 [7,605ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_normal.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:41:14 [7,605ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_point.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:41:14 [7,605ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_vector.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:41:14 [7,605ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_matrix.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:41:14 [7,605ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdTransform2d.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+Traceback (most recent call last):
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/asset_base.py", line 94, in <lambda>
+    lambda event, obj=weakref.proxy(self): obj._initialize_callback(event),
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/asset_base.py", line 265, in _initialize_callback
+    self._initialize_impl()
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/articulation/articulation.py", line 1136, in _initialize_impl
+    self._validate_cfg()
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/articulation/articulation.py", line 1465, in _validate_cfg
+    raise ValueError(msg)
+ValueError: The following joints have default positions out of the limits: 
+	- 'ground_to_slider_2': 0.000 not in [0.020, 0.210]
+	- 'ground_to_slider_1': 0.000 not in [-0.210, -0.020]
+
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/wandb/sdk/internal/internal_api.py:13: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+  from pkg_resources import parse_version
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/pkg_resources/__init__.py:3142: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google')`.
+Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+  declare_namespace(pkg)
+wandb: Currently logged in as: schulzj (idsc-rda). Use `wandb login --relogin` to force relogin
+[INFO]: Loading model checkpoint from: /home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_2/nn/klask.pth
+[INFO] Logging experiment in directory: /home/student/klask_rl/IsaacLab/logs/rl_games/klask
+Setting seed: 42
+[INFO]: Base environment:
+	Environment device    : cuda:1
+	Environment seed      : 42
+	Physics step-size     : 0.001
+	Rendering step-size   : 0.001
+	Environment step-size : 0.02
+[INFO]: Time taken for scene creation : 0.656349 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 4096
+	Environment spacing   : 1.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Time taken for simulation start : 1.843224 seconds
+[INFO] Command Manager:  <CommandManager> contains 0 active terms.
++------------------------+
+|  Active Command Terms  |
++--------+-------+-------+
+| Index  | Name  |  Type |
++--------+-------+-------+
++--------+-------+-------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++---------------------+
+| Active Recorder Terms |
++-----------+---------+
+|   Index   | Name    |
++-----------+---------+
++-----------+---------+
+
+[INFO] Action Manager:  <ActionManager> contains 4 active terms.
++-----------------------------------+
+|   Active Action Terms (shape: 4)  |
++--------+-------------+------------+
+| Index  | Name        |  Dimension |
++--------+-------------+------------+
+|   0    | player_x    |          1 |
+|   1    | player_y    |          1 |
+|   2    | opponent_x  |          1 |
+|   3    | opponent_y  |          1 |
++--------+-------------+------------+
+
+[INFO] Observation Manager: <ObservationManager> contains 1 groups.
++-------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (12,)) |
++-------------+---------------------------+-------------+
+|    Index    | Name                      |    Shape    |
++-------------+---------------------------+-------------+
+|      0      | peg_1_pos                 |     (2,)    |
+|      1      | peg_1_x_vel               |     (1,)    |
+|      2      | peg_1_y_vel               |     (1,)    |
+|      3      | peg_2_pos                 |     (2,)    |
+|      4      | peg_2_x_vel               |     (1,)    |
+|      5      | peg_2_y_vel               |     (1,)    |
+|      6      | ball_pos_rel              |     (2,)    |
+|      7      | ball_vel_rel              |     (2,)    |
++-------------+---------------------------+-------------+
+
+[INFO] Event Manager:  <EventManager> contains 1 active terms.
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++--------+----------------------------+
+| Index  | Name                       |
++--------+----------------------------+
+|   0    | reset_x_position_peg_1     |
+|   1    | reset_x_position_peg_2     |
+|   2    | reset_y_position_peg_1     |
+|   3    | reset_y_position_peg_2     |
+|   4    | reset_ball_position        |
++--------+----------------------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 1 active terms.
++-----------------------------+
+|   Active Termination Terms  |
++-------+----------+----------+
+| Index | Name     | Time Out |
++-------+----------+----------+
+|   0   | time_out |   True   |
++-------+----------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 10 active terms.
++------------------------------------------------+
+|              Active Reward Terms               |
++-------+-------------------------------+--------+
+| Index | Name                          | Weight |
++-------+-------------------------------+--------+
+|   0   | player_in_goal                |    0.0 |
+|   1   | goal_scored                   |    0.0 |
+|   2   | goal_conceded                 |    0.0 |
+|   3   | distance_player_ball          |    0.0 |
+|   4   | distance_player_ball_own_half |    0.0 |
+|   5   | distance_ball_opponent_goal   |    0.0 |
+|   6   | ball_speed                    |    0.0 |
+|   7   | ball_stationary               |    0.0 |
+|   8   | collision_player_ball         |    0.0 |
+|   9   | ball_in_own_half              |    0.0 |
++-------+-------------------------------+--------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 0 active terms.
++----------------------+
+| Active Curriculum Terms |
++-----------+----------+
+|   Index   | Name     |
++-----------+----------+
++-----------+----------+
+
+[INFO]: Completed setting up the environment...
+self.seed = 42
+wandb: wandb version 0.19.6 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.12.21
+wandb: Run data is saved locally in /home/student/klask_rl/IsaacLab/wandb/run-20250218_204117-f2t9ww6e
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run eager-plasma-18
+wandb: ⭐️ View project at https://wandb.ai/idsc-rda/Isaac-Klask
+wandb: 🚀 View run at https://wandb.ai/idsc-rda/Isaac-Klask/runs/f2t9ww6e
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/common/a2c_common.py:254: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = torch.cuda.amp.GradScaler(enabled=self.mixed_precision)
+2025-02-18 20:41:26.522352: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1739907686.536053  478260 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1739907686.540201  478260 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+Started to train
+Exact experiment name requested from command line: sim_distance_ro_a0_1
+seq_length: 4
+current training device: cuda:0
+build mlp: 12
+=> loading checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_4/nn/klask.pth'
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x718240dd4f70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_4/nn/klask.pth',) and kwargs:{}...
+Waiting 1 before trying again...
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x718240dd4f70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_4/nn/klask.pth',) and kwargs:{}...
+Waiting 2 before trying again...
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x718240dd4f70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_4/nn/klask.pth',) and kwargs:{}...
+Waiting 4 before trying again...
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x718240dd4f70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_4/nn/klask.pth',) and kwargs:{}...
+Waiting 8 before trying again...
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x718240dd4f70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_4/nn/klask.pth',) and kwargs:{}...
+Waiting 16 before trying again...
+Error executing job with overrides: []
+Traceback (most recent call last):
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/utils/hydra.py", line 101, in hydra_main
+    func(env_cfg, agent_cfg, *args, **kwargs)
+  File "/home/student/klask_rl/IsaacLab/scripts/reinforcement_learning/rl_games/train_klask.py", line 218, in main
+    runner.run({"train": True, "play": False, "sigma": train_sigma, "checkpoint": resume_path})
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/torch_runner.py", line 133, in run
+    self.run_train(args)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/torch_runner.py", line 114, in run_train
+    _restore(agent, args)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/torch_runner.py", line 20, in _restore
+    agent.restore(args['checkpoint'])
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/a2c_continuous.py", line 71, in restore
+    checkpoint = torch_ext.load_checkpoint(fn)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/torch_ext.py", line 83, in load_checkpoint
+    state = safe_load(filename)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/torch_ext.py", line 75, in safe_load
+    return safe_filesystem_op(torch.load, filename)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/torch_ext.py", line 69, in safe_filesystem_op
+    raise RuntimeError(f'Could not execute {func}, give up after {num_attempts} attempts...')
+RuntimeError: Could not execute <function load at 0x718240dd4f70>, give up after 5 attempts...
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.
+wandb: - 0.011 MB of 0.011 MB uploaded (0.010 MB deduped)wandb: \ 0.011 MB of 0.011 MB uploaded (0.010 MB deduped)wandb: | 0.011 MB of 0.011 MB uploaded (0.010 MB deduped)wandb: / 0.011 MB of 0.011 MB uploaded (0.010 MB deduped)wandb: - 0.011 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: \ 0.011 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: | 0.011 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: / 0.057 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: - 0.064 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: \ 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: | 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: / 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: - 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: \ 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: | 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb:                                                                                
+wandb: W&B sync reduced upload amount by 14.4%             
+wandb: Synced rosy-voice-17: https://wandb.ai/idsc-rda/Isaac-Klask/runs/44okym2n
+wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 2 other file(s)
+wandb: Find logs at: ./wandb/run-20250218_204057-44okym2n/logs
+2025-02-18 19:41:48 [62,334ms] [Warning] [omni.fabric.plugin] gFabricState->gUsdStageToSimStageWithHistoryMap had 1 outstanding SimStageWithHistory(s) at shutdown
+2025-02-18 19:41:48 [62,705ms] [Warning] [carb] Recursive unloadAllPlugins() detected!
+Started to train
+Exact experiment name requested from command line: sim_distance_ro_a0_2
+seq_length: 4
+current training device: cuda:0
+build mlp: 12
+=> loading checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_2/nn/klask.pth'
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x7d03e94fcf70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_2/nn/klask.pth',) and kwargs:{}...
+Waiting 1 before trying again...
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x7d03e94fcf70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_2/nn/klask.pth',) and kwargs:{}...
+Waiting 2 before trying again...
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x7d03e94fcf70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_2/nn/klask.pth',) and kwargs:{}...
+Waiting 4 before trying again...
+ExError executing job with overrides: []
+ception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x7d03e94fcf70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_2/nn/klask.pth',) and kwargs:{}...
+Waiting 8 before trying again...
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x7d03e94fcf70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_2/nn/klask.pth',) and kwargs:{}...
+Waiting 16 before trying again...
+Traceback (most recent call last):
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/utils/hydra.py", line 101, in hydra_main
+    func(env_cfg, agent_cfg, *args, **kwargs)
+  File "/home/student/klask_rl/IsaacLab/scripts/reinforcement_learning/rl_games/train_klask.py", line 218, in main
+    runner.run({"train": True, "play": False, "sigma": train_sigma, "checkpoint": resume_path})
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/torch_runner.py", line 133, in run
+    self.run_train(args)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/torch_runner.py", line 114, in run_train
+    _restore(agent, args)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/torch_runner.py", line 20, in _restore
+    agent.restore(args['checkpoint'])
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/a2c_continuous.py", line 71, in restore
+    checkpoint = torch_ext.load_checkpoint(fn)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/torch_ext.py", line 83, in load_checkpoint
+    state = safe_load(filename)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/torch_ext.py", line 75, in safe_load
+    return safe_filesystem_op(torch.load, filename)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/torch_ext.py", line 69, in safe_filesystem_op
+    raise RuntimeError(f'Could not execute {func}, give up after {num_attempts} attempts...')
+RuntimeError: Could not execute <function load at 0x7d03e94fcf70>, give up after 5 attempts...
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.
+wandb: - 0.011 MB of 0.011 MB uploaded (0.010 MB deduped)wandb: \ 0.011 MB of 0.011 MB uploaded (0.010 MB deduped)wandb: | 0.011 MB of 0.011 MB uploaded (0.010 MB deduped)wandb: / 0.011 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: - 0.011 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: \ 0.011 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: | 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: / 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: - 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: \ 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: | 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: / 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: - 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb:                                                                                
+wandb: W&B sync reduced upload amount by 14.4%             
+wandb: Synced eager-plasma-18: https://wandb.ai/idsc-rda/Isaac-Klask/runs/f2t9ww6e
+wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 2 other file(s)
+wandb: Find logs at: ./wandb/run-20250218_204117-f2t9ww6e/logs
+2025-02-18 19:42:08 [61,222ms] [Warning] [omni.fabric.plugin] gFabricState->gUsdStageToSimStageWithHistoryMap had 1 outstanding SimStageWithHistory(s) at shutdown
+2025-02-18 19:42:08 [61,555ms] [Warning] [carb] Recursive unloadAllPlugins() detected!
+2025-02-18 20:42:08.563581: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1739907728.574947  478281 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1739907728.578374  478281 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2025-02-18 20:42:08.590804: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+DEBUG:2025-02-18 20:42:09,272:jax._src.path:31: etils.epath found. Using etils.epath for file I/O.
+[Warning] [simulation_app.simulation_app] Modules: ['omni.kit_app'] were loaded before SimulationApp was started and might not be loaded correctly.
+[Warning] [simulation_app.simulation_app] Please check to make sure no extra omniverse or pxr modules are imported before the call to SimulationApp(...)
+Loading user config located at: '/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/omni/data/Kit/Isaac-Sim/4.5/user.config.json'
+[Info] [carb] Logging to file: /home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/omni/logs/Kit/Isaac-Sim/4.5/kit_20250218_204205.log
+2025-02-18 19:42:05 [0ms] [Warning] [omni.kit.app.plugin] No crash reporter present, dumps uploading isn't available.
+2025-02-18 19:42:05 [144ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2025-02-18 19:42:05 [267ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
+2025-02-18 19:42:06 [465ms] [Warning] [omni.datastore] OmniHub is inaccessible
+2025-02-18 19:42:06 [540ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 560.28.03     | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 4090          | Yes: 0 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 77773d38.. |
+|     |                                  |        |     |            | 1         |            |
+|---------------------------------------------------------------------------------------------|
+| 1   | NVIDIA GeForce RTX 4090          | Yes: 1 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | e872ee4d.. |
+|     |                                  |        |     |            | 2d        |            |
+|---------------------------------------------------------------------------------------------|
+| 2   | NVIDIA GeForce RTX 4090          | Yes: 2 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 693155e8.. |
+|     |                                  |        |     |            | 41        |            |
+|---------------------------------------------------------------------------------------------|
+| 3   | NVIDIA GeForce RTX 4090          | Yes: 3 |     | 24564   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | 2b4da82c.. |
+|     |                                  |        |     |            | 61        |            |
+|=============================================================================================|
+| OS: 22.04.5 LTS (Jammy Jellyfish) ubuntu, Version: 22.04.5, Kernel: 6.8.0-49-generic
+| Processor: AMD Ryzen Threadripper PRO 5995WX 64-Cores
+| Cores: 64 | Logical Cores: 128
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 515572 | Free Memory: 503920
+| Total Page/Swap (MB): 2047 | Free Page/Swap: 2047
+|---------------------------------------------------------------------------------------------|
+2025-02-18 19:42:12 [6,399ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2025-02-18 19:42:12 [6,399ms] [Warning] [gpu.foundation.plugin] Detected IOMMU is enabled. Running CUDA peer-to-peer bandwidth and latency validation.
+Uni[INFO][AppLauncher]: Loading experience file: /home/student/klask_rl/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO]: Parsing configuration from: <class 'isaaclab_tasks.manager_based.klask.klask_env_cfg.KlaskEnvCfg'>
+[INFO]: Parsing configuration from: /home/student/klask_rl/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/manager_based/klask/agents/rl_games_ppo_cfg.yaml
+directional P2P=Enabled Bandwidth (P2P Writes) Matrix (GB/s)
+   D\D     0      1      2      3 
+     0 911.61  22.05  22.22  22.00 
+     1  22.15 923.11  22.20  22.26 
+     2  22.08  22.31 918.58  22.34 
+     3  22.35  22.32  22.21 923.63 
+P2P=Enabled Latency (P2P Writes) Matrix (us)
+   GPU     0      1      2      3 
+     0   1.39  11.26  14.64  11.55 
+     1  11.35   1.35  14.27  11.55 
+     2  12.31  12.93   1.42  10.40 
+     3  14.31  13.86  11.65   1.36 
+
+   CPU     0      1      2      3 
+     0   2.18   6.91   6.35   6.25 
+     1   6.90   2.03   6.25   6.11 
+     2   6.54   6.33   1.90   5.84 
+     3   6.37   6.18   6.83   2.07 
+2025-02-18 19:42:12 [6,930ms] [Warning] [gpu.foundation.plugin] CUDA peer-to-peer observed bandwidth: 22.0 GB/s.
+2025-02-18 19:42:12 [6,930ms] [Warning] [gpu.foundation.plugin] CUDA peer-to-peer observed latency: 14.6 us.
+2025-02-18 19:42:12 [6,930ms] [Warning] [gpu.foundation.plugin] Please verify if observed bandwidth and latency are expected.
+2025-02-18 19:42:13 [7,655ms] [Warning] [isaaclab.envs.manager_based_env] The render interval (1) is smaller than the decimation (20). Multiple render calls will happen for each environment step. If this is not intended, set the render interval to be equal to the decimation.
+2025-02-18 19:42:13 [7,756ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPreviewSurface.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:42:13 [7,756ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdUVTexture.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:42:13 [7,756ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:42:13 [7,757ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float2.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:42:13 [7,757ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float3.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:42:13 [7,757ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_float4.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:42:13 [7,757ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_int.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:42:13 [7,757ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_string.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:42:13 [7,757ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_normal.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:42:13 [7,757ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_point.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:42:13 [7,758ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_vector.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:42:13 [7,758ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdPrimvarReader_matrix.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+2025-02-18 19:42:13 [7,758ms] [Warning] [omni.usd] Warning: in GetNodeDiscoveryResults at line 136 of /builds/omniverse/usd-ci/USD/pxr/usd/usdShade/shaderDefUtils.cpp -- Unable to resolve info:sourceAsset </UsdTransform2d.info:mdl:sourceAsset> with value @UsdPreviewSurface.mdl@.
+
+Traceback (most recent call last):
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/asset_base.py", line 94, in <lambda>
+    lambda event, obj=weakref.proxy(self): obj._initialize_callback(event),
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/asset_base.py", line 265, in _initialize_callback
+    self._initialize_impl()
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/articulation/articulation.py", line 1136, in _initialize_impl
+    self._validate_cfg()
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab/isaaclab/assets/articulation/articulation.py", line 1465, in _validate_cfg
+    raise ValueError(msg)
+ValueError: The following joints have default positions out of the limits: 
+	- 'ground_to_slider_2': 0.000 not in [0.020, 0.210]
+	- 'ground_to_slider_1': 0.000 not in [-0.210, -0.020]
+
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/wandb/sdk/internal/internal_api.py:13: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+  from pkg_resources import parse_version
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/pkg_resources/__init__.py:3142: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google')`.
+Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+  declare_namespace(pkg)
+wandb: Currently logged in as: schulzj (idsc-rda). Use `wandb login --relogin` to force relogin
+[INFO]: Loading model checkpoint from: /home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_3/nn/klask.pth
+[INFO] Logging experiment in directory: /home/student/klask_rl/IsaacLab/logs/rl_games/klask
+Setting seed: 42
+[INFO]: Base environment:
+	Environment device    : cuda:2
+	Environment seed      : 42
+	Physics step-size     : 0.001
+	Rendering step-size   : 0.001
+	Environment step-size : 0.02
+[INFO]: Time taken for scene creation : 0.678025 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 4096
+	Environment spacing   : 1.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Time taken for simulation start : 1.831134 seconds
+[INFO] Command Manager:  <CommandManager> contains 0 active terms.
++------------------------+
+|  Active Command Terms  |
++--------+-------+-------+
+| Index  | Name  |  Type |
++--------+-------+-------+
++--------+-------+-------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++---------------------+
+| Active Recorder Terms |
++-----------+---------+
+|   Index   | Name    |
++-----------+---------+
++-----------+---------+
+
+[INFO] Action Manager:  <ActionManager> contains 4 active terms.
++-----------------------------------+
+|   Active Action Terms (shape: 4)  |
++--------+-------------+------------+
+| Index  | Name        |  Dimension |
++--------+-------------+------------+
+|   0    | player_x    |          1 |
+|   1    | player_y    |          1 |
+|   2    | opponent_x  |          1 |
+|   3    | opponent_y  |          1 |
++--------+-------------+------------+
+
+[INFO] Observation Manager: <ObservationManager> contains 1 groups.
++-------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (12,)) |
++-------------+---------------------------+-------------+
+|    Index    | Name                      |    Shape    |
++-------------+---------------------------+-------------+
+|      0      | peg_1_pos                 |     (2,)    |
+|      1      | peg_1_x_vel               |     (1,)    |
+|      2      | peg_1_y_vel               |     (1,)    |
+|      3      | peg_2_pos                 |     (2,)    |
+|      4      | peg_2_x_vel               |     (1,)    |
+|      5      | peg_2_y_vel               |     (1,)    |
+|      6      | ball_pos_rel              |     (2,)    |
+|      7      | ball_vel_rel              |     (2,)    |
++-------------+---------------------------+-------------+
+
+[INFO] Event Manager:  <EventManager> contains 1 active terms.
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++--------+----------------------------+
+| Index  | Name                       |
++--------+----------------------------+
+|   0    | reset_x_position_peg_1     |
+|   1    | reset_x_position_peg_2     |
+|   2    | reset_y_position_peg_1     |
+|   3    | reset_y_position_peg_2     |
+|   4    | reset_ball_position        |
++--------+----------------------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 1 active terms.
++-----------------------------+
+|   Active Termination Terms  |
++-------+----------+----------+
+| Index | Name     | Time Out |
++-------+----------+----------+
+|   0   | time_out |   True   |
++-------+----------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 10 active terms.
++------------------------------------------------+
+|              Active Reward Terms               |
++-------+-------------------------------+--------+
+| Index | Name                          | Weight |
++-------+-------------------------------+--------+
+|   0   | player_in_goal                |    0.0 |
+|   1   | goal_scored                   |    0.0 |
+|   2   | goal_conceded                 |    0.0 |
+|   3   | distance_player_ball          |    0.0 |
+|   4   | distance_player_ball_own_half |    0.0 |
+|   5   | distance_ball_opponent_goal   |    0.0 |
+|   6   | ball_speed                    |    0.0 |
+|   7   | ball_stationary               |    0.0 |
+|   8   | collision_player_ball         |    0.0 |
+|   9   | ball_in_own_half              |    0.0 |
++-------+-------------------------------+--------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 0 active terms.
++----------------------+
+| Active Curriculum Terms |
++-----------+----------+
+|   Index   | Name     |
++-----------+----------+
++-----------+----------+
+
+[INFO]: Completed setting up the environment...
+self.seed = 42
+wandb: wandb version 0.19.6 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.12.21
+wandb: Run data is saved locally in /home/student/klask_rl/IsaacLab/wandb/run-20250218_204216-6ogb2wld
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run easy-puddle-19
+wandb: ⭐️ View project at https://wandb.ai/idsc-rda/Isaac-Klask
+wandb: 🚀 View run at https://wandb.ai/idsc-rda/Isaac-Klask/runs/6ogb2wld
+/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/common/a2c_common.py:254: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = torch.cuda.amp.GradScaler(enabled=self.mixed_precision)
+2025-02-18 20:42:25.361848: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1739907745.375453  479012 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1739907745.379603  479012 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+Error executing job with overrides: []
+Started to train
+Exact experiment name requested from command line: sim_distance_ro_a0_3
+seq_length: 4
+current training device: cuda:0
+build mlp: 12
+=> loading checkpoint '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_3/nn/klask.pth'
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x78f25d4f0f70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_3/nn/klask.pth',) and kwargs:{}...
+Waiting 1 before trying again...
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x78f25d4f0f70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_3/nn/klask.pth',) and kwargs:{}...
+Waiting 2 before trying again...
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x78f25d4f0f70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_3/nn/klask.pth',) and kwargs:{}...
+Waiting 4 before trying again...
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x78f25d4f0f70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_3/nn/klask.pth',) and kwargs:{}...
+Waiting 8 before trying again...
+Exception Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL numpy.core.multiarray.scalar was not an allowed global by default. Please use `torch.serialization.add_safe_globals([scalar])` or the `torch.serialization.safe_globals([scalar])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html. when trying to execute <function load at 0x78f25d4f0f70> with args:('/home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_3/nn/klask.pth',) and kwargs:{}...
+Waiting 16 before trying again...
+Traceback (most recent call last):
+  File "/home/student/klask_rl/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/utils/hydra.py", line 101, in hydra_main
+    func(env_cfg, agent_cfg, *args, **kwargs)
+  File "/home/student/klask_rl/IsaacLab/scripts/reinforcement_learning/rl_games/train_klask.py", line 218, in main
+    runner.run({"train": True, "play": False, "sigma": train_sigma, "checkpoint": resume_path})
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/torch_runner.py", line 133, in run
+    self.run_train(args)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/torch_runner.py", line 114, in run_train
+    _restore(agent, args)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/torch_runner.py", line 20, in _restore
+    agent.restore(args['checkpoint'])
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/a2c_continuous.py", line 71, in restore
+    checkpoint = torch_ext.load_checkpoint(fn)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/torch_ext.py", line 83, in load_checkpoint
+    state = safe_load(filename)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/torch_ext.py", line 75, in safe_load
+    return safe_filesystem_op(torch.load, filename)
+  File "/home/student/miniconda3/envs/env_isaaclab/lib/python3.10/site-packages/rl_games/algos_torch/torch_ext.py", line 69, in safe_filesystem_op
+    raise RuntimeError(f'Could not execute {func}, give up after {num_attempts} attempts...')
+RuntimeError: Could not execute <function load at 0x78f25d4f0f70>, give up after 5 attempts...
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.
+wandb: - 0.011 MB of 0.011 MB uploaded (0.010 MB deduped)wandb: \ 0.011 MB of 0.011 MB uploaded (0.010 MB deduped)wandb: | 0.011 MB of 0.011 MB uploaded (0.010 MB deduped)wandb: / 0.011 MB of 0.011 MB uploaded (0.010 MB deduped)wandb: - 0.011 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: \ 0.011 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: | 0.011 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: / 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: - 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: \ 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: | 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: / 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: - 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: \ 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb: | 0.068 MB of 0.068 MB uploaded (0.010 MB deduped)wandb:                                                                                
+wandb: W&B sync reduced upload amount by 14.4%             
+wandb: Synced easy-puddle-19: https://wandb.ai/idsc-rda/Isaac-Klask/runs/6ogb2wld
+wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 2 other file(s)
+wandb: Find logs at: ./wandb/run-20250218_204216-6ogb2wld/logs
+2025-02-18 19:43:07 [61,427ms] [Warning] [omni.fabric.plugin] gFabricState->gUsdStageToSimStageWithHistoryMap had 1 outstanding SimStageWithHistory(s) at shutdown
+2025-02-18 19:43:07 [61,792ms] [Warning] [carb] Recursive unloadAllPlugins() detected!
