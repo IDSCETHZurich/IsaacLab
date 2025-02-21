@@ -332,8 +332,10 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("klask", joint_names=["slider_to_peg_1"]),
-            "position_range": (-0.15, 0.15),
-            "velocity_range": (0.0, 0.0),
+            "position_range": (0.0202, 0.0202),
+            "velocity_range": (0.086, 0.086)
+            #"position_range": (-0.15, 0.15),
+            #"velocity_range": (0.0, 0.0),
         },
     )
 
@@ -352,8 +354,10 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("klask", joint_names=["ground_to_slider_1"]),
-            "position_range": (-0.2, -0.03),
-            "velocity_range": (0.0, 0.0),
+            #"position_range": (-0.2, -0.03),
+            "position_range": (-0.1103, -0.1103),
+            "velocity_range": (-0.0043, -0.0043)
+            #"velocity_range": (0.0, 0.0),
         },
     )
 

@@ -7,7 +7,7 @@ from gymnasium import Wrapper
 class ActuatorNetwork(nn.Module):
     def __init__(self, input_dim, output_dim, hidden_dim):
         super(ActuatorNetwork, self).__init__()
-        # Following the excerpt: 3 hidden layers
+        # Following the excerpt: 3 hidden layers of 32 units each
         # Use softsign activation
         self.fc1 = nn.Linear(input_dim, hidden_dim)
         self.fc2 = nn.Linear(hidden_dim, hidden_dim)
@@ -16,7 +16,11 @@ class ActuatorNetwork(nn.Module):
         # softsign activation: y = x/(1+|x|)
         self.activation = nn.Softsign()
 
-    def forward(self, x):
+    def forward(self, x_commands, x_states=None):
+        if x_states is not None:
+            x = torch.cat([x_commands, x_states], dim=1)
+        else:
+            x = x_commands
         x = self.activation(self.fc1(x))
         x = self.activation(self.fc2(x))
         x = self.activation(self.fc3(x))
@@ -49,6 +53,8 @@ class ActuatorModelWrapper(Wrapper):
             self.state_buffer_1 = torch.zeros(num_envs, 4 * (self.num_history_steps - 1), dtype=torch.float32).to(device)
             self.state_buffer_2 = torch.zeros(num_envs, 4 * (self.num_history_steps - 1), dtype=torch.float32).to(device)
 
+        self.actions_log = []
+
     def reset(self):
         obs, info = self.env.reset()
         
@@ -69,38 +75,35 @@ class ActuatorModelWrapper(Wrapper):
     def step(self, actions):
         # Peg 1 command history update:
         command_1 = actions[:, :2]
-        self.command_buffer_1[:, 2:] = self.command_buffer_1.clone()[:, 2:]
+        self.command_buffer_1[:, 2:] = self.command_buffer_1.clone()[:, :-2]
         self.command_buffer_1[:, :2] = command_1
 
         # Peg 2 command history update:
         command_2 = actions[:, :2]
-        self.command_buffer_2[:, 2:] = self.command_buffer_2.clone()[:, 2:]
+        self.command_buffer_2[:, 2:] = self.command_buffer_2.clone()[:, :-2]
         self.command_buffer_2[:, :2] = command_2
 
         # Map commands to velocities using the actuator model:
         if self.include_states:
-            input_1 = torch.cat([self.command_buffer_1, self.state_buffer_1], dim=1)
-            input_2 = torch.cat([self.command_buffer_2, self.state_buffer_2], dim=1)
+            states_input_1, states_input_2 = self.state_buffer_1, self.state_buffer_2
         else:
-            input_1 = self.command_buffer_1
-            input_2 = self.command_buffer_2
-        #print(input_1)
-        actions_1 = self.model(input_1)
-        #print(actions_1)
-        actions_2 = self.model(input_2)
+            states_input_1, states_input_2 = None, None
+        actions_1 = self.model(self.command_buffer_1, states_input_1)
+        actions_2 = self.model(self.command_buffer_2, states_input_2)
         actions[:, :2] = actions_1
         actions[:, 2:] = actions_2
+        self.actions_log.append(actions.detach().cpu().numpy())
         obs, rew, terminated, truncated, info = self.env.step(actions)
 
         if self.include_states:
             # Peg 1 state history update:
             state_1 = obs["policy"][:, :4]
-            self.state_buffer_1[:, 4:] = self.state_buffer_1.clone()[:, 4:]
+            self.state_buffer_1[:, 4:] = self.state_buffer_1.clone()[:, :-4]
             self.state_buffer_1[:, :4] = state_1
             
             # Peg 2 state history update:
             state_2 = -obs["opponent"][:, :4]
-            self.state_buffer_2[:, 4:] = self.state_buffer_2.clone()[:, 4:]
+            self.state_buffer_2[:, 4:] = self.state_buffer_2.clone()[:, :-4]
             self.state_buffer_2[:, :4] = state_2
 
         # Reset buffers for terminated envs:
