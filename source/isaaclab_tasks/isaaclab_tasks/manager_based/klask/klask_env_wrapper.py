@@ -210,9 +210,7 @@ class OpponentObservationWrapper(Wrapper):
 
     def get_opponent_obs(self, obs):
         opponent_obs = obs.detach().clone()
-        opponent_obs[:, :4] = -obs[:, 4:8]
-        opponent_obs[:, 4:8] = -obs[:, :4]
-        opponent_obs[:, 8:12] = -obs[:, 8:12]
+        opponent_obs[:, :12] = -obs[:, :12]
         return opponent_obs
     
     def reset(self):
@@ -280,9 +278,7 @@ class KlaskAgentOpponentWrapper(Wrapper):
     
     def get_opponent_obs(self, obs):
         opponent_obs = obs.detach().clone()
-        opponent_obs[:, :4] = -obs[:, 4:8]
-        opponent_obs[:, 4:8] = -obs[:, :4]
-        opponent_obs[:, 8:12] = -obs[:, 8:12]
+        opponent_obs[:, :12] = -obs[:, :12]
         return opponent_obs
 
     def reset(self, *args, **kwargs):

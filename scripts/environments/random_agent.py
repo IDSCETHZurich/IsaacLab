@@ -38,7 +38,7 @@ import numpy as np
 import isaaclab_tasks  # noqa: F401
 from isaaclab_tasks.utils import parse_env_cfg
 
-from isaaclab_tasks.manager_based.klask import ObservationNoiseWrapper
+from isaaclab_tasks.manager_based.klask import ObservationNoiseWrapper, ActuatorModelWrapper
 
 
 def main():
@@ -49,7 +49,8 @@ def main():
     )
     # create environment
     env = gym.make(args_cli.task, cfg=env_cfg)
-    env = ObservationNoiseWrapper(env, 0.01)
+    env = ActuatorModelWrapper(env)
+    #env = ObservationNoiseWrapper(env, 0.01)
 
     # print info (this is vectorized environment)
     print(f"[INFO]: Gym observation space: {env.observation_space}")
