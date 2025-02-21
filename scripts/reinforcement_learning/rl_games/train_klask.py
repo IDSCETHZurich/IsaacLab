@@ -84,7 +84,7 @@ from isaaclab_tasks.manager_based.klask import (
     OpponentObservationWrapper
 )
 from isaaclab_assets.robots.klask import KLASK_PARAMS
-from klask_algo_observer import KlaskAlgoObserver
+from klask_rl_games import KlaskAlgoObserver, KlaskRunner
 
 @hydra_task_config(args_cli.task, "rl_games_cfg_entry_point")
 def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agent_cfg: dict):
@@ -200,7 +200,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # set number of actors into agent config
     agent_cfg["params"]["config"]["num_actors"] = env.unwrapped.num_envs
     # create runner from rl-games
-    runner = Runner(KlaskAlgoObserver())
+    runner = KlaskRunner(KlaskAlgoObserver())
     runner.load(agent_cfg)
 
     if "env" in agent_cfg.keys():

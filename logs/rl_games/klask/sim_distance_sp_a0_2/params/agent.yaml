@@ -31,7 +31,7 @@ params:
       regularizer:
         name: None
   load_checkpoint: true
-  load_path: /home/student/klask_rl/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_2/nn/klask.pth
+  load_path: /home/idsc/IsaacLab/logs/rl_games/klask/sim_collision_ro_a0_2/nn/klask.pth
   config:
     full_experiment_name: sim_distance_sp_a0_2
     name: klask
@@ -72,7 +72,7 @@ params:
       update_score: -100.0
       games_to_check: 1
       env_update_num: 4096
-    train_dir: /home/student/klask_rl/IsaacLab/logs/rl_games/klask
+    train_dir: /home/idsc/IsaacLab/logs/rl_games/klask
 env:
   obs_noise: 0.0
 rewards:

@@ -1,6 +1,8 @@
 isaacsim isaacsim.exp.full.kit
 
 WANDB_API_KEY=369fbf0326cfa2c16aab5babba5a478788d901f4 nohup python scripts/reinforcement_learning/rl_games/train_klask.py --task Isaac-Klask-v0 --num_envs 4096 --config planned_runs/sweep/sim_sparse_ro_a0_1.yaml --checkpoint logs/rl_games/klask/sim_distance_ro_a0_2/nn/klask.pth --headless --wandb-project-name Isaac-Klask --device cuda:1 --wandb-entity idsc-rda > output_1.log &
+WANDB_API_KEY=369fbf0326cfa2c16aab5babba5a478788d901f4 python scripts/reinforcement_learning/rl_games/train_klask.py --task Isaac-Klask-v0 --num_envs 4096 --config planned_runs/sweep/sim_distance_sp_a0_2.yaml --checkpoint "logs/rl_games/klask/sim_collision_ro_a0_2/nn/klask.pth" --headless --wandb-project-name Isaac-Klask --wandb-entity idsc-rda
+
 
 Implementation:
 - possibly use curriculum manager instead of curriculum wrapper
@@ -49,6 +51,6 @@ Sweep:
 
 ACTUATOR MODEL:
 - dataloader:
-    - inputs: history of commands (+ states) + delta_t; window [t-300ms, t] or [t-300ms, t-200ms]
+    - inputs: history of commands (+ states) (+ delta_t); window [t-300ms, t] or [t-300ms, t-200ms]
     - outputs: peg velocity at time t
     - interpolation: randomly select points inbetween timestamps and linearly interpolate states (use nearest command)

@@ -43,11 +43,11 @@ class ActuatorModelWrapper(Wrapper):
         if model_file is None:
             model_file = self.model_file
         self.model.load_state_dict(torch.load(model_file, map_location=device))
-        self.command_buffer_1 = torch.zeros(num_envs, 2 * self.num_history_steps, dtype=float).to(device)
-        self.command_buffer_2 = torch.zeros(num_envs, 2 * self.num_history_steps, dtype=float).to(device)
+        self.command_buffer_1 = torch.zeros(num_envs, 2 * self.num_history_steps, dtype=torch.float32).to(device)
+        self.command_buffer_2 = torch.zeros(num_envs, 2 * self.num_history_steps, dtype=torch.float32).to(device)
         if self.include_states:
-            self.state_buffer_1 = torch.zeros(num_envs, 4 * (self.num_history_steps - 1), dtype=float).to(device)
-            self.state_buffer_2 = torch.zeros(num_envs, 4 * (self.num_history_steps - 1), dtype=float).to(device)
+            self.state_buffer_1 = torch.zeros(num_envs, 4 * (self.num_history_steps - 1), dtype=torch.float32).to(device)
+            self.state_buffer_2 = torch.zeros(num_envs, 4 * (self.num_history_steps - 1), dtype=torch.float32).to(device)
 
     def reset(self):
         obs, info = self.env.reset()
@@ -55,13 +55,13 @@ class ActuatorModelWrapper(Wrapper):
         # Peg 1 history update:
         state_1 = obs["policy"][:, :4]
         if self.include_states:
-            self.state_buffer_1[:, -4:] = state_1.repeat(1, self.num_history_steps - 1)
+            self.state_buffer_1[:, :] = state_1.repeat(1, self.num_history_steps - 1)
         self.command_buffer_1[:, :] = 0.0
         
         # Peg 2 history update:
         state_2 = -obs["opponent"][:, :4]
         if self.include_states:
-            self.state_buffer_2[:, -4:] = state_2.repeat(1, self.num_history_steps - 1)
+            self.state_buffer_2[:, :] = state_2.repeat(1, self.num_history_steps - 1)
         self.command_buffer_2[:, :] = 0.0
 
         return obs, info
@@ -69,13 +69,13 @@ class ActuatorModelWrapper(Wrapper):
     def step(self, actions):
         # Peg 1 command history update:
         command_1 = actions[:, :2]
-        self.command_buffer_1[:, :-2] = self.command_buffer_1[:, 2:]
-        self.command_buffer_1[:, -2:] = command_1
+        self.command_buffer_1[:, 2:] = self.command_buffer_1.clone()[:, 2:]
+        self.command_buffer_1[:, :2] = command_1
 
         # Peg 2 command history update:
         command_2 = actions[:, :2]
-        self.command_buffer_2[:, :-2] = self.command_buffer_2[:, 2:]
-        self.command_buffer_2[:, -2:] = command_2
+        self.command_buffer_2[:, 2:] = self.command_buffer_2.clone()[:, 2:]
+        self.command_buffer_2[:, :2] = command_2
 
         # Map commands to velocities using the actuator model:
         if self.include_states:
@@ -84,7 +84,9 @@ class ActuatorModelWrapper(Wrapper):
         else:
             input_1 = self.command_buffer_1
             input_2 = self.command_buffer_2
+        #print(input_1)
         actions_1 = self.model(input_1)
+        #print(actions_1)
         actions_2 = self.model(input_2)
         actions[:, :2] = actions_1
         actions[:, 2:] = actions_2
@@ -93,21 +95,21 @@ class ActuatorModelWrapper(Wrapper):
         if self.include_states:
             # Peg 1 state history update:
             state_1 = obs["policy"][:, :4]
-            self.state_buffer_1[:, :-4] = self.state_buffer_1[:, 4:]
-            self.state_buffer_1[:, -4:] = state_1
+            self.state_buffer_1[:, 4:] = self.state_buffer_1.clone()[:, 4:]
+            self.state_buffer_1[:, :4] = state_1
             
             # Peg 2 state history update:
             state_2 = -obs["opponent"][:, :4]
-            self.state_buffer_2[:, :-4] = self.state_buffer_2[:, 4:]
-            self.state_buffer_2[:, -4:] = state_2
+            self.state_buffer_2[:, 4:] = self.state_buffer_2.clone()[:, 4:]
+            self.state_buffer_2[:, :4] = state_2
 
         # Reset buffers for terminated envs:
         done = terminated | truncated
         self.command_buffer_1[done, :] = 0.0
         self.command_buffer_2[done, :] = 0.0
         if self.include_states:
-            self.state_buffer_1[done, -4:] = state_1.repeat(1, self.num_history_steps - 1)
-            self.state_buffer_2[done, -4:] = state_2.repeat(1, self.num_history_steps - 1)
+            self.state_buffer_1[done, :] = state_1.repeat(1, self.num_history_steps - 1)
+            self.state_buffer_2[done, :] = state_2.repeat(1, self.num_history_steps - 1)
         
 
         return obs, rew, terminated, truncated, info

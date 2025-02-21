@@ -80,9 +80,10 @@ params:
     bounds_loss_coef: 0.0001
     self_play: True
     self_play_config:
-      update_score: -100.0
+      update_score: 0.0
       games_to_check: 1
       env_update_num: 4096
+      check_scores: True
 
 env:
   obs_noise: 0.0

@@ -1,5 +1,7 @@
 from rl_games.algos_torch import torch_ext
 from rl_games.common.algo_observer import AlgoObserver
+from rl_games.algos_torch.self_play_manager import SelfPlayManager
+from rl_games.torch_runner import Runner, _restore, _override_sigma
 import torch
 import numpy as np
 
@@ -30,12 +32,14 @@ class KlaskAlgoObserver(AlgoObserver):
                 # only log scalars
                 if isinstance(v, float) or isinstance(v, int) or (isinstance(v, torch.Tensor) and len(v.shape) == 0):
                     self.direct_info[k] = v
-                if k == "Episode_Termination/goal_scored":
-                    self.mean_scores.update(torch.ones(v, dtype=float).to(self.algo.ppo_device))
-                elif k == "Episode_Termination/goal_conceded":
-                    self.mean_scores.update(-torch.ones(v, dtype=float).to(self.algo.ppo_device))
-                elif k == "Episode_Termination/player_in_goal":
-                    self.mean_scores.update(-torch.ones(v, dtype=float).to(self.algo.ppo_device))
+                if k == "episode":
+                    for key, val in v.items():
+                        if key == "Episode_Termination/goal_scored":
+                            self.mean_scores.update(torch.ones(val, dtype=float).to(self.algo.ppo_device))
+                        elif key == "Episode_Termination/goal_conceded":
+                            self.mean_scores.update(-torch.ones(val, dtype=float).to(self.algo.ppo_device))
+                        elif key == "Episode_Termination/player_in_goal":
+                            self.mean_scores.update(-torch.ones(val, dtype=float).to(self.algo.ppo_device))
 
     def after_clear_stats(self):
         # clear stored buffers
@@ -67,3 +71,43 @@ class KlaskAlgoObserver(AlgoObserver):
             self.writer.add_scalar("scores/mean", mean_scores, frame)
             self.writer.add_scalar("scores/iter", mean_scores, epoch_num)
             self.writer.add_scalar("scores/time", mean_scores, total_time)
+
+
+class KlaskSelfPlayManager(SelfPlayManager):
+
+    def update(self, algo):
+        self.updates_num += 1
+        if self.check_scores:
+            data = algo.algo_observer.mean_scores
+        else:
+            data = algo.game_rewards
+
+        if len(data) >= self.games_to_check:
+            mean_scores = data.get_mean()
+            mean_rewards = algo.game_rewards.get_mean()
+            if mean_scores > self.update_score:
+                print('Mean scores: ', mean_scores, ' mean rewards: ', mean_rewards, ' updating weights')
+
+                algo.clear_stats()
+                self.writter.add_scalar('selfplay/iters_update_weigths', self.updates_num, algo.frame)
+                algo.vec_env.set_weights(self.env_indexes, algo.get_weights())
+                self.env_indexes = (self.env_indexes + 1) % (algo.num_actors)
+                self.updates_num = 0
+
+
+class KlaskRunner(Runner):
+
+    def run_train(self, args):
+        """Run the training procedure from the algorithm passed in.
+
+        Args:
+            args (:obj:`dict`): Train specific args passed in as a dict obtained from a yaml file or some other config format.
+
+        """
+        print('Started to train')
+        agent = self.algo_factory.create(self.algo_name, base_name='run', params=self.params)
+        _restore(agent, args)
+        _override_sigma(agent, args)
+        if agent.has_self_play_config:
+            agent.self_play_manager = KlaskSelfPlayManager(agent.self_play_config, agent.writer)
+        agent.train()

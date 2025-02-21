@@ -75,7 +75,7 @@ def main():
         stop = False
         stop_counter = 20
         step = 0
-        max_steps = 20
+        max_steps = 2000
         while simulation_app.is_running() and time.time() - start_time < 1000.0 and step < max_steps:
             # run everything in inference mode
             with torch.inference_mode():
@@ -91,7 +91,7 @@ def main():
 
                 # sample actions from -1 to 1
                 #actions = 2 * torch.rand(env.action_space.shape, device=env.unwrapped.device) - 1
-                actions = torch.zeros(*env.action_space.shape, device=env.unwrapped.device, dtype=float)
+                actions = torch.zeros(*env.action_space.shape, device=env.unwrapped.device, dtype=torch.float32)
                 actions[:, 0] = 1.0
                 
                 # apply actions
