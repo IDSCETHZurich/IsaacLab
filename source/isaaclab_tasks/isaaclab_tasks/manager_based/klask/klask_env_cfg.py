@@ -482,33 +482,30 @@ class TerminationsCfg:
 
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
 
-    if KLASK_PARAMS["terminations"]["goal_scored"]:
-        goal_scored = DoneTerm(
-            func=ball_in_goal, 
-            params={
-                "asset_cfg": SceneEntityCfg("ball"),
-                "goal": KLASK_PARAMS["opponent_goal"]
-            }
-        )
+    goal_scored = DoneTerm(
+        func=ball_in_goal, 
+        params={
+            "asset_cfg": SceneEntityCfg("ball"),
+            "goal": KLASK_PARAMS["opponent_goal"]
+        }
+    )
 
-    if KLASK_PARAMS["terminations"]["goal_conceded"]:
-        goal_conceded = DoneTerm(
-            func=ball_in_goal, 
-            params={
-                "asset_cfg": SceneEntityCfg("ball"),
-                "goal": KLASK_PARAMS["player_goal"]
-            }
-        )
+    goal_conceded = DoneTerm(
+        func=ball_in_goal, 
+        params={
+            "asset_cfg": SceneEntityCfg("ball"),
+            "goal": KLASK_PARAMS["player_goal"]
+        }
+    )
 
-    if KLASK_PARAMS["terminations"]["player_in_goal"]:
-        player_in_goal = DoneTerm(
-            func=in_goal, 
-            params={
-                "asset_cfg": SceneEntityCfg("klask", body_names=["Peg_1"]),
-                "goal": KLASK_PARAMS["player_goal"]
-            }
-        )
-    
+    player_in_goal = DoneTerm(
+        func=in_goal, 
+        params={
+            "asset_cfg": SceneEntityCfg("klask", body_names=["Peg_1"]),
+            "goal": KLASK_PARAMS["player_goal"]
+        }
+    )
+
 
 @configclass
 class KlaskEnvCfg(ManagerBasedRLEnvCfg):

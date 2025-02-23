@@ -13,7 +13,7 @@ KLASK_PARAMS = {
     "physics_dt": 0.001,
     "timeout": 5.0,
     "actuator_delay": (0.18, 0.22),
-    "action_history": 15,
+    "action_history": 0,
     "player_goal": (0.0, -0.176215, 0.01905),
     "opponent_goal": (0.0, 0.176215, 0.01905),
     "ball_restitution": 0.8,
@@ -21,11 +21,6 @@ KLASK_PARAMS = {
     "ball_dynamic_friction": 0.2,
     "ball_mass_initial": 0.002,
     "max_ball_vel": 5.0,    # maximum speed the ball may have for a goal to be counted
-    "terminations": {
-        "goal_scored": True,
-        "goal_conceded": True,
-        "player_in_goal": True
-    },
     "domain_randomization": {
         "use_domain_randomization": False,
         "static_friction_range": (0.1, 0.5),

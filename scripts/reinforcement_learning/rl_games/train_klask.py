@@ -81,8 +81,9 @@ from isaaclab_tasks.manager_based.klask import (
     CurriculumWrapper,
     RlGamesGpuEnvSelfPlay,
     ObservationNoiseWrapper,
-    OpponentObservationWrapper
+    OpponentObservationWrapper,
 )
+from isaaclab_tasks.manager_based.klask.utils_manager_based import set_terminations
 from isaaclab_assets.robots.klask import KLASK_PARAMS
 from klask_rl_games import KlaskAlgoObserver, KlaskRunner
 
@@ -172,12 +173,17 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     obs_noise = agent_cfg["env"].get("obs_noise", 0.0)
     env = ObservationNoiseWrapper(env, obs_noise, list(range(12)))
-    if not agent_cfg["params"]["config"].get("self_play", False):
-        env = KlaskRandomOpponentWrapper(env)
+        
+    # configure active reward terms and curricula as specified in agent_cfg:
     if "rewards" in agent_cfg.keys():
         env = CurriculumWrapper(env, agent_cfg["rewards"], agent_cfg["params"]["config"]["max_frames"] / env_cfg.scene.num_envs)
+    
+    # if self-play, use opponent observation wrapper to get access to opponent player's observations:
     if agent_cfg["params"]["config"].get("self_play", False):
         env = OpponentObservationWrapper(env)
+    # if no self-play, pick random actions for the opponent:
+    else:
+        env = KlaskRandomOpponentWrapper(env)
     
     # wrap around environment for rl-games
     env = RlGamesVecEnvWrapper(env, rl_device, clip_obs, clip_actions)
@@ -197,12 +203,17 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         )
         env_configurations.register("rlgpu", {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env})
 
+    # set active termination terms specified in agent_cfg:
+    if "terminations" in agent_cfg.keys():
+        set_terminations(env, agent_cfg["terminations"])
+    
     # set number of actors into agent config
     agent_cfg["params"]["config"]["num_actors"] = env.unwrapped.num_envs
     # create runner from rl-games
     runner = KlaskRunner(KlaskAlgoObserver())
     runner.load(agent_cfg)
 
+    # create complete config and log to wandb:
     if "env" in agent_cfg.keys():
         agent_cfg["env"].update(KLASK_PARAMS)
     else:
@@ -230,6 +241,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         runner.run({"train": True, "play": False, "sigma": train_sigma})
     print(f"Total training time: {time.time() - start_time}")
 
+    # log model checkpoint to wandb:
     if args_cli.wandb_project_name is not None:
         model = wandb.Artifact("model", type="model")
         model.add_file(os.path.join(log_root_path, log_dir, "nn", f"{agent_cfg['params']['config']['name']}.pth"))

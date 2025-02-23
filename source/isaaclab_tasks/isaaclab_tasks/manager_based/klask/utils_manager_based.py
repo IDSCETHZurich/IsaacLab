@@ -4,6 +4,7 @@ from isaaclab.assets import RigidObject, Articulation
 import isaaclab.utils.math as math_utils
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.envs import ManagerBasedRLEnv
+from isaaclab.managers import ManagerTermBaseCfg
 
 
 def reset_joints_by_offset(
@@ -157,3 +158,22 @@ def collision_player_ball(env: ManagerBasedRLEnv, player_cfg: SceneEntityCfg, ba
 def ball_in_own_half(env: ManagerBasedRLEnv, ball_cfg: SceneEntityCfg):
     ball_pos = root_xy_pos_w(env, ball_cfg)
     return 1.0 * (ball_pos[:, 1] < 0.0)
+
+
+def set_terminations(env, cfg):
+    """
+    Removes active termination terms from the environment according 
+    to specified terms in cfg.
+
+    param cfg: dict {term: active} containing term name to active bool mappings
+    """
+    manager = env.unwrapped.termination_manager
+    for term, active in cfg.items():
+        if not active:
+            try:
+                idx = manager._term_names.index(term)
+                manager._term_names.pop(idx)
+                manager._term_cfgs.pop(idx)
+                manager._term_dones.pop(term)
+            except ValueError:
+                continue

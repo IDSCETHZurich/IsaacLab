@@ -70,6 +70,8 @@ from isaaclab_tasks.manager_based.klask import (
     ObservationNoiseWrapper,
     find_wrapper
 )
+from isaaclab_tasks.manager_based.klask.utils_manager_based import set_terminations
+
 
 def main():
     """Play with RL-Games agent."""
@@ -154,6 +156,10 @@ def main():
         )
         env_configurations.register("rlgpu", {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env})
 
+    # set active termination terms specified in agent_cfg:
+    if "terminations" in agent_cfg.keys():
+        set_terminations(env, agent_cfg["terminations"])
+    
     # load previously trained model
     agent_cfg["params"]["load_checkpoint"] = True
     agent_cfg["params"]["load_path"] = resume_path
