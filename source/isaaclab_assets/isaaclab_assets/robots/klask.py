@@ -13,7 +13,7 @@ KLASK_PARAMS = {
     "physics_dt": 0.001,
     "timeout": 5.0,
     "actuator_delay": (0.18, 0.22),
-    "action_history": 0,
+    "action_history": 15,
     "player_goal": (0.0, -0.176215, 0.01905),
     "opponent_goal": (0.0, 0.176215, 0.01905),
     "ball_restitution": 0.8,
