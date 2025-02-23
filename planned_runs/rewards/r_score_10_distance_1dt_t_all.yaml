@@ -91,11 +91,11 @@ rewards:
   player_in_goal: !!float 0.0
   goal_scored: !!float 10.0
   goal_conceded: !!float 0.0
-  distance_ball_opponent_goal: !!float 0.0
-  ball_speed: !!float 0.0
-  distance_player_ball_own_half: 
+  distance_ball_opponent_goal:
     weight: 1.0
     per_second: True
+  ball_speed: !!float 0.0
+  distance_player_ball_own_half: !!float 0.0
   ball_stationary: !!float 0.0
   collision_player_ball: !!float 0.0
 
