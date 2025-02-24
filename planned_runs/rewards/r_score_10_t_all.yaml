@@ -43,7 +43,7 @@ params:
   load_path: '' # path to the checkpoint to load
 
   config:
-    full_experiment_name: r_score_10_t_all
+    full_experiment_name: r_score_10_t_all_selfplay
     name: klask
     env_name: rlgpu
     device: 'cuda:0'
@@ -64,7 +64,7 @@ params:
     kl_threshold: 0.008
     #score_to_win: 20000
     max_epochs: -1
-    max_frames: !!int 100_000_000
+    max_frames: !!int 200_000_000
     save_best_after: 50
     save_frequency: 25
     grad_norm: 1.0
@@ -78,10 +78,10 @@ params:
     clip_value: True
     seq_length: 4
     bounds_loss_coef: 0.0001
-    self_play: False
-    #self_play_config:
-      #update_score: -100.0
-      #games_to_check: 1
+    self_play: True
+    self_play_config:
+      update_score: 
+      games_to_check: 1
       #env_update_num: 4096
 
 env:
@@ -102,4 +102,4 @@ terminations:
   goal_scored: True
   goal_conceded: True
   player_in_goal: True
-  opponent_in_goal: False
+  opponent_in_goal: True

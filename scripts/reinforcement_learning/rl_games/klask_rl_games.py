@@ -40,6 +40,8 @@ class KlaskAlgoObserver(AlgoObserver):
                             self.mean_scores.update(-torch.ones(val, dtype=float).to(self.algo.ppo_device))
                         elif key == "Episode_Termination/player_in_goal":
                             self.mean_scores.update(-torch.ones(val, dtype=float).to(self.algo.ppo_device))
+                        elif key == "Episode_Termination/opponent_in_goal":
+                            self.mean_scores.update(torch.ones(val, dtype=float).to(self.algo.ppo_device))
 
     def after_clear_stats(self):
         # clear stored buffers
