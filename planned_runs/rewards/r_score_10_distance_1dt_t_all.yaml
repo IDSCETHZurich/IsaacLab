@@ -79,9 +79,9 @@ params:
     seq_length: 4
     bounds_loss_coef: 0.0001
     self_play: False
-    #self_play_config:
-      #update_score: -100.0
-      #games_to_check: 1
+    self_play_config:
+      update_score: 1.0
+      games_to_check: 1
       #env_update_num: 4096
 
 env:
