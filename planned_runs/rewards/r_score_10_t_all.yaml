@@ -80,7 +80,8 @@ params:
     bounds_loss_coef: 0.0001
     self_play: True
     self_play_config:
-      update_score: 
+      check_scores: True
+      update_score: 0.5
       games_to_check: 1
       #env_update_num: 4096
 
