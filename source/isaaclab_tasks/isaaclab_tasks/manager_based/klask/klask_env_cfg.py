@@ -376,7 +376,7 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("ball"),
-            "pose_range": {"x": (-0.15, 0.15), "y": (-0.21, -0.02), "z": (0.032, 0.032)},
+            "pose_range": {"x": (-0.15, 0.15), "y": (-0.21, 0.21), "z": (0.032, 0.032)},
             "velocity_range": {"x": (0.0, 0.0), "y": (0.0, 0.0)}
         },
     )
@@ -530,7 +530,7 @@ class KlaskEnvCfg(ManagerBasedRLEnvCfg):
     events = EventCfg()
     rewards = RewardsCfg()
     terminations = TerminationsCfg()
-    episode_length_s = 2.0
+    episode_length_s = KLASK_PARAMS["timeout"]
 
     def __post_init__(self):
         """Post initialization."""

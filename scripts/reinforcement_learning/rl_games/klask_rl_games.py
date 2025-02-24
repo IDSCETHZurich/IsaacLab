@@ -84,6 +84,9 @@ class KlaskSelfPlayManager(SelfPlayManager):
         else:
             data = algo.game_rewards
 
+        if self.updates_num == 1:
+            algo.vec_env.set_weights(self.env_indexes, algo.get_weights())
+        
         if len(data) >= self.games_to_check:
             mean_scores = data.get_mean()
             mean_rewards = algo.game_rewards.get_mean()

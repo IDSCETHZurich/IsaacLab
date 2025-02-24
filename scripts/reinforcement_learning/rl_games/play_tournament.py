@@ -19,7 +19,7 @@ parser.add_argument(
     "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
 )
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
-parser.add_argument("--task", type=str, default=None, help="Name of the task.")
+parser.add_argument("--task", type=str, default="Isaac-Klask-v0", help="Name of the task.")
 parser.add_argument("--checkpoints_dir", type=str, default=None, help="Path to model checkpoint directory")
 parser.add_argument("--configs_dir", type=str, default=None, help="Path to model configs directory")
 parser.add_argument("--config", type=str, default=None, help="config.yaml file, rl_games_cfg_entry_point used when not provided")
@@ -50,6 +50,7 @@ import yaml
 import time
 import matplotlib.pyplot as plt
 import itertools
+import numpy as np
 
 from rl_games.common import env_configurations, vecenv
 from rl_games.common.player import BasePlayer
@@ -177,6 +178,8 @@ def main():
         player.elo = 1200.0
         player.name = player_name
         players.append(player)
+
+    player_elos = []
             
     # simulate environment
     # note: We simplified the logic in rl-games player.py (:func:`BasePlayer.run()`) function in an
@@ -219,13 +222,25 @@ def main():
                         break
             
             update_elo(p1, p2, average_score_1 / num_games, average_score_2 / num_games)
+            player_elos.append([p.elo for p in players])
         
         print(f"Round {i} completed. ELO scores:")
         for p in players:
             print(f"{p.name}: {p.elo}")
 
+    # Plot ELO scores:
+    player_elos = np.array(player_elos)
+    for i, p in enumerate(players):
+        plt.plot(player_elos[:, i], label=p.name)
+    plt.xlabel("round")
+    plt.ylabel("ELO")
+    plt.legend()
+    plt.grid()
+    plt.show()
+
     # close the simulator
     env.close()
+
 
 
 if __name__ == "__main__":
