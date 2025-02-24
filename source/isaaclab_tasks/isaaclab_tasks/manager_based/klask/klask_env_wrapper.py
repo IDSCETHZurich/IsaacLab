@@ -208,19 +208,29 @@ class CurriculumWrapper(Wrapper):
 
 class OpponentObservationWrapper(Wrapper):
 
+    def __init__(self, env, mode="train"):
+        super().__init__(env)
+        self.mode = mode
+    
     def get_opponent_obs(self, obs):
         opponent_obs = obs.detach().clone()
         opponent_obs[:, :12] = -obs[:, :12]
         return opponent_obs
     
-    def reset(self):
-        obs_dict, extras = self.env.reset()
-        self.opponent_obs = self.get_opponent_obs(obs_dict["opponent"])
+    def reset(self, *args, **kwargs):
+        obs_dict, extras = self.env.reset(*args, **kwargs)
+        if self.mode == "train":
+            self.opponent_obs = self.get_opponent_obs(obs_dict["opponent"])
+        else:
+            obs_dict["opponent"] = self.get_opponent_obs(obs_dict["opponent"])
         return obs_dict, extras
     
-    def step(self, actions):
-        obs_dict, rew, terminated, truncated, extras = self.env.step(actions)
-        self.opponent_obs = self.get_opponent_obs(obs_dict["opponent"])
+    def step(self, actions, *args, **kwargs):
+        obs_dict, rew, terminated, truncated, extras = self.env.step(actions, *args, **kwargs)
+        if self.mode == "train":
+            self.opponent_obs = self.get_opponent_obs(obs_dict["opponent"])
+        else:
+            obs_dict["opponent"] = self.get_opponent_obs(obs_dict["opponent"])
         return obs_dict, rew, terminated, truncated, extras 
 
 

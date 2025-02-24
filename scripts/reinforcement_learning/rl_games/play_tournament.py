@@ -12,7 +12,7 @@ import argparse
 from isaaclab.app import AppLauncher
 
 # add argparse arguments
-parser = argparse.ArgumentParser(description="Play a checkpoint of an RL agent from RL-Games.")
+parser = argparse.ArgumentParser(description="Play a tournament between RL agents from RL-Games.")
 parser.add_argument("--video", action="store_true", default=False, help="Record videos during training.")
 parser.add_argument("--video_length", type=int, default=200, help="Length of the recorded video (in steps).")
 parser.add_argument(
@@ -20,13 +20,13 @@ parser.add_argument(
 )
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
 parser.add_argument("--task", type=str, default=None, help="Name of the task.")
-parser.add_argument("--checkpoint", type=str, default=None, help="Path to model checkpoint.")
-parser.add_argument(
-    "--use_last_checkpoint",
-    action="store_true",
-    help="When no checkpoint provided, use the last saved model. Otherwise use the best saved model.",
-)
+parser.add_argument("--checkpoints_dir", type=str, default=None, help="Path to model checkpoint directory")
+parser.add_argument("--configs_dir", type=str, default=None, help="Path to model configs directory")
 parser.add_argument("--config", type=str, default=None, help="config.yaml file, rl_games_cfg_entry_point used when not provided")
+parser.add_argument("--num_rounds", type=int, default=10, help="Number of rounds in the tournament.")
+parser.add_argument("--num_games_per_round", type=int, default=100, help="Number of games per round.")
+parser.add_argument("--tournament_name", type=str, default="tournament", help="Name used for logging videos.")
+
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
@@ -49,6 +49,7 @@ import torch
 import yaml
 import time
 import matplotlib.pyplot as plt
+import itertools
 
 from rl_games.common import env_configurations, vecenv
 from rl_games.common.player import BasePlayer
@@ -63,14 +64,30 @@ from isaaclab_tasks.utils import get_checkpoint_path, load_cfg_from_registry, pa
 from isaaclab_rl.rl_games import RlGamesGpuEnv, RlGamesVecEnvWrapper
 
 from isaaclab_tasks.manager_based.klask import (
-    KlaskRandomOpponentWrapper,
+    OpponentObservationWrapper,
     CurriculumWrapper,
     RlGamesGpuEnvSelfPlay,
-    KlaskAgentOpponentWrapper,
     ObservationNoiseWrapper,
     find_wrapper
 )
 from isaaclab_tasks.manager_based.klask.utils_manager_based import set_terminations
+
+
+def update_elo(p1, p2, score_1, score_2, k=10.0):
+    elo_1 = p1.elo + k * (score_1 - 1 / (1 + 10 ** ((p2.elo - p1.elo) / 400)))
+    elo_2 = p2.elo + k * (score_2 - 1 / (1 + 10 ** ((p1.elo - p2.elo) / 400)))
+    p1.elo = elo_1.item()
+    p2.elo = elo_2.item()
+
+
+def compute_scores(info):
+    average_score_1 = (info["episode"]["Episode_Termination/goal_scored"]
+                     + info["episode"]["Episode_Termination/opponent_in_goal"]
+                     + 0.5 * info["episode"]["Episode_Termination/time_out"])
+    average_score_2 = (info["episode"]["Episode_Termination/goal_conceded"]
+                     + info["episode"]["Episode_Termination/player_in_goal"]
+                     + 0.5 * info["episode"]["Episode_Termination/time_out"])
+    return average_score_1, average_score_2
 
 
 def main():
@@ -89,22 +106,7 @@ def main():
     # specify directory for logging experiments
     log_root_path = os.path.join("logs", "rl_games", agent_cfg["params"]["config"]["name"])
     log_root_path = os.path.abspath(log_root_path)
-    print(f"[INFO] Loading experiment from directory: {log_root_path}")
-    # find checkpoint
-    if args_cli.checkpoint is None:
-        # specify directory for logging runs
-        run_dir = agent_cfg["params"]["config"].get("full_experiment_name", ".*")
-        # specify name of checkpoint
-        if args_cli.use_last_checkpoint:
-            checkpoint_file = ".*"
-        else:
-            # this loads the best checkpoint
-            checkpoint_file = f"{agent_cfg['params']['config']['name']}.pth"
-        # get path to previous checkpoint
-        resume_path = get_checkpoint_path(log_root_path, run_dir, checkpoint_file, other_dirs=["nn"])
-    else:
-        resume_path = retrieve_file_path(args_cli.checkpoint)
-    log_dir = os.path.dirname(os.path.dirname(resume_path))
+    log_dir = os.path.dirname(args_cli.tournament_name)
 
     # wrap around environment for rl-games
     rl_device = agent_cfg["params"]["config"]["device"]
@@ -131,10 +133,7 @@ def main():
 
     obs_noise = agent_cfg["env"].get("obs_noise", 0.0)
     env = ObservationNoiseWrapper(env, obs_noise)
-    if agent_cfg["params"]["config"].get("self_play", False):
-        env = KlaskAgentOpponentWrapper(env)
-    else:
-        env = KlaskRandomOpponentWrapper(env)
+    env = OpponentObservationWrapper(env)
     if "rewards" in agent_cfg.keys():
         env = CurriculumWrapper(env, agent_cfg["rewards"], mode="test")
     
@@ -143,87 +142,90 @@ def main():
 
     # register the environment to rl-games registry
     # note: in agents configuration: environment name must be "rlgpu"
-    if agent_cfg["params"]["config"].get("self_play", False):
-        vecenv.register(
-            "IsaacRlgWrapper", lambda config_name, num_actors, **kwargs: RlGamesGpuEnvSelfPlay(
-                config_name, num_actors, agent_cfg.copy(), **kwargs)
-        )
-        env_configurations.register("rlgpu", {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env})
-
-    else:
-        vecenv.register(
-            "IsaacRlgWrapper", lambda config_name, num_actors, **kwargs: RlGamesGpuEnv(config_name, num_actors, **kwargs)
-        )
-        env_configurations.register("rlgpu", {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env})
-
+    vecenv.register(
+        "IsaacRlgWrapper", lambda config_name, num_actors, **kwargs: RlGamesGpuEnvSelfPlay(
+            config_name, num_actors, agent_cfg.copy(), **kwargs)
+    )
+    env_configurations.register("rlgpu", {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env})
+ 
     # set active termination terms specified in agent_cfg:
     if "terminations" in agent_cfg.keys():
         set_terminations(env, agent_cfg["terminations"])
-
-    # load previously trained model
-    agent_cfg["params"]["load_checkpoint"] = True
-    agent_cfg["params"]["load_path"] = resume_path
-    print(f"[INFO]: Loading model checkpoint from: {agent_cfg['params']['load_path']}")
-
+    
     # set number of actors into agent config
     agent_cfg["params"]["config"]["num_actors"] = env.unwrapped.num_envs
-    # create runner from rl-games
-    runner = Runner()
-    runner.load(agent_cfg)
-    # obtain the agent from the runner
-    agent: BasePlayer = runner.create_player()
-    agent.restore(resume_path)
-    agent.reset()
-
+    
     # reset environment
     obs = env.reset()
-    rewards = []
-    if isinstance(obs, dict):
-        obs = obs["obs"]
     timestep = 0
-    # required: enables the flag for batched observations
-    _ = agent.get_batch_size(obs, 1)
-    # initialize RNN states if used
-    if agent.is_rnn:
-        agent.init_rnn()
-
-    if agent_cfg["params"]["config"].get("self_play", False):
-        opponent = runner.create_player()
-        opponent.set_weights(agent.get_weights())
-        find_wrapper(env, KlaskAgentOpponentWrapper).add_opponent(opponent)
-
+    
+    # create runner from rl-games
+    runner = Runner()
+    players = []
+    for i, model_file in enumerate(os.listdir(args_cli.checkpoints_dir)):
+        player_name = model_file.split(".")[0]
+        with open(os.path.join(args_cli.configs_dir, f"{player_name}.yaml"), 'r') as file:
+            config = yaml.safe_load(file)
+        runner.load(config)
+        player = runner.create_player()
+        player.restore(os.path.join(args_cli.checkpoints_dir, model_file))
+        player.reset()
+        # initialize RNN states if used
+        if player.is_rnn:
+            player.init_rnn()
+        _ = player.get_batch_size(obs, 1)
+        player.elo = 1200.0
+        player.name = player_name
+        players.append(player)
+            
     # simulate environment
     # note: We simplified the logic in rl-games player.py (:func:`BasePlayer.run()`) function in an
     #   attempt to have complete control over environment stepping. However, this removes other
     #   operations such as masking that is used for multi-agent learning by RL-Games.
-    start_time = time.time()
-    while simulation_app.is_running() and time.time() - start_time < 1000.0:
-        # run everything in inference mode
-        with torch.inference_mode():
-            # convert obs to agent format
-            obs = agent.obs_to_torch(obs)
-            # agent stepping
-            actions = agent.get_action(obs, is_deterministic=True)
-            # env stepping
-            obs, rew, dones, _ = env.step(actions)
-            rewards.append(rew.detach().cpu())
-            # perform operations for terminated episodes
-            if len(dones) > 0:
-                # reset rnn state for terminated episodes
-                if agent.is_rnn and agent.states is not None:
-                    for s in agent.states:
-                        s[:, dones, :] = 0.0
-        if args_cli.video:
-            timestep += 1
-            # Exit the play loop after recording one video
-            if timestep == args_cli.video_length:
-                break
+    for i, _ in enumerate(range(args_cli.num_rounds)):
+        for p1, p2 in itertools.combinations(players, 2):
+            num_games = 0
+            average_score_1 = 0.0
+            average_score_2 = 0.0
+            while num_games < args_cli.num_games_per_round:
+                # run everything in inference mode
+                with torch.inference_mode():
+                    # convert obs to agent format
+                    obs_1 = p1.obs_to_torch(obs)
+                    opponent_obs = find_wrapper(env, OpponentObservationWrapper).opponent_obs
+                    obs_2 = p2.obs_to_torch(opponent_obs)
+                    # agent stepping
+                    actions = p1.get_action(obs_1, is_deterministic=True)
+                    actions[:, 2:] = -p2.get_action(obs_2, is_deterministic=True)[:, :2]
+                    # env stepping
+                    obs, rew, dones, info = env.step(actions)
+                    # perform operations for terminated episodes
+                    if len(dones) > 0:
+                        num_games += dones.sum()
+                        score_1, score_2 = compute_scores(info)
+                        average_score_1 += score_1
+                        average_score_2 += score_2
+                        # reset rnn state for terminated episodes
+                        if p1.is_rnn and p1.states is not None:
+                            for s in p1.states:
+                                s[:, dones, :] = 0.0
+                        if p2.is_rnn and p2.states is not None:
+                            for s in p2.states:
+                                s[:, dones, :] = 0.0
+                if args_cli.video:
+                    timestep += 1
+                    # Exit the play loop after recording one video
+                    if timestep == args_cli.video_length:
+                        break
+            
+            update_elo(p1, p2, average_score_1 / num_games, average_score_2 / num_games)
+        
+        print(f"Round {i} completed. ELO scores:")
+        for p in players:
+            print(f"{p.name}: {p.elo}")
 
     # close the simulator
     env.close()
-    plt.plot(rewards, label="Reward")
-    plt.legend()
-    plt.show()
 
 
 if __name__ == "__main__":

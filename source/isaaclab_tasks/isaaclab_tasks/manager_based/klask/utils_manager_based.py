@@ -63,7 +63,7 @@ def in_goal(
 
 
 def ball_in_goal(
-    env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg, goal: tuple[float, float, float], max_ball_vel: float = 0.5, weight: float | None = None
+    env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg, goal: tuple[float, float, float], max_ball_vel: float = 2.0, weight: float | None = None
 ) -> torch.Tensor:
     """
         Penalize asset being in goal.

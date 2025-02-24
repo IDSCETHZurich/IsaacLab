@@ -44,7 +44,7 @@ class KlaskSceneCfg(InteractiveSceneCfg):
             ),
             activate_contact_sensors=True
         ),
-        init_state=RigidObjectCfg.InitialStateCfg(pos=(0.0, 0.0, 0.0)),
+        init_state=RigidObjectCfg.InitialStateCfg(pos=(0.0, 0.0, 0.032)),
     )
 
     #contact_sensor = ContactSensorCfg(
@@ -376,7 +376,7 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("ball"),
-            "pose_range": {"x": (-0.15, 0.15), "y": (-0.21, -0.02)},
+            "pose_range": {"x": (-0.15, 0.15), "y": (-0.21, -0.02), "z": (0.032, 0.032)},
             "velocity_range": {"x": (0.0, 0.0), "y": (0.0, 0.0)}
         },
     )
@@ -486,7 +486,8 @@ class TerminationsCfg:
         func=ball_in_goal, 
         params={
             "asset_cfg": SceneEntityCfg("ball"),
-            "goal": KLASK_PARAMS["opponent_goal"]
+            "goal": KLASK_PARAMS["opponent_goal"],
+            "max_ball_vel": KLASK_PARAMS["max_ball_vel"]
         }
     )
 
@@ -494,7 +495,8 @@ class TerminationsCfg:
         func=ball_in_goal, 
         params={
             "asset_cfg": SceneEntityCfg("ball"),
-            "goal": KLASK_PARAMS["player_goal"]
+            "goal": KLASK_PARAMS["player_goal"],
+            "max_ball_vel": KLASK_PARAMS["max_ball_vel"]
         }
     )
 
@@ -503,6 +505,14 @@ class TerminationsCfg:
         params={
             "asset_cfg": SceneEntityCfg("klask", body_names=["Peg_1"]),
             "goal": KLASK_PARAMS["player_goal"]
+        }
+    )
+
+    opponent_in_goal = DoneTerm(
+        func=in_goal, 
+        params={
+            "asset_cfg": SceneEntityCfg("klask", body_names=["Peg_2"]),
+            "goal": KLASK_PARAMS["opponent_goal"]
         }
     )
 

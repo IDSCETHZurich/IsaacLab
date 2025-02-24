@@ -99,6 +99,6 @@ rewards:
 
 terminations:
   time_out: True
-  goal_scored: False
-  goal_conceded: False
-  player_in_goal: False
+  goal_scored: True
+  goal_conceded: True
+  player_in_goal: True

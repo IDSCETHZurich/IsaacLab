@@ -102,3 +102,4 @@ terminations:
   goal_scored: True
   goal_conceded: True
   player_in_goal: True
+  opponent_in_goal: False
