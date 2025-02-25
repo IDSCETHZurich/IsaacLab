@@ -50,7 +50,7 @@ def main():
     )
     # create environment
     env = gym.make(args_cli.task, cfg=env_cfg)
-    #env = ActuatorModelWrapper(env)
+    env = ActuatorModelWrapper(env)
     #env = ObservationNoiseWrapper(env, 0.01)
 
     # print info (this is vectorized environment)
@@ -86,8 +86,8 @@ def main():
     if X_states is not None:
         state_history = torch.from_numpy(X_states[0]).to(env.unwrapped.device)
     
-    #env.command_buffer_1[0, :] = command_history
-    #env.state_buffer_1[0, :] = state_history
+    env.command_buffer_1[0, :] = command_history
+    env.state_buffer_1[0, :] = state_history
 
     start_time = time.time()
     try:
@@ -106,9 +106,9 @@ def main():
                 #actions = 2 * torch.rand(env.action_space.shape, device=env.unwrapped.device) - 1
                 actions = torch.zeros(*env.action_space.shape, device=env.unwrapped.device, dtype=torch.float32)
                 #actions[:, 0] = 1.0
-                #actions[:, :2] = torch.from_numpy(X[step, :2]).to(env.unwrapped.device)
-                #state_history = torch.from_numpy(X[step, 20:]).to(env.unwrapped.device)
-                #command_history = torch.from_numpy(X[step, :20]).to(env.unwrapped.device)
+                actions[:, :2] = torch.from_numpy(X_commands[step, :2]).to(env.unwrapped.device)
+                state_history = torch.from_numpy(X_states[step]).to(env.unwrapped.device)
+                command_history = torch.from_numpy(X_commands[step]).to(env.unwrapped.device)
                 #env.command_buffer_1[0, :] = command_history
                 #env.state_buffer_1[0, ::4] = state_history[::4]
                 #env.state_buffer_1[0, 1::4] = state_history[1::4]
@@ -129,7 +129,7 @@ def main():
                 step += 1
 
     finally:
-        #actions_log = np.vstack(env.actions_log)
+        actions_log = np.vstack(env.actions_log)
         # close the simulator
         env.close()
         fig, ax = plt.subplots(4)
@@ -142,12 +142,12 @@ def main():
 
         ax[0].plot(Y[:, 0], label="GT x_dot")
         ax[0].plot(obs_x_vel, label="Sim x_dot")
-        #ax[0].plot(actions_log[:, 0], label="Model x_dot")
+        ax[0].plot(actions_log[:, 0], label="Model x_dot")
         ax[0].legend()
 
         ax[1].plot(Y[:, 1], label="GT y_dot")
         ax[1].plot(obs_y_vel, label="Sim y_dot")
-        #ax[1].plot(actions_log[:, 1], label="Model y_dot")
+        ax[1].plot(actions_log[:, 1], label="Model y_dot")
         ax[1].legend()
 
         ax[2].plot(X_states[:, 0], label="GT x")

@@ -81,7 +81,7 @@ params:
     self_play: True
     self_play_config:
       check_scores: True
-      update_score: 0.5
+      update_score: 0.35
       games_to_check: 1
       #env_update_num: 4096
 

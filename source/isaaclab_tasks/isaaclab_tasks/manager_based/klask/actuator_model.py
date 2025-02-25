@@ -41,7 +41,7 @@ class ActuatorModelWrapper(Wrapper):
 
         num_envs = env.unwrapped.num_envs
         
-        input_dim = self.num_history_steps * 2 + self.include_states * (self.num_history_steps - 1) * 4
+        input_dim = self.num_history_steps * 2 + self.include_states * (self.num_history_steps - 1) * 2
         output_dim = 2
         self.model = ActuatorNetwork(input_dim, output_dim, hidden_dim=self.hidden_dim).to(device)
         if model_file is None:
@@ -50,8 +50,8 @@ class ActuatorModelWrapper(Wrapper):
         self.command_buffer_1 = torch.zeros(num_envs, 2 * self.num_history_steps, dtype=torch.float32).to(device)
         self.command_buffer_2 = torch.zeros(num_envs, 2 * self.num_history_steps, dtype=torch.float32).to(device)
         if self.include_states:
-            self.state_buffer_1 = torch.zeros(num_envs, 4 * (self.num_history_steps - 1), dtype=torch.float32).to(device)
-            self.state_buffer_2 = torch.zeros(num_envs, 4 * (self.num_history_steps - 1), dtype=torch.float32).to(device)
+            self.state_buffer_1 = torch.zeros(num_envs, 2 * (self.num_history_steps - 1), dtype=torch.float32).to(device)
+            self.state_buffer_2 = torch.zeros(num_envs, 2 * (self.num_history_steps - 1), dtype=torch.float32).to(device)
 
         self.actions_log = []
 
@@ -59,13 +59,13 @@ class ActuatorModelWrapper(Wrapper):
         obs, info = self.env.reset()
         
         # Peg 1 history update:
-        state_1 = obs["policy"][:, :4]
+        state_1 = obs["policy"][:, :2]
         if self.include_states:
             self.state_buffer_1[:, :] = state_1.repeat(1, self.num_history_steps - 1)
         self.command_buffer_1[:, :] = 0.0
         
         # Peg 2 history update:
-        state_2 = -obs["opponent"][:, :4]
+        state_2 = -obs["opponent"][:, :2]
         if self.include_states:
             self.state_buffer_2[:, :] = state_2.repeat(1, self.num_history_steps - 1)
         self.command_buffer_2[:, :] = 0.0
@@ -97,14 +97,14 @@ class ActuatorModelWrapper(Wrapper):
 
         if self.include_states:
             # Peg 1 state history update:
-            state_1 = obs["policy"][:, :4]
-            self.state_buffer_1[:, 4:] = self.state_buffer_1.clone()[:, :-4]
-            self.state_buffer_1[:, :4] = state_1
+            state_1 = obs["policy"][:, :2]
+            self.state_buffer_1[:, 2:] = self.state_buffer_1.clone()[:, :-2]
+            self.state_buffer_1[:, :2] = state_1
             
             # Peg 2 state history update:
-            state_2 = -obs["opponent"][:, :4]
-            self.state_buffer_2[:, 4:] = self.state_buffer_2.clone()[:, :-4]
-            self.state_buffer_2[:, :4] = state_2
+            state_2 = -obs["opponent"][:, :2]
+            self.state_buffer_2[:, 2:] = self.state_buffer_2.clone()[:, :-2]
+            self.state_buffer_2[:, :2] = state_2
 
         # Reset buffers for terminated envs:
         done = terminated | truncated
