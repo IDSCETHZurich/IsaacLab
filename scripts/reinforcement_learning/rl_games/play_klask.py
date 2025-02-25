@@ -19,7 +19,7 @@ parser.add_argument(
     "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
 )
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
-parser.add_argument("--task", type=str, default=None, help="Name of the task.")
+parser.add_argument("--task", type=str, default="Isaac-Klask-v0", help="Name of the task.")
 parser.add_argument("--checkpoint", type=str, default=None, help="Path to model checkpoint.")
 parser.add_argument(
     "--use_last_checkpoint",
@@ -71,6 +71,7 @@ from isaaclab_tasks.manager_based.klask import (
     find_wrapper
 )
 from isaaclab_tasks.manager_based.klask.utils_manager_based import set_terminations
+from isaaclab_tasks.manager_based.klask.actuator_model import ActuatorModelWrapper
 
 
 def main():
@@ -129,8 +130,13 @@ def main():
     if isinstance(env.unwrapped, DirectMARLEnv):
         env = multi_agent_to_single_agent(env)
 
+    if agent_cfg["env"].get("actuator_model", False):
+        env = ActuatorModelWrapper(env)
+
     obs_noise = agent_cfg["env"].get("obs_noise", 0.0)
-    env = ObservationNoiseWrapper(env, obs_noise)
+    if obs_noise > 0.0:
+        env = ObservationNoiseWrapper(env, obs_noise)
+
     if agent_cfg["params"]["config"].get("self_play", False):
         env = KlaskAgentOpponentWrapper(env)
     else:

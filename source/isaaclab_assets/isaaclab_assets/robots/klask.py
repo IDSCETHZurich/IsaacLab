@@ -20,6 +20,8 @@ KLASK_PARAMS = {
     "ball_static_friction": 0.3,
     "ball_dynamic_friction": 0.2,
     "ball_mass_initial": 0.002,
+    "ball_reset_position_x": (-0.15, 0.15),
+    "ball_reset_position_y": (-0.21, -0.02),
     "max_ball_vel": 5.0,    # maximum speed the ball may have for a goal to be counted
     "domain_randomization": {
         "use_domain_randomization": False,

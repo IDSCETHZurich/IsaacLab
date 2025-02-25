@@ -69,20 +69,20 @@ def main():
     obs_y_vel = []
     resting = []
 
-    start_index = 10000
+    start_index = 1000
     batch_size = 100
-    data_file = "/home/student/Documents/ActuatorPolicy/actuator_model/data/data_history_10_interval_0.02_delay_0.0_with_states.npz"
+    data_file = "source/isaaclab_tasks/isaaclab_tasks/manager_based/klask/actuator_model/data_history_10_interval_0.02_delay_0.0_horizon_100_with_states.npz"
     data = np.load(data_file)
     X_commands, Y, Y_prev, commands = data["X_commands"], data["Y"], data["Y_prev"], data["commands"]
     if "X_states" in data.keys():
         X_states = data["X_states"]
     else:
         X_states = None
-    command_history = torch.from_numpy(X_commands[start_index-1]).to(env.unwrapped.device)
     X_commands, Y, Y_prev, commands = X_commands[start_index:start_index+batch_size], Y[start_index:start_index+batch_size], Y_prev[start_index:start_index+batch_size], commands[start_index:start_index+batch_size]
     if X_states is not None:
         X_states = X_states[start_index:start_index+batch_size]
 
+    command_history = torch.from_numpy(X_commands[0]).to(env.unwrapped.device)
     if X_states is not None:
         state_history = torch.from_numpy(X_states[0]).to(env.unwrapped.device)
     
@@ -93,8 +93,8 @@ def main():
     try:
         # simulate environment
         step = 0
-        max_steps = batch_size
-        while simulation_app.is_running() and time.time() - start_time < 1000.0 and step < max_steps:
+        #while simulation_app.is_running() and time.time() - start_time < 1000.0:
+        for t in range(commands.shape[1]):
             # run everything in inference mode
             with torch.inference_mode():
                 #peg_1_x_pos.append(env.unwrapped.scene.articulations["klask"].data.joint_pos[0, -1].item())
@@ -105,11 +105,13 @@ def main():
                 # sample actions from -1 to 1
                 #actions = 2 * torch.rand(env.action_space.shape, device=env.unwrapped.device) - 1
                 actions = torch.zeros(*env.action_space.shape, device=env.unwrapped.device, dtype=torch.float32)
-                #actions[:, 0] = 1.0
-                actions[:, :2] = torch.from_numpy(X_commands[step, :2]).to(env.unwrapped.device)
-                state_history = torch.from_numpy(X_states[step]).to(env.unwrapped.device)
-                command_history = torch.from_numpy(X_commands[step]).to(env.unwrapped.device)
+                #actions[:, 0] = -0.7
+                #actions[:, 1] = -0.7
+                actions[:, :2] = torch.from_numpy(commands[0, t]).to(env.unwrapped.device)
+                #state_history = torch.from_numpy(X_states[step]).to(env.unwrapped.device)
+                #command_history = torch.from_numpy(X_commands[step]).to(env.unwrapped.device)
                 #env.command_buffer_1[0, :] = command_history
+                #env.state_buffer_1[0, :2] = torch.from_numpy(Y[0, t]).to(env.unwrapped.device)
                 #env.state_buffer_1[0, ::4] = state_history[::4]
                 #env.state_buffer_1[0, 1::4] = state_history[1::4]
                 #env.state_buffer_1[0, 2::4] = state_history[2::4]
@@ -128,35 +130,31 @@ def main():
 
                 step += 1
 
+    except Exception as e:
+        print(e)
+
     finally:
-        actions_log = np.vstack(env.actions_log)
         # close the simulator
         env.close()
-        fig, ax = plt.subplots(4)
+        fig, ax = plt.subplots(2)
         #ax[0].plot(obs_x_pos, label="Obs x")
         #ax[0].plot(obs_y_pos, label="Obs y")
 
-        print("Velocity reached at step:")
-        #print(np.argwhere(np.abs(np.array(obs_x_vel) - 1.0 ) < 0.01)[0])
-        print(obs_x_vel)
-
-        ax[0].plot(Y[:, 0], label="GT x_dot")
+        ax[0].plot(Y[0, :, 0], label="GT x_dot")
         ax[0].plot(obs_x_vel, label="Sim x_dot")
-        ax[0].plot(actions_log[:, 0], label="Model x_dot")
         ax[0].legend()
 
-        ax[1].plot(Y[:, 1], label="GT y_dot")
+        ax[1].plot(Y[0, :, 1], label="GT y_dot")
         ax[1].plot(obs_y_vel, label="Sim y_dot")
-        ax[1].plot(actions_log[:, 1], label="Model y_dot")
         ax[1].legend()
 
-        ax[2].plot(X_states[:, 0], label="GT x")
-        ax[2].plot(obs_x_pos, label="Sim x")
-        ax[2].legend()
+        #ax[2].plot(X_states[:, 0], label="GT x")
+        #ax[2].plot(obs_x_pos, label="Sim x")
+        #ax[2].legend()
 
-        ax[3].plot(X_states[:, 1], label="GT y")
-        ax[3].plot(obs_y_pos, label="Sim y")
-        ax[3].legend()
+        #ax[3].plot(X_states[:, 1], label="GT y")
+        #ax[3].plot(obs_y_pos, label="Sim y")
+        #ax[3].legend()
 
         #ax.axhline(y=0, color='red', linestyle='--')      
         #ax.plot(obs_x_vel, label="Peg x vel")

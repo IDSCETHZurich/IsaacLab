@@ -18,7 +18,7 @@ parser.add_argument("--video", action="store_true", default=False, help="Record 
 parser.add_argument("--video_length", type=int, default=200, help="Length of the recorded video (in steps).")
 parser.add_argument("--video_interval", type=int, default=2000, help="Interval between video recordings (in steps).")
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
-parser.add_argument("--task", type=str, default=None, help="Name of the task.")
+parser.add_argument("--task", type=str, default="Isaac-Klask-v0", help="Name of the task.")
 parser.add_argument("--seed", type=int, default=None, help="Seed used for the environment")
 parser.add_argument(
     "--distributed", action="store_true", default=False, help="Run training with multiple GPUs or nodes."
@@ -83,6 +83,7 @@ from isaaclab_tasks.manager_based.klask import (
     ObservationNoiseWrapper,
     OpponentObservationWrapper,
 )
+from isaaclab_tasks.manager_based.klask.actuator_model import ActuatorModelWrapper
 from isaaclab_tasks.manager_based.klask.utils_manager_based import set_terminations
 from isaaclab_assets.robots.klask import KLASK_PARAMS
 from klask_rl_games import KlaskAlgoObserver, KlaskRunner
@@ -171,8 +172,12 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     if isinstance(env.unwrapped, DirectMARLEnv):
         env = multi_agent_to_single_agent(env)
 
+    if agent_cfg["env"].get("actuator_model", False):
+        env = ActuatorModelWrapper(env)
+    
     obs_noise = agent_cfg["env"].get("obs_noise", 0.0)
-    env = ObservationNoiseWrapper(env, obs_noise, list(range(12)))
+    if obs_noise > 0.0:
+        env = ObservationNoiseWrapper(env, obs_noise, list(range(12)))
         
     # configure active reward terms and curricula as specified in agent_cfg:
     if "rewards" in agent_cfg.keys():

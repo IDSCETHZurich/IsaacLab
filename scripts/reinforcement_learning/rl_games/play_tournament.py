@@ -20,8 +20,7 @@ parser.add_argument(
 )
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
 parser.add_argument("--task", type=str, default="Isaac-Klask-v0", help="Name of the task.")
-parser.add_argument("--checkpoints_dir", type=str, default=None, help="Path to model checkpoint directory")
-parser.add_argument("--configs_dir", type=str, default=None, help="Path to model configs directory")
+parser.add_argument("--dir", type=str, default=None, help="Path to tournament directory containing checkpoints and config directories.")
 parser.add_argument("--config", type=str, default=None, help="config.yaml file, rl_games_cfg_entry_point used when not provided")
 parser.add_argument("--num_rounds", type=int, default=10, help="Number of rounds in the tournament.")
 parser.add_argument("--num_games_per_round", type=int, default=100, help="Number of games per round.")
@@ -163,13 +162,14 @@ def main():
     # create runner from rl-games
     runner = Runner()
     players = []
-    for i, model_file in enumerate(os.listdir(args_cli.checkpoints_dir)):
+    checkpoints_dir = os.path.join(args_cli.dir, "checkpoints")
+    for i, model_file in enumerate(os.listdir(checkpoints_dir)):
         player_name = model_file.split(".")[0]
-        with open(os.path.join(args_cli.configs_dir, f"{player_name}.yaml"), 'r') as file:
+        with open(os.path.join(args_cli.dir, "configs", f"{player_name}.yaml"), 'r') as file:
             config = yaml.safe_load(file)
         runner.load(config)
         player = runner.create_player()
-        player.restore(os.path.join(args_cli.checkpoints_dir, model_file))
+        player.restore(os.path.join(checkpoints_dir, model_file))
         player.reset()
         # initialize RNN states if used
         if player.is_rnn:
@@ -232,7 +232,7 @@ def main():
     player_elos = np.array(player_elos)
     for i, p in enumerate(players):
         plt.plot(player_elos[:, i], label=p.name)
-    plt.xlabel("round")
+    plt.xlabel("game")
     plt.ylabel("ELO")
     plt.legend()
     plt.grid()
