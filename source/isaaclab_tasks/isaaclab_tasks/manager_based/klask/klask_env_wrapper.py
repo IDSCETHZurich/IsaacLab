@@ -304,3 +304,88 @@ class KlaskAgentOpponentWrapper(Wrapper):
         self.opponent_obs = self.get_opponent_obs(obs["opponent"])
         return obs, reward, terminated, truncated, info
         
+
+class KlaskCollisionAvoidanceWrapper(Wrapper):
+    
+    real_to_sim_factor = 0.0008285
+    board_dimensions = (0.32, 0.44)
+
+    def __init__(self, env, action_factor=1.0):
+        super().__init__(env)
+        self.action_factor = action_factor
+        self.x_min, self.x_max = 15.0, 360.0
+        self.y_min_1, self.y_max_1 = 15.0, 235.0
+        self.y_min_2, self.y_max_2 = 340.0, 530.0
+
+    def reset(self, *args, **kwargs):
+        obs, info = self.env.reset(*args, **kwargs)
+        self.state_1 = obs["policy"].clone()[:, :2]
+        self.state_2 = obs["opponent"].clone()[:, 4:6]
+        self.state_1[:, 0] += self.board_dimensions[0] / 2 
+        self.state_1[:, 1] += self.board_dimensions[1] / 2
+        self.state_2[:, 0] += self.board_dimensions[0] / 2 
+        self.state_2[:, 1] += self.board_dimensions[1] / 2
+        self.state_1 /= self.real_to_sim_factor
+        self.state_2 /= self.real_to_sim_factor
+
+        return obs, info
+    
+    def step(self, actions, *args, **kwargs):
+        actions *= self.action_factor
+        
+        x_vel_max = torch.tanh((self.x_max - self.state_1[:, 0]) / 70).clamp(min=0.0)
+        x_vel_min = torch.tanh((self.x_min - self.state_1[:, 0]) / 70).clamp(max=0.0)
+        y_vel_max = torch.tanh((self.y_max_1 - self.state_1[:, 1]) / 70).clamp(min=0.0)
+        y_vel_min = torch.tanh((self.y_min_1 - self.state_1[:, 1]) / 70).clamp(max=0.0)
+
+        actions[:, 0] = actions[:, 0].clamp(min=x_vel_min, max=x_vel_max)
+        actions[:, 1] = actions[:, 1].clamp(min=y_vel_min, max=y_vel_max)
+
+        x_vel_max = torch.tanh((self.x_max - self.state_2[:, 0]) / 70).clamp(min=0.0)
+        x_vel_min = torch.tanh((self.x_min - self.state_2[:, 0]) / 70).clamp(max=0.0)
+        y_vel_max = torch.tanh((self.y_max_2 - self.state_2[:, 1]) / 70).clamp(min=0.0)
+        y_vel_min = torch.tanh((self.y_min_2 - self.state_2[:, 1]) / 70).clamp(max=0.0)
+
+        actions[:, 2] = actions[:, 2].clamp(min=x_vel_min, max=x_vel_max)
+        actions[:, 3] = actions[:, 3].clamp(min=y_vel_min, max=y_vel_max)
+
+        obs, rew, terminated, truncated, info = self.env.step(actions, *args, **kwargs)
+        self.state_1 = obs["policy"].clone()[:, :2]
+        self.state_2 = obs["opponent"].clone()[:, 4:6]
+        self.state_1[:, 0] += self.board_dimensions[0] / 2 
+        self.state_1[:, 1] += self.board_dimensions[1] / 2
+        self.state_2[:, 0] += self.board_dimensions[0] / 2 
+        self.state_2[:, 1] += self.board_dimensions[1] / 2
+        self.state_1 /= self.real_to_sim_factor
+        self.state_2 /= self.real_to_sim_factor
+
+        return obs, rew, terminated, truncated, info
+    
+
+class ActionHistoryWrapper(Wrapper):
+
+    def __init__(self, env, history_length):
+        super().__init__(env)
+        self.history_length = history_length
+        self.history_x_player = torch.zeros(env.unwrapped.num_envs, history_length).to(env.unwrapped.device)
+        self.history_y_player = torch.zeros(env.unwrapped.num_envs, history_length).to(env.unwrapped.device)
+        self.history_x_opponent = torch.zeros(env.unwrapped.num_envs, history_length).to(env.unwrapped.device)
+        self.history_y_opponent = torch.zeros(env.unwrapped.num_envs, history_length).to(env.unwrapped.device)
+
+    def reset(self, *args, **kwargs):
+        return self.env.reset(*args, **kwargs)
+
+    def step(self, actions, *args, **kwargs):
+        self.history_x_player[:, :-1] = self.history_x_player.clone()[:, 1:]
+        self.history_x_player[:, -1] = actions[:, 0]
+        self.history_y_player[:, :-1] = self.history_y_player.clone()[:, 1:]
+        self.history_y_player[:, -1] = actions[:, 1]
+        self.history_x_opponent[:, :-1] = self.history_x_opponent.clone()[:, 1:]
+        self.history_x_opponent[:, -1] = actions[:, 2]
+        self.history_y_opponent[:, :-1] = self.history_y_opponent.clone()[:, 1:]
+        self.history_y_opponent[:, -1] = actions[:, 3]
+
+        obs, rew, terminated, truncated, info = self.env.step(actions, *args, **kwargs)
+        obs["policy"][:, 12:] = torch.cat([self.history_x_player, self.history_y_player], dim=1)
+        obs["opponent"][:, 12:] = torch.cat([self.history_x_opponent, self.history_y_opponent], dim=1)
+        return obs, rew, terminated, truncated, info

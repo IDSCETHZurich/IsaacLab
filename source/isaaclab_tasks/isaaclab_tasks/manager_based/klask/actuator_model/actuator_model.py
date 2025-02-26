@@ -30,7 +30,7 @@ class ActuatorNetwork(nn.Module):
 
 class ActuatorModelWrapper(Wrapper):
 
-    model_file = "source/isaaclab_tasks/isaaclab_tasks/manager_based/klask/actuator_model/model_history_10_interval_0.02_delay_0.0_horizon_10_with_states.pt"
+    model_file = "source/isaaclab_tasks/isaaclab_tasks/manager_based/klask/actuator_model/model_history_10_interval_0.02_delay_0.0_horizon3_with_states.pt"
     num_history_steps = 10  # Number of past commands to include in input
     hidden_dim = 64
     delay = 0               # Time delay between most recent command included in the input and the current time
@@ -57,13 +57,13 @@ class ActuatorModelWrapper(Wrapper):
         obs, info = self.env.reset(*args, **kwargs)
         
         # Peg 1 history update:
-        state_1 = obs["policy"][:, :2]
+        state_1 = obs["policy"][:, 2:4]
         if self.include_states:
             self.state_buffer_1[:, :] = state_1.repeat(1, self.num_history_steps - 1)
         self.command_buffer_1[:, :] = 0.0
         
         # Peg 2 history update:
-        state_2 = -obs["opponent"][:, :2]
+        state_2 = -obs["opponent"][:, 2:4]
         if self.include_states:
             self.state_buffer_2[:, :] = state_2.repeat(1, self.num_history_steps - 1)
         self.command_buffer_2[:, :] = 0.0
@@ -77,7 +77,7 @@ class ActuatorModelWrapper(Wrapper):
         self.command_buffer_1[:, :2] = command_1
 
         # Peg 2 command history update:
-        command_2 = -actions[:, :2]
+        command_2 = actions[:, 2:]
         self.command_buffer_2[:, 2:] = self.command_buffer_2.clone()[:, :-2]
         self.command_buffer_2[:, :2] = command_2
 
@@ -89,17 +89,21 @@ class ActuatorModelWrapper(Wrapper):
         actions_1 = self.model(self.command_buffer_1, states_input_1)
         actions_2 = self.model(self.command_buffer_2, states_input_2)
         actions[:, :2] = actions_1
-        actions[:, 2:] = -actions_2
+        actions[:, 2:] = actions_2
+        #print(actions)
+        #print()
+        #print(self.state_buffer_1.min(), self.state_buffer_1.max())
+        #print(self.command_buffer_1.min(), self.command_buffer_1.max())
         obs, rew, terminated, truncated, info = self.env.step(actions, *args, **kwargs)
 
         if self.include_states:
             # Peg 1 state history update:
-            state_1 = obs["policy"][:, :2]
+            state_1 = obs["policy"][:, 2:4]
             self.state_buffer_1[:, 2:] = self.state_buffer_1.clone()[:, :-2]
             self.state_buffer_1[:, :2] = state_1
             
             # Peg 2 state history update:
-            state_2 = -obs["opponent"][:, :2]
+            state_2 = obs["opponent"][:, 2:4]
             self.state_buffer_2[:, 2:] = self.state_buffer_2.clone()[:, :-2]
             self.state_buffer_2[:, :2] = state_2
 

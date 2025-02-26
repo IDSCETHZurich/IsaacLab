@@ -38,7 +38,7 @@ import numpy as np
 import isaaclab_tasks  # noqa: F401
 from isaaclab_tasks.utils import parse_env_cfg
 
-from isaaclab_tasks.manager_based.klask import ObservationNoiseWrapper, ActuatorModelWrapper
+from isaaclab_tasks.manager_based.klask import ObservationNoiseWrapper, ActuatorModelWrapper, KlaskCollisionAvoidanceWrapper
 from isaaclab.managers import SceneEntityCfg
 
 
@@ -51,13 +51,12 @@ def main():
     # create environment
     env = gym.make(args_cli.task, cfg=env_cfg)
     env = ActuatorModelWrapper(env)
+    env = KlaskCollisionAvoidanceWrapper(env)
     #env = ObservationNoiseWrapper(env, 0.01)
 
     # print info (this is vectorized environment)
     print(f"[INFO]: Gym observation space: {env.observation_space}")
     print(f"[INFO]: Gym action space: {env.action_space}")
-    # reset environment
-    obs, info = env.reset()
 
     peg_1_x_pos = []
     peg_1_x_vel = []
@@ -71,7 +70,7 @@ def main():
 
     start_index = 1000
     batch_size = 100
-    data_file = "source/isaaclab_tasks/isaaclab_tasks/manager_based/klask/actuator_model/data_history_10_interval_0.02_delay_0.0_horizon_100_with_states.npz"
+    data_file = "/home/student/Documents/ActuatorPolicy/actuator_model/data/data_history_10_interval_0.02_delay_0.0_horizon3_with_states.npz"
     data = np.load(data_file)
     X_commands, Y, Y_prev, commands = data["X_commands"], data["Y"], data["Y_prev"], data["commands"]
     if "X_states" in data.keys():
@@ -86,84 +85,98 @@ def main():
     if X_states is not None:
         state_history = torch.from_numpy(X_states[0]).to(env.unwrapped.device)
     
+    preds = env.model(torch.from_numpy(X_commands).to("cuda"), torch.from_numpy(X_states).to("cuda"))
+
+     # reset environment
+    obs, info = env.reset()
+    
+    asset_cfg = SceneEntityCfg("klask", joint_names=["ground_to_slider_1"])
+    asset = env.scene[asset_cfg.name]
+    joint_pos = asset.data.default_joint_pos[0].clone()
+    joint_vel = asset.data.default_joint_vel[0].clone()
+    joint_vel[1] = torch.tensor(X_states[1, 3]).to(joint_pos.device)
+    joint_vel[3] = torch.tensor(X_states[1, 2]).to(joint_pos.device)
+    asset.write_joint_state_to_sim(joint_pos, joint_vel) 
+
+    obs["policy"][0, 2] = joint_vel[3]
+    obs["policy"][0, 3] = joint_vel[1]
+
     env.command_buffer_1[0, :] = command_history
     env.state_buffer_1[0, :] = state_history
 
     start_time = time.time()
-    try:
-        # simulate environment
-        step = 0
-        #while simulation_app.is_running() and time.time() - start_time < 1000.0:
-        for t in range(commands.shape[1]):
-            # run everything in inference mode
-            with torch.inference_mode():
-                #peg_1_x_pos.append(env.unwrapped.scene.articulations["klask"].data.joint_pos[0, -1].item())
-                #peg_1_x_vel.append(env.unwrapped.scene.articulations["klask"].data.joint_vel[0, -1].item())
-                #peg_1_body_x_pos.append(env.unwrapped.scene.articulations["klask"].data.body_pos_w[0, -1, 0].item())
-                #obs_x_vel.append(env.unwrapped.scene.articulations["klask"].data.body_lin_vel_w[0, -1, 0].item())
+    # simulate environment
+    step = 0
+    while simulation_app.is_running() and time.time() - start_time < 1000.0:
+    #for t in range(commands.shape[1]):
+        # run everything in inference mode
+        with torch.inference_mode():
+            #peg_1_x_pos.append(env.unwrapped.scene.articulations["klask"].data.joint_pos[0, -1].item())
+            #peg_1_x_vel.append(env.unwrapped.scene.articulations["klask"].data.joint_vel[0, -1].item())
+            #peg_1_body_x_pos.append(env.unwrapped.scene.articulations["klask"].data.body_pos_w[0, -1, 0].item())
+            #obs_x_vel.append(env.unwrapped.scene.articulations["klask"].data.body_lin_vel_w[0, -1, 0].item())
 
-                # sample actions from -1 to 1
-                #actions = 2 * torch.rand(env.action_space.shape, device=env.unwrapped.device) - 1
-                actions = torch.zeros(*env.action_space.shape, device=env.unwrapped.device, dtype=torch.float32)
-                #actions[:, 0] = -0.7
-                #actions[:, 1] = -0.7
-                actions[:, :2] = torch.from_numpy(commands[0, t]).to(env.unwrapped.device)
-                #state_history = torch.from_numpy(X_states[step]).to(env.unwrapped.device)
-                #command_history = torch.from_numpy(X_commands[step]).to(env.unwrapped.device)
-                #env.command_buffer_1[0, :] = command_history
-                #env.state_buffer_1[0, :2] = torch.from_numpy(Y[0, t]).to(env.unwrapped.device)
-                #env.state_buffer_1[0, ::4] = state_history[::4]
-                #env.state_buffer_1[0, 1::4] = state_history[1::4]
-                #env.state_buffer_1[0, 2::4] = state_history[2::4]
-                #env.state_buffer_1[0, 3::4] = state_history[3::4]
+            # sample actions from -1 to 1
+            actions = 2 * torch.rand(env.action_space.shape, device=env.unwrapped.device) - 1
+            #actions *= 0.5
+            actions[:, 2:] = 0.0
+            actions[:, :2] = torch.from_numpy(X_commands[step+1, :2]).to(actions.device)
+            #actions = torch.zeros(*env.action_space.shape, device=env.unwrapped.device, dtype=torch.float32)
+            actions[:, 0] = 0.9
+            actions[:, 1] = 0.0
+            #actions[:, 1] = -0.7
+            
+            #print()
+            #print(torch.from_numpy(X_states[step]).to(actions.device) - env.state_buffer_1[0])
+            #env.state_buffer_1[0, :] = torch.from_numpy(X_states[step]).to(actions.device)
 
-                # apply actions
-                obs, rew, terminated, truncated, info = env.step(actions)
+            # apply actions
+            obs, rew, terminated, truncated, info = env.step(actions)
+            #print(obs["policy"][0, 2:4], preds[step])
+            #print(obs["policy"][0, 2:4], preds[step], X_states[step+1, :2])
 
-                obs_x_pos.append(obs["policy"][0, 0].item())
-                obs_x_vel.append(obs["policy"][0, 2].item())
-                obs_y_pos.append(obs["policy"][0, 1].item())
-                obs_y_vel.append(obs["policy"][0, 3].item())
+            obs_x_pos.append(obs["policy"][0, 0].item())
+            obs_x_vel.append(obs["policy"][0, 2].item())
+            obs_y_pos.append(obs["policy"][0, 1].item())
+            obs_y_vel.append(obs["policy"][0, 3].item())
 
-                #print(f"y_dot gt: {Y[step, 1].item()}, y_dot sim: {obs_y_vel[-1]}")
-                #print(env.state_buffer_1[0, 2::4])
+            #print(f"y_dot gt: {Y[step, 1].item()}, y_dot sim: {obs_y_vel[-1]}")
+            #print(env.state_buffer_1[0, 2::4])
 
-                step += 1
+            step += 1
 
-    except Exception as e:
-        print(e)
 
-    finally:
-        # close the simulator
-        env.close()
-        fig, ax = plt.subplots(2)
-        #ax[0].plot(obs_x_pos, label="Obs x")
-        #ax[0].plot(obs_y_pos, label="Obs y")
+    
+    # close the simulator
+    env.close()
+    fig, ax = plt.subplots(2)
+    #ax[0].plot(obs_x_pos, label="Obs x")
+    #ax[0].plot(obs_y_pos, label="Obs y")
 
-        ax[0].plot(Y[0, :, 0], label="GT x_dot")
-        ax[0].plot(obs_x_vel, label="Sim x_dot")
-        ax[0].legend()
+    #ax[0].plot(Y[0, :, 0], label="GT x_dot")
+    ax[0].plot(obs_x_vel, label="Sim x_dot")
+    ax[0].legend()
 
-        ax[1].plot(Y[0, :, 1], label="GT y_dot")
-        ax[1].plot(obs_y_vel, label="Sim y_dot")
-        ax[1].legend()
+    #ax[1].plot(Y[0, :, 1], label="GT y_dot")
+    ax[1].plot(obs_y_vel, label="Sim y_dot")
+    ax[1].legend()
 
-        #ax[2].plot(X_states[:, 0], label="GT x")
-        #ax[2].plot(obs_x_pos, label="Sim x")
-        #ax[2].legend()
+    #ax[2].plot(X_states[:, 0], label="GT x")
+    #ax[2].plot(obs_x_pos, label="Sim x")
+    #ax[2].legend()
 
-        #ax[3].plot(X_states[:, 1], label="GT y")
-        #ax[3].plot(obs_y_pos, label="Sim y")
-        #ax[3].legend()
+    #ax[3].plot(X_states[:, 1], label="GT y")
+    #ax[3].plot(obs_y_pos, label="Sim y")
+    #ax[3].legend()
 
-        #ax.axhline(y=0, color='red', linestyle='--')      
-        #ax.plot(obs_x_vel, label="Peg x vel")
-        #ax.plot(obs_y_vel, label="Peg y vel")
-        #ax.plot(obs_y_vel, label="Peg y vel")
-        #ax[0].eventplot(events)
-        #ax[0].legend()
-        #ax.legend()
-        plt.show()
+    #ax.axhline(y=0, color='red', linestyle='--')      
+    #ax.plot(obs_x_vel, label="Peg x vel")
+    #ax.plot(obs_y_vel, label="Peg y vel")
+    #ax.plot(obs_y_vel, label="Peg y vel")
+    #ax[0].eventplot(events)
+    #ax[0].legend()
+    #ax.legend()
+    plt.show()
 
 
 if __name__ == "__main__":

@@ -82,6 +82,8 @@ from isaaclab_tasks.manager_based.klask import (
     RlGamesGpuEnvSelfPlay,
     ObservationNoiseWrapper,
     OpponentObservationWrapper,
+    KlaskCollisionAvoidanceWrapper,
+    ActionHistoryWrapper
 )
 from isaaclab_tasks.manager_based.klask.actuator_model import ActuatorModelWrapper
 from isaaclab_tasks.manager_based.klask.utils_manager_based import set_terminations
@@ -174,6 +176,13 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     if agent_cfg["env"].get("actuator_model", False):
         env = ActuatorModelWrapper(env)
+
+    if agent_cfg["env"].get("collision_avoidance", False):
+        action_factor = agent_cfg["env"].get("action_factor", 1.0)
+        env = KlaskCollisionAvoidanceWrapper(env, action_factor)
+
+    if KLASK_PARAMS["action_history"] > 0:
+        env = ActionHistoryWrapper(env, history_length=KLASK_PARAMS["action_history"])
     
     obs_noise = agent_cfg["env"].get("obs_noise", 0.0)
     if obs_noise > 0.0:
