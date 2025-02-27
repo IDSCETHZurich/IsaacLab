@@ -1,0 +1,94 @@
+params:
+  seed: 42
+  env:
+    clip_observations: 5.0
+    clip_actions: 1.0
+  algo:
+    name: a2c_continuous
+  model:
+    name: continuous_a2c_logstd
+  network:
+    name: actor_critic
+    separate: true
+    space:
+      continuous:
+        mu_activation: None
+        sigma_activation: None
+        mu_init:
+          name: default
+        sigma_init:
+          name: const_initializer
+          val: 0
+        fixed_sigma: true
+    mlp:
+      units:
+      - 256
+      - 128
+      - 64
+      activation: elu
+      d2rl: false
+      initializer:
+        name: default
+      regularizer:
+        name: None
+  load_checkpoint: false
+  load_path: ''
+  config:
+    full_experiment_name: test
+    name: klask
+    env_name: rlgpu
+    device: cuda:0
+    device_name: cuda:0
+    multi_gpu: false
+    ppo: true
+    mixed_precision: false
+    normalize_input: false
+    normalize_value: false
+    num_actors: -1
+    reward_shaper:
+      scale_value: 1.0
+    normalize_advantage: false
+    gamma: 0.99
+    tau: 0.95
+    learning_rate: 3e-4
+    lr_schedule: adaptive
+    kl_threshold: 0.008
+    max_epochs: -1
+    max_frames: 200000000
+    save_best_after: 50
+    save_frequency: 25
+    grad_norm: 1.0
+    entropy_coef: 0.0
+    truncate_grads: true
+    e_clip: 0.2
+    horizon_length: 16
+    minibatch_size: 4096
+    mini_epochs: 8
+    critic_coef: 4
+    clip_value: true
+    seq_length: 4
+    bounds_loss_coef: 0.0001
+    self_play: false
+    train_dir: /home/student/klask_rl/IsaacLab/logs/rl_games/klask
+env:
+  actuator_model: true
+  collision_avoidance: true
+  action_factor: 0.7
+  obs_noise: 0.0
+rewards:
+  player_in_goal: 0.0
+  goal_scored: 10.0
+  goal_conceded: 0.0
+  distance_ball_opponent_goal:
+    weight: 1.0
+    per_second: true
+  ball_speed: 0.0
+  distance_player_ball_own_half: 0.0
+  ball_stationary: 0.0
+  collision_player_ball: 0.0
+terminations:
+  time_out: true
+  goal_scored: true
+  goal_conceded: true
+  player_in_goal: true
+  opponent_in_goal: false
