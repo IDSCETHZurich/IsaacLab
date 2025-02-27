@@ -309,6 +309,7 @@ class KlaskCollisionAvoidanceWrapper(Wrapper):
     
     real_to_sim_factor = 0.0008285
     board_dimensions = (0.32, 0.44)
+    speed_limit_weight = 70.0
 
     def __init__(self, env, action_factor=1.0):
         super().__init__(env)
@@ -333,18 +334,18 @@ class KlaskCollisionAvoidanceWrapper(Wrapper):
     def step(self, actions, *args, **kwargs):
         actions *= self.action_factor
         
-        x_vel_max = torch.tanh((self.x_max - self.state_1[:, 0]) / 70).clamp(min=0.0)
-        x_vel_min = torch.tanh((self.x_min - self.state_1[:, 0]) / 70).clamp(max=0.0)
-        y_vel_max = torch.tanh((self.y_max_1 - self.state_1[:, 1]) / 70).clamp(min=0.0)
-        y_vel_min = torch.tanh((self.y_min_1 - self.state_1[:, 1]) / 70).clamp(max=0.0)
+        x_vel_max = torch.tanh((self.x_max - self.state_1[:, 0]) / self.speed_limit_weight).clamp(min=0.0)
+        x_vel_min = torch.tanh((self.x_min - self.state_1[:, 0]) / self.speed_limit_weight).clamp(max=0.0)
+        y_vel_max = torch.tanh((self.y_max_1 - self.state_1[:, 1]) / self.speed_limit_weight).clamp(min=0.0)
+        y_vel_min = torch.tanh((self.y_min_1 - self.state_1[:, 1]) / self.speed_limit_weight).clamp(max=0.0)
 
         actions[:, 0] = actions[:, 0].clamp(min=x_vel_min, max=x_vel_max)
         actions[:, 1] = actions[:, 1].clamp(min=y_vel_min, max=y_vel_max)
 
-        x_vel_max = torch.tanh((self.x_max - self.state_2[:, 0]) / 70).clamp(min=0.0)
-        x_vel_min = torch.tanh((self.x_min - self.state_2[:, 0]) / 70).clamp(max=0.0)
-        y_vel_max = torch.tanh((self.y_max_2 - self.state_2[:, 1]) / 70).clamp(min=0.0)
-        y_vel_min = torch.tanh((self.y_min_2 - self.state_2[:, 1]) / 70).clamp(max=0.0)
+        x_vel_max = torch.tanh((self.x_max - self.state_2[:, 0]) / self.speed_limit_weight).clamp(min=0.0)
+        x_vel_min = torch.tanh((self.x_min - self.state_2[:, 0]) / self.speed_limit_weight).clamp(max=0.0)
+        y_vel_max = torch.tanh((self.y_max_2 - self.state_2[:, 1]) / self.speed_limit_weight).clamp(min=0.0)
+        y_vel_min = torch.tanh((self.y_min_2 - self.state_2[:, 1]) / self.speed_limit_weight).clamp(max=0.0)
 
         actions[:, 2] = actions[:, 2].clamp(min=x_vel_min, max=x_vel_max)
         actions[:, 3] = actions[:, 3].clamp(min=y_vel_min, max=y_vel_max)

@@ -64,7 +64,7 @@ params:
     kl_threshold: 0.008
     #score_to_win: 20000
     max_epochs: -1
-    max_frames: !!int 200_000_000
+    max_frames: !!int 100_000_000
     save_best_after: 50
     save_frequency: 25
     grad_norm: 1.0
@@ -77,11 +77,11 @@ params:
     critic_coef: 4
     clip_value: True
     seq_length: 4
-    bounds_loss_coef: 0.0001
+    bounds_loss_coef: 0.0005
     self_play: True
     self_play_config:
       check_scores: True
-      update_score: 0.0
+      update_score: 0.3
       games_to_check: 1
       #env_update_num: 4096
 

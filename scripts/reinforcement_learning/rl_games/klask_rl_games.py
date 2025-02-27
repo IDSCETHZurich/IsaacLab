@@ -34,8 +34,8 @@ class KlaskAlgoObserver(AlgoObserver):
                     self.direct_info[k] = v
                 if k == "episode":
                     for key, val in v.items():
-                        if isinstance(val, torch.Tensor):
-                            val = int(val.item()) 
+                        if isinstance(val, torch.Tensor) and len(val.shape) != 0:
+                            val = int(val.item())
                         if key == "Episode_Termination/goal_scored":
                             self.mean_scores.update(torch.ones(val, dtype=float).to(self.algo.ppo_device))
                         elif key == "Episode_Termination/goal_conceded":

@@ -175,7 +175,8 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         env = multi_agent_to_single_agent(env)
 
     if agent_cfg["env"].get("actuator_model", False):
-        env = ActuatorModelWrapper(env)
+        pass
+        #env = ActuatorModelWrapper(env)
 
     if agent_cfg["env"].get("collision_avoidance", False):
         action_factor = agent_cfg["env"].get("action_factor", 1.0)

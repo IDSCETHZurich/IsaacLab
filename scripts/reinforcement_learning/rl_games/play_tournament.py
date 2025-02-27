@@ -230,6 +230,8 @@ def main():
 
     # Plot ELO scores:
     player_elos = np.array(player_elos)
+    kwargs = {p.name: player_elos[:, i] for i, p in enumerate(players)}
+    np.savez(os.path.join(log_root_path, log_dir, "elos.npz"), **kwargs)
     for i, p in enumerate(players):
         plt.plot(player_elos[:, i], label=p.name)
     plt.xlabel("game")
