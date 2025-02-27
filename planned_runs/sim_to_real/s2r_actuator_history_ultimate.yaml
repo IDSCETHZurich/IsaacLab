@@ -78,11 +78,11 @@ params:
     clip_value: True
     seq_length: 4
     bounds_loss_coef: 0.0001
-    self_play: False
-    #self_play_config:
-      #check_scores: True
-      #update_score: 0.35
-      #games_to_check: 1
+    self_play: True
+    self_play_config:
+      check_scores: True
+      update_score: 0.0
+      games_to_check: 1
       #env_update_num: 4096
 
 env:
@@ -108,5 +108,5 @@ terminations:
   goal_scored: True
   goal_conceded: True
   player_in_goal: True
-  opponent_in_goal: False
+  opponent_in_goal: True
 
