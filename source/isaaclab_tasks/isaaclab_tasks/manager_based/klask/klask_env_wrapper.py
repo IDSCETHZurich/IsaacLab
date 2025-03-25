@@ -1,18 +1,11 @@
 import numpy as np
-from collections import defaultdict
 import torch
-import yaml
-import os
 import gymnasium as gym
-from gymnasium import Wrapper, ActionWrapper, ObservationWrapper, spaces
+from gymnasium import Wrapper, ObservationWrapper
 from collections import OrderedDict
-from stable_baselines3.common.vec_env.base_vec_env import VecEnv
 from rl_games.torch_runner import Runner
-from isaaclab_rl.rl_games import RlGamesGpuEnv, RlGamesVecEnvWrapper
 
 from isaaclab_assets.robots.klask import KLASK_PARAMS
-from isaaclab_rl.sb3 import Sb3VecEnvWrapper, process_sb3_cfg
-from isaaclab.envs import DirectRLEnv, ManagerBasedRLEnv
 
 
 def find_wrapper(env, wrapper_type):
@@ -22,69 +15,6 @@ def find_wrapper(env, wrapper_type):
     if isinstance(env, wrapper_type):
             return env  # Found the wrapper
     return None  # Wrapper not found
-
-
-class KlaskGoalEnvWrapper(Wrapper):
-
-    def __init__(self, env):
-        super().__init__(env)
-        
-        self.player_in_goal_weight = 1.0
-        self.goal_conceded_weight = 1.0
-        self.goal_scored_weight = 1.0
-        self.ball_speed_weight = 1.0
-        self.distance_player_ball_weight = 1.0
-        self.distance_ball_opponent_goal_weight = 1.0
-        self.dt = self.unwrapped.step_dt
-        self.single_observation_space = self.unwrapped.single_observation_space
-        self.single_action_space = spaces.Box(
-            self.unwrapped.single_action_space.low[:2], 
-            self.unwrapped.single_action_space.high[:2],
-            shape=(2,), 
-            dtype=self.unwrapped.single_action_space.dtype
-        )
-    
-    def compute_reward(self, achieved_goal, desired_goal, info, observation, **kwargs):
-        player_in_goal_reward = self.compute_player_in_goal_reward(observation)
-        goal_conceded_reward = self.compute_goal_conceded_reward(observation)
-        goal_reward = self.compute_goal_reward(achieved_goal, desired_goal)
-        ball_speed_reward = self.compute_ball_speed_reward(observation)
-        distance_player_ball_reward = self.compute_distance_player_ball_reward(observation)
-        distance_ball_opponent_goal_reward = self.compute_distance_ball_opponent_goal_reward(observation)
-        return [self.dt * (goal_reward + player_in_goal_reward + goal_conceded_reward + ball_speed_reward 
-                           + distance_player_ball_reward)]
-    
-    def compute_goal_reward(self, achieved_goal, desired_goal):
-        # TODO: possibly need to unnormalize achieved and desired goal OR don't normalize achieved
-        # and desired goal in the first place
-        r = KLASK_PARAMS["opponent_goal"][2]
-        v = np.sqrt(desired_goal[:, 2] ** 2 + desired_goal[:, 3] ** 2)
-        ball_in_goal = (achieved_goal[:, 0] - desired_goal[:, 0]) ** 2 + (achieved_goal[:, 1] - desired_goal[:, 1]) ** 2 <= r ** 2
-        ball_slow = ((achieved_goal[:, 2] ** 2 + achieved_goal[:, 3] ** 2 >= v ** 2) & 
-                     (achieved_goal[:, 2] ** 2 + achieved_goal[:, 3] ** 2 <= (v + KLASK_PARAMS["max_ball_vel"]) ** 2))
-        return self.goal_scored_weight * ball_in_goal * ball_slow
-    
-    def compute_player_in_goal_reward(self, observation):
-        cx, cy, r = KLASK_PARAMS["player_goal"]
-        player_in_goal = (observation[:, 0] - cx) ** 2 + (observation[:, 1] - cy) ** 2 <= r ** 2
-        return self.player_in_goal_weight * player_in_goal
-
-    def compute_goal_conceded_reward(self, observation):
-        cx, cy, r = KLASK_PARAMS["player_goal"]
-        ball_in_goal = (observation[:, 8] - cx) ** 2 + (observation[:, 9] - cy) ** 2 <= r ** 2
-        ball_slow = observation[:, 10] ** 2 + observation[:, 11] ** 2 <= KLASK_PARAMS["max_ball_vel"] ** 2
-        return self.goal_conceded_weight * ball_in_goal * ball_slow
-
-    def compute_ball_speed_reward(self, observation):
-        return self.ball_speed_weight * np.sqrt((observation[:, 10] ** 2 + observation[:, 11] ** 2))   
-
-    def compute_distance_player_ball_reward(self, observation):
-        return  self.distance_player_ball_weight * np.sqrt((observation[:, 0] - observation[:, 8]) ** 2 + (observation[:, 1] - observation[:, 9]) ** 2)
-    
-    def compute_distance_ball_opponent_goal_reward(self, observation):
-        cx, cy, r = KLASK_PARAMS["player_goal"]
-        distance_ball_opponent_goal = torch.sqrt((observation[:, 8] - cx) ** 2 + (observation[:, 9] - cy) ** 2)
-        return self.distance_ball_opponent_goal_weight * distance_ball_opponent_goal
     
 
 class KlaskRandomOpponentWrapper(Wrapper):
@@ -96,60 +26,6 @@ class KlaskRandomOpponentWrapper(Wrapper):
     def reset(self, *args, **kwargs):
         return self.env.reset(*args, **kwargs)
 
-
-class KlaskSb3VecEnvWrapper(Sb3VecEnvWrapper):
-    
-    def __init__(self, env: KlaskGoalEnvWrapper):
-        """Initialize the wrapper.
-
-        Args:
-            env: The environment to wrap around.
-
-        Raises:
-            ValueError: When the environment is not an instance of :class:`ManagerBasedRLEnv` or :class:`DirectRLEnv`.
-        """
-        # check that input is valid
-        if not isinstance(env.unwrapped, ManagerBasedRLEnv) and not isinstance(env.unwrapped, DirectRLEnv):
-            raise ValueError(
-                "The environment must be inherited from ManagerBasedRLEnv or DirectRLEnv. Environment type:"
-                f" {type(env)}"
-            )
-        # initialize the wrapper
-        self.env = env
-        # collect common information
-        self.num_envs = self.unwrapped.num_envs
-        self.sim_device = self.unwrapped.device
-        self.render_mode = self.unwrapped.render_mode
-
-        # obtain gym spaces
-        # note: stable-baselines3 does not like when we have unbounded action space so
-        #   we set it to some high value here. Maybe this is not general but something to think about.
-        #observation_space = self.unwrapped.single_observation_space
-        observation_space = self.env.single_observation_space
-        action_space = self.env.single_action_space
-        if isinstance(action_space, gym.spaces.Box) and not action_space.is_bounded("both"):
-            action_space = gym.spaces.Box(low=-100, high=100, shape=action_space.shape)
-
-        # initialize vec-env
-        VecEnv.__init__(self, self.num_envs, observation_space, action_space)
-        # add buffer for logging episodic information
-        self._ep_rew_buf = torch.zeros(self.num_envs, device=self.sim_device)
-        self._ep_len_buf = torch.zeros(self.num_envs, device=self.sim_device)
-
-    def _process_obs(self, obs_dict: torch.Tensor | dict[str, torch.Tensor]) -> np.ndarray | dict[str, np.ndarray]:
-        """Convert observations into NumPy data type."""
-        obs = obs_dict
-
-        # note: ManagerBasedRLEnv uses torch backend (by default).
-        if isinstance(obs, dict):
-            for key, value in obs.items():
-                obs[key] = value.detach().cpu().numpy()
-        elif isinstance(obs, torch.Tensor):
-            obs = obs.detach().cpu().numpy()
-        else:
-            raise NotImplementedError(f"Unsupported data type: {type(obs)}")
-        return obs
-    
 
 class ObservationNoiseWrapper(ObservationWrapper):
 
