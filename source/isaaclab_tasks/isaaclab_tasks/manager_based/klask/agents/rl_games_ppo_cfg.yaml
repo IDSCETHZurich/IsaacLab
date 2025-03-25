@@ -1,11 +1,12 @@
+###########################################
+# RL Games Config Parameters
+###########################################
+
 params:
   seed: 42
 
-  # environment wrapper clipping
   env:
-    # added to the wrapper
     clip_observations: 5.0
-    # can make custom wrapper?
     clip_actions: 1.0
 
   algo:
@@ -14,7 +15,6 @@ params:
   model:
     name: continuous_a2c_logstd
 
-  # doesn't have this fine grained control but made it close
   network:
     name: actor_critic
     separate: False
@@ -84,20 +84,32 @@ params:
       #games_to_check: 1
       #env_update_num: 4096
 
+
+###########################################
+# Custom Config Parameters
+###########################################
+
 env:
-  obs_noise: 0.0
+  # std of Gaussian noise added to the observations (implemented as ObservationNoiseWrapper)
+  obs_noise: 0.0 
 
 rewards:
+  # reward terms and their weights:
   player_in_goal: !!float -10.0
   goal_scored: !!float 10.0
   goal_conceded: !!float -10.0
-  distance_ball_opponent_goal: !!float 0.0
+  distance_ball_opponent_goal:
+    # if per_second is True, the reward is scaled by dt (environment time step)
+    weight: 1.0
+    per_second: True
   ball_speed: !!float 0.0
   distance_player_ball_own_half: !!float 0.0
   ball_stationary: !!float 0.0
   collision_player_ball: !!float 1.0
 
 terminations:
+  # If left out of the config.yaml file, terminations are active by default; use this if you want to
+  # deactivate a specific termination criteria by setting it to False
   time_out: True
   goal_scored: True
   goal_conceded: True
