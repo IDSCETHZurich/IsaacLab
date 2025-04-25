@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import gymnasium as gym
 from gymnasium import Wrapper
+import matplotlib.pyplot as plt
+from isaaclab_assets.robots import klask
 
 
 class ActuatorNetwork(nn.Module):
@@ -20,7 +22,7 @@ class ActuatorNetwork(nn.Module):
         if x_states is not None:
             x = torch.cat([x_commands, x_states], dim=1)
         else:
-            x = x_commands
+            x = torch.cat([x_commands], dim=1)
         x = self.activation(self.fc1(x))
         x = self.activation(self.fc2(x))
         x = self.activation(self.fc3(x))
@@ -30,17 +32,18 @@ class ActuatorNetwork(nn.Module):
 
 class ActuatorModelWrapper(Wrapper):
 
-    model_file = "source/isaaclab_tasks/isaaclab_tasks/manager_based/klask/actuator_model/model_history_10_interval_0.02_delay_0.0_horizon3_with_states.pt"
+    model_file = "source/isaaclab_tasks/isaaclab_tasks/manager_based/klask/actuator_model/model_odrive_scaled_history_10_interval_0.02_delay_0.0_horizon3_with_states.pt"
     num_history_steps = 10  # Number of past commands to include in input
     hidden_dim = 64
     delay = 0               # Time delay between most recent command included in the input and the current time
-    include_states = True   # Whether to include history of peg states in input
+    include_states = True  # Whether to include history of peg states in input
+    
 
     def __init__(self, env, device="cuda", model_file=None):   
         super().__init__(env)
 
         num_envs = env.unwrapped.num_envs
-        
+        self.dT = klask.KLASK_PARAMS["decimation"]*klask.KLASK_PARAMS["physics_dt"]
         input_dim = self.num_history_steps * 2 + self.include_states * (self.num_history_steps - 1) * 2
         output_dim = 2
         self.model = ActuatorNetwork(input_dim, output_dim, hidden_dim=self.hidden_dim).to(device)
@@ -52,18 +55,27 @@ class ActuatorModelWrapper(Wrapper):
         if self.include_states:
             self.state_buffer_1 = torch.zeros(num_envs, 2 * (self.num_history_steps - 1), dtype=torch.float32).to(device)
             self.state_buffer_2 = torch.zeros(num_envs, 2 * (self.num_history_steps - 1), dtype=torch.float32).to(device)
+            self.position_puffer_1 = torch.zeros(num_envs, 4, dtype=torch.float32).to(device)
+            self.position_puffer_2 = torch.zeros(num_envs, 4, dtype=torch.float32).to(device)
+
+        self.model.eval()
+
+        
+
 
     def reset(self, *args, **kwargs):
         obs, info = self.env.reset(*args, **kwargs)
         
         # Peg 1 history update:
         state_1 = obs["policy"][:, 2:4]
+        
         if self.include_states:
             self.state_buffer_1[:, :] = state_1.repeat(1, self.num_history_steps - 1)
         self.command_buffer_1[:, :] = 0.0
         
         # Peg 2 history update:
-        state_2 = -obs["opponent"][:, 2:4]
+        state_2 = obs["opponent"][:, 2:4] #here was a minus before but doesnt make sense
+        
         if self.include_states:
             self.state_buffer_2[:, :] = state_2.repeat(1, self.num_history_steps - 1)
         self.command_buffer_2[:, :] = 0.0
@@ -72,25 +84,36 @@ class ActuatorModelWrapper(Wrapper):
     
     def step(self, actions, *args, **kwargs):
         # Peg 1 command history update:
+
+        #actions/=30 #action must be scaled down
+        
+
         command_1 = actions[:, :2]
-        self.command_buffer_1[:, 2:] = self.command_buffer_1.clone()[:, :-2]
+        prev_buffer = self.command_buffer_1.clone()
+        self.command_buffer_1[:, 2:] = prev_buffer[:, :-2]
         self.command_buffer_1[:, :2] = command_1
 
         # Peg 2 command history update:
         command_2 = actions[:, 2:]
         self.command_buffer_2[:, 2:] = self.command_buffer_2.clone()[:, :-2]
         self.command_buffer_2[:, :2] = command_2
-
+        
         # Map commands to velocities using the actuator model:
         if self.include_states:
             states_input_1, states_input_2 = self.state_buffer_1, self.state_buffer_2
         else:
             states_input_1, states_input_2 = None, None
-        actions_1 = self.model(self.command_buffer_1, states_input_1)
-        actions_2 = self.model(self.command_buffer_2, states_input_2)
+        with torch.no_grad():    
+            actions_1 = self.model(self.command_buffer_1, states_input_1)
+            actions_2 = self.model(self.command_buffer_2, states_input_2)
+
+        
         actions[:, :2] = actions_1
         actions[:, 2:] = actions_2
-        #print(actions)
+        
+        
+        
+        
         #print()
         #print(self.state_buffer_1.min(), self.state_buffer_1.max())
         #print(self.command_buffer_1.min(), self.command_buffer_1.max())
@@ -98,14 +121,20 @@ class ActuatorModelWrapper(Wrapper):
 
         if self.include_states:
             # Peg 1 state history update:
+            self.position_puffer_1[:,2:] = self.position_puffer_1[:,:-2]
+            self.position_puffer_1[:,:2] = obs["policy"][:, :2]
             state_1 = obs["policy"][:, 2:4]
+            
+            
+
             self.state_buffer_1[:, 2:] = self.state_buffer_1.clone()[:, :-2]
             self.state_buffer_1[:, :2] = state_1
             
             # Peg 2 state history update:
             state_2 = obs["opponent"][:, 2:4]
+            
             self.state_buffer_2[:, 2:] = self.state_buffer_2.clone()[:, :-2]
-            self.state_buffer_2[:, :2] = state_2
+            self.state_buffer_2[:, :2] = state_2 
 
         # Reset buffers for terminated envs:
         done = terminated | truncated
@@ -118,3 +147,4 @@ class ActuatorModelWrapper(Wrapper):
 
         return obs, rew, terminated, truncated, info
 
+  

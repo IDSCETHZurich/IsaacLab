@@ -5,6 +5,7 @@ import isaaclab.utils.math as math_utils
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.envs import ManagerBasedRLEnv
 from isaaclab.managers import ManagerTermBaseCfg
+from isaaclab_assets.robots.klask import KLASK_PARAMS
 
 
 def reset_joints_by_offset(
@@ -88,6 +89,24 @@ def ball_in_goal(
 
     return ball_in_goal
 
+def peg_in_defense_line(
+    env: ManagerBasedRLEnv, player_cfg: SceneEntityCfg, opponent_cfg: SceneEntityCfg, goal: tuple[float, float, float], ball_cfg: SceneEntityCfg, weight: float | None = None
+) -> torch.Tensor:
+    
+    """
+        Rewards defending positions where the ball is supposed to be shot at
+    """
+    ball_pos = root_xy_pos_w(env, ball_cfg)
+    ball_in_own_half = ball_pos[:, 1] < 0.0
+    if(not ball_in_own_half):
+       player: RigidObject = env.scene[player_cfg]
+       opponent: RigidObject = env.scene[opponent_cfg]
+       ball : RigidObject = env.scene[ball_cfg]
+       x_b,y_b = ball.data.root_pos_w
+       x_o,y_o = opponent.data.root_pos_w
+       xp_y_p = player.data.root_pos_w
+       ball_pos = 1
+    
 
 def root_xy_pos_w(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg) -> torch.Tensor:
     """Asset root position in the environment frame."""
@@ -138,13 +157,13 @@ def player_speed(env: ManagerBasedRLEnv, player_cfg: SceneEntityCfg) -> torch.Te
 def distance_ball_goal(env: ManagerBasedRLEnv, ball_cfg: SceneEntityCfg, goal: tuple[float, float, float]) -> torch.Tensor:
     cx, cy, r = goal
     ball_pos = root_xy_pos_w(env, ball_cfg)
-    return 1.0 - torch.sqrt((ball_pos[:, 0] - cx) ** 2 + (ball_pos[:, 1] - cy) ** 2)
+    return torch.exp(-5*torch.sqrt((ball_pos[:, 0] - cx) ** 2 + (ball_pos[:, 1] - cy) ** 2)) #factor 5 because distances are really small
 
 
 def distance_player_ball_own_half(env: ManagerBasedRLEnv, player_cfg: SceneEntityCfg, ball_cfg: SceneEntityCfg) -> torch.Tensor:
     ball_pos = root_xy_pos_w(env, ball_cfg)
     ball_in_own_half = ball_pos[:, 1] < 0.0
-    return ball_in_own_half * (1.0 - distance_player_ball(env, player_cfg, ball_cfg))
+    return ball_in_own_half * (torch.exp(- 5* distance_player_ball(env, player_cfg, ball_cfg))) #factor 5 because distances are really small
 
 
 def ball_stationary(env: ManagerBasedRLEnv, ball_cfg: SceneEntityCfg, eps=5e-3) -> torch.Tensor:
@@ -159,6 +178,29 @@ def ball_in_own_half(env: ManagerBasedRLEnv, ball_cfg: SceneEntityCfg):
     ball_pos = root_xy_pos_w(env, ball_cfg)
     return 1.0 * (ball_pos[:, 1] < 0.0)
 
+def distance_to_wall(env: ManagerBasedRLEnv, player_cfg:SceneEntityCfg) -> torch.Tensor:
+    player_pos = body_xy_pos_w(env, player_cfg)
+    device = player_pos.device
+    cost = torch.zeros(player_pos.shape[0], device=device)
+
+    x_edge =player_pos[:,0] < 0.03 +torch.tensor(KLASK_PARAMS["edge"][0]) 
+    distance = player_pos[:,0] - torch.tensor(KLASK_PARAMS["edge"][0]) 
+    cost += x_edge*0.5*torch.exp(-5*distance)
+    
+    x_edge = torch.tensor(KLASK_PARAMS["edge"][1])-player_pos[:,0] <0.03
+    distance =  torch.tensor(KLASK_PARAMS["edge"][1]) - player_pos[:,0] 
+    cost += x_edge*0.5*torch.exp(-5*distance)
+
+    y_edge = player_pos[:,1] - torch.tensor(KLASK_PARAMS["edge"][2]) < 0.03
+    distance = player_pos[:,1] - torch.tensor(KLASK_PARAMS["edge"][2]) 
+    cost += y_edge*0.5*torch.exp(-5*distance)
+    
+    y_edge = torch.tensor(KLASK_PARAMS["edge"][3])-player_pos[:,1] <0.03
+    distance = torch.tensor(KLASK_PARAMS["edge"][3]) - player_pos[:,1] 
+    cost += y_edge*0.5*torch.exp(-5*distance)
+
+
+    return 1.0*(cost)
 
 def set_terminations(env, cfg):
     """

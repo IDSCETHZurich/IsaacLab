@@ -377,7 +377,7 @@ class EventCfg:
         params={
             "asset_cfg": SceneEntityCfg("ball"),
             "pose_range": {"x": KLASK_PARAMS["ball_reset_position_x"], "y": KLASK_PARAMS["ball_reset_position_y"], "z": (0.032, 0.032)},
-            "velocity_range": {"x": (0.0, 0.0), "y": (0.0, 0.0)}
+            "velocity_range": {"x": (-0.0, 0.0), "y": (-0.0, 0.0)}
         },
     )
 
@@ -386,6 +386,9 @@ class EventCfg:
 class RewardsCfg:
     """Reward terms for the MDP."""
     
+    time_punishment = RewTerm(func=mdp.is_alive, weight=0.0)
+
+
     player_in_goal = RewTerm(
         func=in_goal, 
         params={
@@ -474,6 +477,24 @@ class RewardsCfg:
         },
         weight=0.0
     )
+
+    close_to_boundaries = RewTerm(
+        func = distance_to_wall,
+        params = {
+            "player_cfg": SceneEntityCfg("klask", body_names=["Peg_1"])
+        },
+        weight = 0.0
+    )
+    #player_strategically_positioned = RewTerm(
+    #    func = peg_in_defense_line,
+    #    params = {
+    #        "player_cfg": SceneEntityCfg("klask", body_names=["Peg_1"]),
+    #        "opponent_cfg": SceneEntityCfg("klask", body_names=["Peg_2"]),
+    #        "goal": KLASK_PARAMS["player_goal"],
+    #        "ball_cfg": SceneEntityCfg("klask", body_names=["ball"])
+    #    }
+    #    weight=0.0
+    #)
 
     
 @configclass

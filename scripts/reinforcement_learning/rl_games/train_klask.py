@@ -175,8 +175,8 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         env = multi_agent_to_single_agent(env)
 
     if agent_cfg["env"].get("actuator_model", False):
-        pass
-        #env = ActuatorModelWrapper(env)
+        env = ActuatorModelWrapper(env)
+        
 
     if agent_cfg["env"].get("collision_avoidance", False):
         action_factor = agent_cfg["env"].get("action_factor", 1.0)
@@ -184,6 +184,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     if KLASK_PARAMS["action_history"] > 0:
         env = ActionHistoryWrapper(env, history_length=KLASK_PARAMS["action_history"])
+        
     
     obs_noise = agent_cfg["env"].get("obs_noise", 0.0)
     if obs_noise > 0.0:

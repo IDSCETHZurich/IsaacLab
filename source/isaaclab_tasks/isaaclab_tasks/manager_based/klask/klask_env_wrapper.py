@@ -4,6 +4,7 @@ import gymnasium as gym
 from gymnasium import Wrapper, ObservationWrapper
 from collections import OrderedDict
 from rl_games.torch_runner import Runner
+from isaaclab_rl.rl_games import RlGamesGpuEnv
 
 from isaaclab_assets.robots.klask import KLASK_PARAMS
 

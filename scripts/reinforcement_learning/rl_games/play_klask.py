@@ -135,6 +135,7 @@ def main():
 
     if agent_cfg["env"].get("actuator_model", False):
         env = ActuatorModelWrapper(env)
+        
 
     if agent_cfg["env"].get("collision_avoidance", False):
         env = KlaskCollisionAvoidanceWrapper(env)
