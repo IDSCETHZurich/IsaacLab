@@ -398,6 +398,15 @@ class RewardsCfg:
         weight=0.0
     )
 
+    opponent_in_goal = RewTerm(
+        func=in_goal, 
+        params={
+            "asset_cfg": SceneEntityCfg("klask", body_names=["Peg_2"]),
+            "goal": KLASK_PARAMS["opponent_goal"]
+        },
+        weight=0.0
+    )
+
     goal_scored = RewTerm(
         func=ball_in_goal, 
         params={
@@ -542,7 +551,7 @@ class TerminationsCfg:
 class KlaskEnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the cartpole environment."""
 
-    sim = SimulationCfg(physx=PhysxCfg(bounce_threshold_velocity=0.0))
+    sim = SimulationCfg(physx=PhysxCfg(bounce_threshold_velocity=0.0), render_interval=KLASK_PARAMS['decimation'])
     # Scene settings
     scene = KlaskSceneCfg(num_envs=1, env_spacing=1.0)
     # Basic settings
