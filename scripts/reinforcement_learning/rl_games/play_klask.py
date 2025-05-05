@@ -28,6 +28,7 @@ parser.add_argument(
 )
 parser.add_argument("--config", type=str, default=None, help="config.yaml file, rl_games_cfg_entry_point used when not provided")
 
+
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
@@ -111,12 +112,18 @@ def main():
     log_dir = os.path.dirname(os.path.dirname(resume_path))
 
     # wrap around environment for rl-games
+    
     rl_device = agent_cfg["params"]["config"]["device"]
+    rl_device = args_cli.device
+    
+    
     clip_obs = agent_cfg["params"]["env"].get("clip_observations", math.inf)
     clip_actions = agent_cfg["params"]["env"].get("clip_actions", math.inf)
     
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
+
+    
     # wrap for video recording
     if args_cli.video:
         video_kwargs = {
@@ -134,7 +141,7 @@ def main():
         env = multi_agent_to_single_agent(env)
 
     if agent_cfg["env"].get("actuator_model", False):
-        env = ActuatorModelWrapper(env)
+        env = ActuatorModelWrapper(env, device=args_cli.device)
         
 
     if agent_cfg["env"].get("collision_avoidance", False):
@@ -191,6 +198,10 @@ def main():
     agent.restore(resume_path)
     agent.reset()
 
+    agent.device = torch.device(args_cli.device)
+    agent.model.to(args_cli.device)
+    agent.actions_low = agent.actions_low.to(args_cli.device)
+    agent.actions_high = agent.actions_high.to(args_cli.device)
     # reset environment
     obs = env.reset()
     rewards = []
@@ -205,6 +216,10 @@ def main():
 
     if agent_cfg["params"]["config"].get("self_play", False):
         opponent = runner.create_player()
+        opponent.device = torch.device(args_cli.device)
+        opponent.model.to(args_cli.device)
+        opponent.actions_low = agent.actions_low.to(args_cli.device)
+        opponent.actions_high = agent.actions_high.to(args_cli.device)
         opponent.set_weights(agent.get_weights())
         find_wrapper(env, KlaskAgentOpponentWrapper).add_opponent(opponent)
 
@@ -215,6 +230,7 @@ def main():
     start_time = time.time()
     while simulation_app.is_running() and time.time() - start_time < 1000.0:
         # run everything in inference mode
+        
         with torch.inference_mode():
             # convert obs to agent format
             obs = agent.obs_to_torch(obs)
