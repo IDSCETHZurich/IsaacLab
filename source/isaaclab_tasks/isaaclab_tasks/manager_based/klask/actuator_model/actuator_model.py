@@ -32,11 +32,17 @@ class ActuatorNetwork(nn.Module):
 
 class ActuatorModelWrapper(Wrapper):
 
-    model_file = "source/isaaclab_tasks/isaaclab_tasks/manager_based/klask/actuator_model/model_odrive_scaled_history_10_interval_0.02_delay_0.0_horizon3_with_states.pt"
+    model_file = "source/isaaclab_tasks/isaaclab_tasks/manager_based/klask/actuator_model/model_odrive_new_estimator_history_10_interval_0.02_delay_0.0_horizon3_with_states.pt"
     num_history_steps = 10  # Number of past commands to include in input
     hidden_dim = 64
     delay = 0               # Time delay between most recent command included in the input and the current time
     include_states = True  # Whether to include history of peg states in input
+    EDGE_x = torch.tensor([-0.16,0.16])
+    EDGE_player_y = torch.tensor([-0.02,-0.22])
+    EDGE_opponent_y = torch.tensor([0.02,0.22])
+    DISTANCE_PER_REVOLUTION = 0.04
+    DEACCELERATION_DISTANCE = 0.09
+    PEG_RADIUS = 0.0075
     
 
     def __init__(self, env, device="cuda", model_file=None):   
@@ -55,8 +61,8 @@ class ActuatorModelWrapper(Wrapper):
         if self.include_states:
             self.state_buffer_1 = torch.zeros(num_envs, 2 * (self.num_history_steps - 1), dtype=torch.float32).to(device)
             self.state_buffer_2 = torch.zeros(num_envs, 2 * (self.num_history_steps - 1), dtype=torch.float32).to(device)
-            self.position_puffer_1 = torch.zeros(num_envs, 4, dtype=torch.float32).to(device)
-            self.position_puffer_2 = torch.zeros(num_envs, 4, dtype=torch.float32).to(device)
+            self.position_player = torch.zeros(num_envs, 2, dtype=torch.float32).to(device)
+            self.position_opponent = torch.zeros(num_envs, 2, dtype=torch.float32).to(device)
 
         self.model.eval()
 
@@ -85,8 +91,8 @@ class ActuatorModelWrapper(Wrapper):
     def step(self, actions, *args, **kwargs):
         # Peg 1 command history update:
 
-        #actions/=30 #action must be scaled down
         
+        #actions = self.apply_boundary_limits(actions)
 
         command_1 = actions[:, :2]
         prev_buffer = self.command_buffer_1.clone()
@@ -103,6 +109,9 @@ class ActuatorModelWrapper(Wrapper):
             states_input_1, states_input_2 = self.state_buffer_1, self.state_buffer_2
         else:
             states_input_1, states_input_2 = None, None
+
+        
+
         with torch.no_grad():    
             actions_1 = self.model(self.command_buffer_1, states_input_1)
             actions_2 = self.model(self.command_buffer_2, states_input_2)
@@ -121,8 +130,7 @@ class ActuatorModelWrapper(Wrapper):
 
         if self.include_states:
             # Peg 1 state history update:
-            self.position_puffer_1[:,2:] = self.position_puffer_1[:,:-2]
-            self.position_puffer_1[:,:2] = obs["policy"][:, :2]
+            self.position_player = obs["policy"][:, :2]
             state_1 = obs["policy"][:, 2:4]
             
             
@@ -131,6 +139,7 @@ class ActuatorModelWrapper(Wrapper):
             self.state_buffer_1[:, :2] = state_1
             
             # Peg 2 state history update:
+            self.position_opponent = obs ["opponent"][:, :2]
             state_2 = obs["opponent"][:, 2:4]
             
             self.state_buffer_2[:, 2:] = self.state_buffer_2.clone()[:, :-2]
@@ -147,4 +156,44 @@ class ActuatorModelWrapper(Wrapper):
 
         return obs, rew, terminated, truncated, info
 
-  
+#    def apply_boundary_limits(self, actions):
+#
+#            # Lower boundary check (EDGE[2])
+#        player_at_middle =  self.position_player[:,1] >= self.EDGE_player_y[0] - self.DEACCELERATION_DISTANCE-self.PEG_RADIUS
+#        player_at_end =self.position_player[:,1]<= self.EDGE_player_y[1]+self.DEACCELERATION_DISTANCE+self.PEG_RADIUS
+#
+#        opponent_at_middle = self.position_opponent[:,1]<= self.EDGE_opponent_y[0] +self.DEACCELERATION_DISTANCE+self.PEG_RADIUS
+#        opponent_at_end = self.position_opponent[:,1] >= self.EDGE_opponent_y[1]-self.DEACCELERATION_DISTANCE-self.PEG_RADIUS
+#        
+#        player_at_front = self.position_player[:,0]<= self.EDGE_x[0]+self.DEACCELERATION_DISTANCE+self.PEG_RADIUS
+#        player_at_back = self.position_player[:,0]>=self.EDGE_x[0]-self.DEACCELERATION_DISTANCE-self.PEG_RADIUS
+#
+#        opponent_at_front =self.position_player[:,1]<= self.EDGE_x[0]+self.DEACCELERATION_DISTANCE+self.PEG_RADIUS
+#        opponent_at_back = self.position_player[:,1]<= self.EDGE_x[0]-self.DEACCELERATION_DISTANCE-self.PEG_RADIUS
+#        return 
+#        actions[:, 0][player_at_front] = torch.maximum
+#        actions[:, 0][player_at_back] =
+#        actions[:, 1][player_at_middle] = 
+#        actions[:, 1][player_at_end] = 
+#        actions[:, 2][opponent_at_front] = torch.maximum
+#        actions[:, 2][opponent_at_back] =
+#        actions[:, 3][opponent_at_middle] = 
+#        actions[:, 3][opponent_at_end] = 
+#        
+#        v_y[lower_zone & fully_lower] = torch.maximum(v_y[lower_zone & fully_lower], torch.tensor(0.0, device=device))
+#        v_y[lower_zone & ~fully_lower] = torch.maximum(
+#            v_y[lower_zone & ~fully_lower],
+#            -interpolate_vel(y_pos[lower_zone & ~fully_lower] - EDGE_YMIN - PEG_RADIUS)
+#        )
+#    
+#        # Upper boundary check (EDGE[3])
+#        upper_zone = y_pos + DEACCEL_DIST + PEG_RADIUS >= EDGE_YMAX
+#        fully_upper = y_pos + PEG_RADIUS >= EDGE_YMAX
+#    
+#        v_y[upper_zone & fully_upper] = torch.minimum(v_y[upper_zone & fully_upper], torch.tensor(0.0, device=device))
+#        v_y[upper_zone & ~fully_upper] = torch.minimum(
+#            v_y[upper_zone & ~fully_upper],
+#            interpolate_vel(EDGE_YMAX - y_pos[upper_zone & ~fully_upper] + PEG_RADIUS)
+#        )
+#    
+#        return v_y

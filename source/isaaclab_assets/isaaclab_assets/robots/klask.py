@@ -39,7 +39,7 @@ else:
     KLASK_PARAMS = {
         "decimation": 20, # system is running at 50Hz (night shift with 100Hz)
         "physics_dt": 0.001,
-        "timeout": 3.0,
+        "timeout": 10.0,
         "actuator_delay": (0.0, 0.0),
         "action_history": 0,
         "player_goal": (0.0, -0.176215, 0.01905),
@@ -49,7 +49,7 @@ else:
         "ball_dynamic_friction": 0.01,
         "ball_mass_initial": 0.002,
         "ball_reset_position_x": (-0.15, 0.15),
-        "ball_reset_position_y": (-0.21, 0.12),
+        "ball_reset_position_y": (-0.12, 0.12),
         "max_ball_vel": 8.0,    # maximum speed the ball may have for a goal to be counted
         "edge": (-0.16, 0.16, -0.22,-0.02),
         "domain_randomization": {

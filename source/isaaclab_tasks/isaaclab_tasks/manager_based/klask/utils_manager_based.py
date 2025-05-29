@@ -89,23 +89,72 @@ def ball_in_goal(
 
     return ball_in_goal
 
-def peg_in_defense_line(
-    env: ManagerBasedRLEnv, player_cfg: SceneEntityCfg, opponent_cfg: SceneEntityCfg, goal: tuple[float, float, float], ball_cfg: SceneEntityCfg, weight: float | None = None
+def peg_in_defense_line_with_rebounds(
+    env: ManagerBasedRLEnv,
+    player_cfg: SceneEntityCfg,
+    opponent_cfg: SceneEntityCfg,
+    ball_cfg: SceneEntityCfg,
+    weight: float | None = None
 ) -> torch.Tensor:
+    """
+    Rewards the player for blocking direct and rebound shot lines from opponent to ball.
+    Includes reflections off the four walls.
+    """
+    # Positions
+    ball_pos = root_xy_pos_w(env, ball_cfg)          # (N, 2)
+    opponent_pos = body_xy_pos_w(env, opponent_cfg)  # (N, 2)
+    player_pos = body_xy_pos_w(env, player_cfg)      # (N, 2)
+
     
-    """
-        Rewards defending positions where the ball is supposed to be shot at
-    """
-    ball_pos = root_xy_pos_w(env, ball_cfg)
-    ball_in_own_half = ball_pos[:, 1] < 0.0
-    if(not ball_in_own_half):
-       player: RigidObject = env.scene[player_cfg]
-       opponent: RigidObject = env.scene[opponent_cfg]
-       ball : RigidObject = env.scene[ball_cfg]
-       x_b,y_b = ball.data.root_pos_w
-       x_o,y_o = opponent.data.root_pos_w
-       xp_y_p = player.data.root_pos_w
-       ball_pos = 1
+    # Only consider when ball in opp half
+    ball_in_opp_half = ball_pos[:, 1] > 0.0 
+    ball_is_close =  distance_player_ball(env,player_cfg,ball_cfg)<0.08
+
+    # Reflect ball across 4 edges
+    mirror_balls = [ball_pos]  # start with original ball
+
+    mirror_opponents = [opponent_pos]
+    # Reflect across x walls
+    mirror_opponents.append(torch.stack([-0.32 - opponent_pos[:, 0], opponent_pos[:, 1]], dim=1))  # left wall
+    mirror_opponents.append(torch.stack([0.32 - opponent_pos[:, 0], opponent_pos[:, 1]], dim=1))   # right wall
+
+    mirror_balls.append(torch.stack([-0.32 - ball_pos[:, 0], ball_pos[:, 1]], dim=1))  # left wall
+    mirror_balls.append(torch.stack([0.32 - ball_pos[:, 0], ball_pos[:, 1]], dim=1))   # right wall
+    # Reflect across y walls ( this is unlikely )
+    #mirror_balls.append(torch.stack([ball_pos[:, 0], -0.44 - ball_pos[:, 1]], dim=1))  # bottom wall
+    #mirror_balls.append(torch.stack([ball_pos[:, 0], 0.44 - ball_pos[:, 1]], dim=1))   # top wall
+
+    all_rewards = []
+
+    
+
+    for mirror_ball, mirror_opp in zip(mirror_balls, mirror_opponents):
+        vec_ob = mirror_ball - mirror_opp
+        vec_op = player_pos - mirror_opp
+
+        # Dot product (batch)
+        dot = torch.sum(vec_ob * vec_op, dim=1)
+        norm_ob = torch.norm(vec_ob, dim=1)
+        norm_op = torch.norm(vec_op, dim=1)
+
+        # Angle (in radians)
+        cos_theta = dot / (norm_ob * norm_op + 1e-6)
+        angle = torch.acos(torch.clamp(cos_theta, -1.0, 1.0))  # Clamp for numerical stability
+
+        # Smaller angle = better blocking → higher reward
+        reward = torch.exp(-1.0 * angle)  # Adjust 5.0 as needed
+        all_rewards.append(reward)
+    # Take maximum reward across all paths (best alignment)
+    final_reward = torch.stack(all_rewards, dim=1).max(dim=1).values 
+
+    # Apply ball-in-own-half condition
+    final_reward = final_reward *ball_is_close.float()* ball_in_opp_half.float()
+
+    # Apply weight if needed
+    if weight is not None:
+        final_reward *= weight
+
+    return final_reward
     
 
 def root_xy_pos_w(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg) -> torch.Tensor:
@@ -126,6 +175,16 @@ def body_xy_pos_w(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg) -> torch.Te
     asset: Articulation = env.scene[asset_cfg.name]
     return asset.data.body_pos_w[:, asset_cfg.body_ids, :2].squeeze(dim=1) - env.scene.env_origins[:, :2]
 
+def shot_over_middle(env: ManagerBasedRLEnv, ball_cfg: SceneEntityCfg, weight: float | None = None) -> torch.Tensor:
+    ball_pos = root_xy_pos_w(env, ball_cfg)  # shape: (num_envs, 2)
+    ball_vel = root_lin_xy_vel_w(env, ball_cfg)  # shape: (num_envs, 2)
+
+    # Detect near center line and moving forward in +y direction
+    is_near_center = (ball_pos[:, 1] >= 0.002) & (ball_pos[:, 1] <= 0.005)
+    is_moving_forward = ball_vel[:, 1] > 0.0
+    if weight  == None:
+        return (torch.norm(ball_vel, dim=1)**2*is_near_center * is_moving_forward).float()
+    return weight*(torch.norm(ball_vel, dim=1)*is_near_center * is_moving_forward).float()
 
 def body_lin_xy_vel_w(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg) -> torch.Tensor:
     asset: Articulation = env.scene[asset_cfg.name]
@@ -153,6 +212,11 @@ def player_speed(env: ManagerBasedRLEnv, player_cfg: SceneEntityCfg) -> torch.Te
     vel = body_lin_xy_vel_w(env, player_cfg)
     return speed(vel)
 
+def difference_speed(env: ManagerBasedRLEnv, player_cfg: SceneEntityCfg, ball_cfg: SceneEntityCfg):
+    vel_ball = root_lin_xy_vel_w(env,ball_cfg)
+    vel_player = body_lin_xy_vel_w(env,player_cfg)
+    diff = vel_player-vel_ball
+    return speed(diff)
 
 def distance_ball_goal(env: ManagerBasedRLEnv, ball_cfg: SceneEntityCfg, goal: tuple[float, float, float]) -> torch.Tensor:
     cx, cy, r = goal
@@ -170,8 +234,8 @@ def ball_stationary(env: ManagerBasedRLEnv, ball_cfg: SceneEntityCfg, eps=5e-3) 
     return ball_speed(env, ball_cfg) < eps
 
 
-def collision_player_ball(env: ManagerBasedRLEnv, player_cfg: SceneEntityCfg, ball_cfg: SceneEntityCfg, eps=0.02) -> torch.Tensor:
-    return (distance_player_ball(env, player_cfg, ball_cfg) < eps) * player_speed(env, player_cfg)
+def collision_player_ball(env: ManagerBasedRLEnv, player_cfg: SceneEntityCfg, ball_cfg: SceneEntityCfg, eps=0.017) -> torch.Tensor:
+    return (distance_player_ball(env, player_cfg, ball_cfg) < eps) * difference_speed(env, player_cfg, ball_cfg)
 
 
 def ball_in_own_half(env: ManagerBasedRLEnv, ball_cfg: SceneEntityCfg):
@@ -185,22 +249,24 @@ def distance_to_wall(env: ManagerBasedRLEnv, player_cfg:SceneEntityCfg) -> torch
 
     x_edge =player_pos[:,0] < 0.03 +torch.tensor(KLASK_PARAMS["edge"][0]) 
     distance = player_pos[:,0] - torch.tensor(KLASK_PARAMS["edge"][0]) 
-    cost += x_edge*0.5*torch.exp(-5*distance)
+    cost += x_edge*torch.exp(-5*distance)
     
     x_edge = torch.tensor(KLASK_PARAMS["edge"][1])-player_pos[:,0] <0.03
     distance =  torch.tensor(KLASK_PARAMS["edge"][1]) - player_pos[:,0] 
-    cost += x_edge*0.5*torch.exp(-5*distance)
+    cost += x_edge*torch.exp(-5*distance)
 
     y_edge = player_pos[:,1] - torch.tensor(KLASK_PARAMS["edge"][2]) < 0.03
     distance = player_pos[:,1] - torch.tensor(KLASK_PARAMS["edge"][2]) 
-    cost += y_edge*0.5*torch.exp(-5*distance)
+    cost += y_edge*torch.exp(-5*distance)
     
     y_edge = torch.tensor(KLASK_PARAMS["edge"][3])-player_pos[:,1] <0.03
     distance = torch.tensor(KLASK_PARAMS["edge"][3]) - player_pos[:,1] 
-    cost += y_edge*0.5*torch.exp(-5*distance)
+    cost += y_edge*torch.exp(-5*distance)
 
 
     return 1.0*(cost)
+
+
 
 def set_terminations(env, cfg):
     """

@@ -388,7 +388,12 @@ class RewardsCfg:
     
     time_punishment = RewTerm(func=mdp.is_alive, weight=0.0)
 
-
+    shot_over_middle_line = RewTerm(
+        func = shot_over_middle,
+        params={
+            "ball_cfg": SceneEntityCfg("ball"),
+        },
+        weight = 0.0)
     player_in_goal = RewTerm(
         func=in_goal, 
         params={
@@ -427,14 +432,6 @@ class RewardsCfg:
         weight=0.0
     )
 
-    distance_player_ball = RewTerm(
-        func=distance_player_ball, 
-        params={
-            "player_cfg": SceneEntityCfg("klask", body_names=["Peg_1"]),
-            "ball_cfg": SceneEntityCfg("ball"),
-        },
-        weight=0.0
-    )
 
     distance_player_ball_own_half = RewTerm(
         func=distance_player_ball_own_half, 
@@ -494,16 +491,15 @@ class RewardsCfg:
         },
         weight = 0.0
     )
-    #player_strategically_positioned = RewTerm(
-    #    func = peg_in_defense_line,
-    #    params = {
-    #        "player_cfg": SceneEntityCfg("klask", body_names=["Peg_1"]),
-    #        "opponent_cfg": SceneEntityCfg("klask", body_names=["Peg_2"]),
-    #        "goal": KLASK_PARAMS["player_goal"],
-    #        "ball_cfg": SceneEntityCfg("klask", body_names=["ball"])
-    #    }
-    #    weight=0.0
-    #)
+    player_strategically_positioned = RewTerm(
+        func = peg_in_defense_line_with_rebounds,
+        params = {
+            "player_cfg": SceneEntityCfg("klask", body_names=["Peg_1"]),
+            "opponent_cfg": SceneEntityCfg("klask", body_names=["Peg_2"]),
+            "ball_cfg": SceneEntityCfg("ball")
+        },
+        weight=0.0
+    )
 
     
 @configclass
@@ -577,7 +573,7 @@ class KlaskEnvCfg(ManagerBasedRLEnvCfg):
 class KlaskGoalEnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the cartpole environment."""
 
-    sim = SimulationCfg(physx=PhysxCfg(bounce_threshold_velocity=0.0))
+    sim = SimulationCfg(physx=PhysxCfg(bounce_threshold_velocity=0.0), render_interval=KLASK_PARAMS['decimation'])
     # Scene settings
     scene = KlaskSceneCfg(num_envs=1, env_spacing=1.0)
     # Basic settings
