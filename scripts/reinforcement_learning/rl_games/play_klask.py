@@ -76,7 +76,7 @@ from isaaclab_tasks.manager_based.klask import (
 from isaaclab_tasks.manager_based.klask.utils_manager_based import set_terminations
 from isaaclab_tasks.manager_based.klask.actuator_model import ActuatorModelWrapper
 from isaaclab_assets.robots.klask import KLASK_PARAMS
-
+import numpy as np
 
 def main():
     """Play with RL-Games agent."""
@@ -162,7 +162,7 @@ def main():
         env = CurriculumWrapper(env, agent_cfg["rewards"], mode="test")
     
     # wrap around environment for rl-games
-    env = RlGamesVecEnvWrapper(env, rl_device, clip_obs, clip_actions)
+    env = RlGamesVecEnvWrapper(env, rl_device, clip_obs = clip_obs, clip_actions=clip_actions)
 
     # register the environment to rl-games registry
     # note: in agents configuration: environment name must be "rlgpu"

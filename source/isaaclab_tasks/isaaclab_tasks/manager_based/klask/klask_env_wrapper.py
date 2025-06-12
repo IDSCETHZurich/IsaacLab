@@ -5,7 +5,9 @@ from gymnasium import Wrapper, ObservationWrapper
 from collections import OrderedDict
 from rl_games.torch_runner import Runner
 from isaaclab_rl.rl_games import RlGamesGpuEnv
-
+from pathlib import Path
+import re
+import yaml
 from isaaclab_assets.robots.klask import KLASK_PARAMS
 
 
@@ -50,8 +52,9 @@ class ObservationNoiseWrapper(ObservationWrapper):
 
 class CurriculumWrapper(Wrapper):
 
-    def __init__(self, env, cfg, num_steps=None, mode="train"):
+    def __init__(self, env, cfg, num_steps=None, mode="train", dynamic = False):
         super().__init__(env)
+        self.dynamic = dynamic
         self.cfg = cfg
         self.num_steps = num_steps
         self.mode = mode
@@ -79,6 +82,10 @@ class CurriculumWrapper(Wrapper):
                     if not weight.get("per_second", False):
                         weight_step /= KLASK_PARAMS["decimation"] * KLASK_PARAMS["physics_dt"]
                     self.env.unwrapped.reward_manager._term_cfgs[term_idx].weight += weight_step
+            
+                if self.dynamic and not (term =='time_punishment' or term =='goal_scored' or term =='goal_conceded' or term == 'opponent_in_goal' or term =='player_in_goal'):
+                    term_idx = self.env.unwrapped.reward_manager.active_terms.index(term)
+                    self.env.unwrapped.reward_manager._term_cfgs[term_idx].weight = weight*(torch.exp(-torch.tensor(self._step/10000000,device=self.env.unwrapped.device,dtype=torch.float32))) #coeff chosen sucht that half the max reward at 20 mio steps
         
         return self.env.step(actions)
                   
@@ -113,16 +120,27 @@ class OpponentObservationWrapper(Wrapper):
 
 class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
 
-    def __init__(self, config_name, num_actors, config, is_deterministic=False, **kwargs):
+    def __init__(self, config_name, num_actors, config, training_curriculum = False,is_deterministic=True, **kwargs):
         self.agent = None
         self.config = config
+        self.instance_device = config["params"]["config"]["device"]
         self.is_deterministic = is_deterministic
         self.sum_rewards = 0
+        self.training_curriculum = training_curriculum
+        
+        self.folder_path_checkpoint = Path("/home/student/klask_rl/IsaacLab/logs/rl_games/klask/training_curriculum/best_agent")
+        self.folder_path_config = Path("/home/student/klask_rl/IsaacLab/planned_runs/training_curriculum")
+        self.current_checkpoint = str(list(self.folder_path_checkpoint.glob("*"))[-1])
+        self.current_config = self.config
         super().__init__(config_name, num_actors, **kwargs)
     
     def reset(self):
+        if self.training_curriculum:
+            self.should_update_agents()
         if self.agent == None:
             self.create_agent()
+        #if self.training_curriculum and new_file:
+
         obs = self.env.reset()
         #self.opponent_obs = self.get_opponent_obs(obs)
         self.opponent_obs = find_wrapper(self.env, OpponentObservationWrapper).opponent_obs
@@ -130,26 +148,53 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
         return obs
 
     def create_agent(self):
-        runner = Runner()
+        
+        runner = Runner() 
         from rl_games.common.env_configurations import get_env_info
         self.config['params']['config']['env_info'] = get_env_info(self.env)
-        runner.load(self.config)
+        runner.load(self.current_config)
+        
         #os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+        restore_checkpoint = self.training_curriculum and self.agent!=None
         self.agent = runner.create_player()
+        if restore_checkpoint:
+            self.agent.restore(self.current_checkpoint)
+        
         self.agent.has_batch_dimension = True
+    
+    def should_update_agents(self):
+        matching_file = str(list(self.folder_path_checkpoint.glob("*"))[-1])
+        if matching_file == self.current_checkpoint:
+            return 
+        self.current_checkpoint = matching_file
+        
+        match = re.search(r'best_agent\((\d+)\)', self.current_checkpoint)
+        if match:
+            agent_number = match.group(1)
+        config_path = self.folder_path_config / f"klask_config_{agent_number}.yaml"
+        with open(config_path, 'r') as f:
+            self.current_config = yaml.safe_load(f)
+            self.current_config["params"]["config"]["device"] = self.instance_device
+            self.current_config["params"]["config"]["device_name"] = self.instance_device
+            
+        self.create_agent()
 
     def step(self, action, *args, **kwargs):
         opponent_obs = self.agent.obs_to_torch(self.opponent_obs)
         opponent_action = self.agent.get_action(opponent_obs, self.is_deterministic)
-        action[:, 2:] = -opponent_action[:, :2]
-        obs, reward, dones, info = self.env.step(action, *args, **kwargs)
+        full_action = torch.cat([action, -opponent_action], dim=1)
+        obs, reward, dones, info = self.env.step(full_action, *args, **kwargs)
         #self.opponent_obs = self.get_opponent_obs(obs)
         self.opponent_obs = find_wrapper(self.env, OpponentObservationWrapper).opponent_obs
         return obs, reward, dones, info
     
     def set_weights(self, indices, weigths):
         print("SETTING WEIGHTS")
+
         self.agent.set_weights(weigths)
+        self.is_deterministic = True
+        
+
 
 
 class KlaskAgentOpponentWrapper(Wrapper):
@@ -176,8 +221,9 @@ class KlaskAgentOpponentWrapper(Wrapper):
     def step(self, action, *args, **kwargs):
         opponent_obs = self.opponent.obs_to_torch(self.opponent_obs)
         opponent_action = self.opponent.get_action(opponent_obs, self.is_deterministic)
-        action[:, 2:] = -opponent_action[:, :2]
-        obs, reward, terminated, truncated, info = self.env.step(action, *args, **kwargs)
+        full_action = torch.cat([action, -opponent_action], dim=1)
+        obs, reward, terminated,truncated, info = self.env.step(full_action, *args, **kwargs)
+        
         self.opponent_obs = self.get_opponent_obs(obs["opponent"])
         return obs, reward, terminated, truncated, info
         

@@ -183,8 +183,8 @@ def shot_over_middle(env: ManagerBasedRLEnv, ball_cfg: SceneEntityCfg, weight: f
     is_near_center = (ball_pos[:, 1] >= 0.002) & (ball_pos[:, 1] <= 0.005)
     is_moving_forward = ball_vel[:, 1] > 0.0
     if weight  == None:
-        return (torch.norm(ball_vel, dim=1)**2*is_near_center * is_moving_forward).float()
-    return weight*(torch.norm(ball_vel, dim=1)*is_near_center * is_moving_forward).float()
+        return (torch.abs(ball_vel[:, 1])**4*is_near_center * is_moving_forward).float()
+    return weight*(torch.abs(ball_vel[:, 1])**4*is_near_center * is_moving_forward).float()
 
 def body_lin_xy_vel_w(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg) -> torch.Tensor:
     asset: Articulation = env.scene[asset_cfg.name]
@@ -235,7 +235,7 @@ def ball_stationary(env: ManagerBasedRLEnv, ball_cfg: SceneEntityCfg, eps=5e-3) 
 
 
 def collision_player_ball(env: ManagerBasedRLEnv, player_cfg: SceneEntityCfg, ball_cfg: SceneEntityCfg, eps=0.017) -> torch.Tensor:
-    return (distance_player_ball(env, player_cfg, ball_cfg) < eps) * difference_speed(env, player_cfg, ball_cfg)
+    return (distance_player_ball(env, player_cfg, ball_cfg) < eps) * torch.exp(-0.1/difference_speed(env, player_cfg, ball_cfg))
 
 
 def ball_in_own_half(env: ManagerBasedRLEnv, ball_cfg: SceneEntityCfg):

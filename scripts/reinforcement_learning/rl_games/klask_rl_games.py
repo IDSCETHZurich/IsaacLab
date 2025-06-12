@@ -13,7 +13,9 @@ class KlaskAlgoObserver(AlgoObserver):
 
     def after_init(self, algo):
         self.algo = algo
+        self.games_to_track = self.algo.games_to_track
         self.mean_scores = torch_ext.AverageMeter(1, self.algo.games_to_track).to(self.algo.ppo_device)
+        self.mean_scores.update(torch.zeros(self.algo.games_to_track,dtype=float).to(self.algo.ppo_device)) #in order to not have the bump in the scores when no episode has yet terminated
         self.ep_infos = []
         self.direct_info = {}
         self.writer = self.algo.writer
@@ -33,6 +35,7 @@ class KlaskAlgoObserver(AlgoObserver):
                 if isinstance(v, float) or isinstance(v, int) or (isinstance(v, torch.Tensor) and len(v.shape) == 0):
                     self.direct_info[k] = v
                 if k == "episode":
+                    
                     for key, val in v.items():
                         if isinstance(val, torch.Tensor) and len(val.shape) != 0:
                             val = int(val.item())
@@ -44,10 +47,14 @@ class KlaskAlgoObserver(AlgoObserver):
                             self.mean_scores.update(-torch.ones(val, dtype=float).to(self.algo.ppo_device))
                         elif key == "Episode_Termination/opponent_in_goal":
                             self.mean_scores.update(torch.ones(val, dtype=float).to(self.algo.ppo_device))
+                        elif key =="Episode_Termination/time_out":
+                            self.mean_scores.update(torch.zeros(val,dtype=float).to(self.algo.ppo_device))         
 
     def after_clear_stats(self):
         # clear stored buffers
         self.mean_scores.clear()
+        self.mean_scores.update(torch.zeros(self.algo.games_to_track,dtype=float).to(self.algo.ppo_device)) #in order to not have the bump in the scores when no episode has yet terminated
+
 
     def after_print_stats(self, frame, epoch_num, total_time):
         # log scalars from the episode
@@ -86,8 +93,8 @@ class KlaskSelfPlayManager(SelfPlayManager):
         else:
             data = algo.game_rewards
 
-        if self.updates_num == 1:
-            algo.vec_env.set_weights(self.env_indexes, algo.get_weights())
+        if  algo.vec_env.training_curriculum:
+            algo.vec_env.should_update_agents()
         
         if len(data) >= self.games_to_check:
             mean_scores = data.get_mean()

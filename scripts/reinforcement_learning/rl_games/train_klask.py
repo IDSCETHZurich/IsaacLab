@@ -31,6 +31,7 @@ parser.add_argument("--config", type=str, default=None, help="config.yaml file, 
 parser.add_argument("--full_experiment_name", type=str, default=None, help="Experiment name used for logs.")
 parser.add_argument("--wandb-project-name", type=str, default=None, help="the wandb's project name")
 parser.add_argument("--wandb-entity", type=str, default=None, help="the entity (team) of wandb's project")
+parser.add_argument("--training_curriculum", action="store_true", default=False)
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
@@ -89,6 +90,7 @@ from isaaclab_tasks.manager_based.klask.actuator_model import ActuatorModelWrapp
 from isaaclab_tasks.manager_based.klask.utils_manager_based import set_terminations
 from isaaclab_assets.robots.klask import KLASK_PARAMS
 from klask_rl_games import KlaskAlgoObserver, KlaskRunner
+import numpy as np
 
 @hydra_task_config(args_cli.task, "rl_games_cfg_entry_point")
 def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agent_cfg: dict):
@@ -153,9 +155,9 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         agent_cfg["params"]["config"]["device"] = args_cli.device
         agent_cfg["params"]["config"]["device_name"] = args_cli.device
     rl_device = agent_cfg["params"]["config"]["device"]
-    clip_obs = agent_cfg["params"]["env"].get("clip_observations", math.inf)
     clip_actions = agent_cfg["params"]["env"].get("clip_actions", math.inf)
-
+    clip_obs = agent_cfg["params"]["env"].get("clip_observations", math.inf)
+    
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
     # wrap for video recording
@@ -192,7 +194,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         
     # configure active reward terms and curricula as specified in agent_cfg:
     if "rewards" in agent_cfg.keys():
-        env = CurriculumWrapper(env, agent_cfg["rewards"], agent_cfg["params"]["config"]["max_frames"] / env_cfg.scene.num_envs)
+        env = CurriculumWrapper(env, agent_cfg["rewards"], agent_cfg["params"]["config"]["max_frames"] / env_cfg.scene.num_envs, dynamic=True)
     
     # if self-play, use opponent observation wrapper to get access to opponent player's observations:
     if agent_cfg["params"]["config"].get("self_play", False):
@@ -209,7 +211,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     if agent_cfg["params"]["config"].get("self_play", False):
         vecenv.register(
             "IsaacRlgWrapper", lambda config_name, num_actors, **kwargs: RlGamesGpuEnvSelfPlay(
-                config_name, num_actors, agent_cfg.copy(), **kwargs)
+                config_name, num_actors, agent_cfg.copy(),training_curriculum=args_cli.training_curriculum, **kwargs)
         )
         env_configurations.register("rlgpu", {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env})
 
