@@ -22,7 +22,6 @@ parser.add_argument("--num_envs", type=int, default=None, help="Number of enviro
 parser.add_argument("--task", type=str, default="Isaac-Klask-v0", help="Name of the task.")
 parser.add_argument("--dir", type=str, default=None, help="Path to tournament directory containing checkpoints and config directories.")
 parser.add_argument("--config", type=str, default=None, help="config.yaml file, rl_games_cfg_entry_point used when not provided")
-parser.add_argument("--num_rounds", type=int, default=10, help="Number of rounds in the tournament.")
 parser.add_argument("--num_games_per_round", type=int, default=100, help="Number of games per round.")
 parser.add_argument("--tournament_name", type=str, default="tournament", help="Name used for logging videos.")
 
@@ -50,8 +49,9 @@ import time
 import matplotlib.pyplot as plt
 import itertools
 import numpy as np
-import json
+import re
 from pathlib import Path
+import seaborn as sns
 
 from rl_games.common import env_configurations, vecenv
 from rl_games.common.player import BasePlayer
@@ -85,10 +85,12 @@ def update_elo(p1, p2, score_1, score_2, k=10.0):
 def compute_scores(info):
     average_score_1 = (info["episode"]["Episode_Termination/goal_scored"]
                      + info["episode"]["Episode_Termination/opponent_in_goal"]
-                     + 0.5 * info["episode"]["Episode_Termination/time_out"])
+                     -info["episode"]["Episode_Termination/goal_conceded"]
+                     - info["episode"]["Episode_Termination/player_in_goal"])
     average_score_2 = (info["episode"]["Episode_Termination/goal_conceded"]
                      + info["episode"]["Episode_Termination/player_in_goal"]
-                     + 0.5 * info["episode"]["Episode_Termination/time_out"])
+                     -info["episode"]["Episode_Termination/goal_scored"]
+                     - info["episode"]["Episode_Termination/opponent_in_goal"])
     return average_score_1, average_score_2
 
 
@@ -159,86 +161,107 @@ def main():
     checkpoints_dir = list(base_path.glob("agent_*"))
     for i, model_file in enumerate(checkpoints_dir):
         
-        match = re.search(r'agent_(\d+)', model_file)
+        match = re.search(r'agent_(\d+)', str(model_file))
         player_name = f"agent_{int(match.group(1))}"
 
         with open(os.path.join(args_cli.dir, player_name, f"player_config.yaml"), 'r') as file:
             config = yaml.safe_load(file)
         runner.load(config)
         player = runner.create_player()
-        player.restore(os.path.join(checkpoints_dir, player_name, "player_checkpoint.pth"))
+        player.restore(os.path.join(str(checkpoints_dir[i]), "player_checkpoint.pth"))
         player.reset()
         # initialize RNN states if used
         if player.is_rnn:
             player.init_rnn()
         _ = player.get_batch_size(obs, 1)
-        player.elo = 1200.0
+        player.index = i
+        player.device = config["params"]["config"]["device"]
         player.name = player_name
         players.append(player)
 
-    player_elos = []
-            
+    
+    nash_matrix = np.zeros((len(checkpoints_dir), len(checkpoints_dir)))
+    nash_players = [p.name for p in players]
     # simulate environment
     # note: We simplified the logic in rl-games player.py (:func:`BasePlayer.run()`) function in an
     #   attempt to have complete control over environment stepping. However, this removes other
     #   operations such as masking that is used for multi-agent learning by RL-Games.
-    for i, _ in enumerate(range(args_cli.num_rounds)):
-        for p1, p2 in itertools.combinations(players, 2):
-            num_games = 0
-            average_score_1 = 0.0
-            average_score_2 = 0.0
-            while num_games < args_cli.num_games_per_round:
-                # run everything in inference mode
-                with torch.inference_mode():
-                    # convert obs to agent format
-                    obs_1 = p1.obs_to_torch(obs)
-                    opponent_obs = find_wrapper(env, OpponentObservationWrapper).opponent_obs
-                    obs_2 = p2.obs_to_torch(opponent_obs)
-                    # agent stepping
-                    actions = p1.get_action(obs_1, is_deterministic=True)
-                    actions[:, 2:] = -p2.get_action(obs_2, is_deterministic=True)[:, :2]
-                    # env stepping
-                    obs, rew, dones, info = env.step(actions)
-                    # perform operations for terminated episodes
-                    if len(dones) > 0:
-                        num_games += dones.sum()
-                        score_1, score_2 = compute_scores(info)
-                        average_score_1 += score_1
-                        average_score_2 += score_2
-                        # reset rnn state for terminated episodes
-                        if p1.is_rnn and p1.states is not None:
-                            for s in p1.states:
-                                s[:, dones, :] = 0.0
-                        if p2.is_rnn and p2.states is not None:
-                            for s in p2.states:
-                                s[:, dones, :] = 0.0
-                if args_cli.video:
-                    timestep += 1
-                    # Exit the play loop after recording one video
-                    if timestep == args_cli.video_length:
-                        break
-            
-            update_elo(p1, p2, average_score_1 / num_games, average_score_2 / num_games)
-            player_elos.append([p.elo for p in players])
+
+    for p1, p2 in itertools.combinations(players, 2):
+        num_games = 0
+        average_score_1 = 0.0
+        average_score_2 = 0.0
+        while num_games < args_cli.num_games_per_round:
+            # run everything in inference mode
+            with torch.inference_mode():
+                # convert obs to agent format
+                obs_1 = p1.obs_to_torch(obs.to(p1.device))
+                opponent_obs = find_wrapper(env, OpponentObservationWrapper).opponent_obs
+                obs_2 = p2.obs_to_torch(opponent_obs.to(p2.device))
+                # agent stepping
+                actions_p1 = p1.get_action(obs_1, is_deterministic=True)
+                actions_p2 = -p2.get_action(obs_2, is_deterministic=True)
+                # env stepping
+                obs, rew, dones, info = env.step(torch.cat([actions_p1.to(rl_device), actions_p2.to(rl_device)], dim=1))
+                if len(dones) > 0:
+                    num_games += dones.sum()
+                    score_1, score_2 = compute_scores(info)
+                    average_score_1 += score_1
+                    average_score_2 += score_2
+                    # reset rnn state for terminated episodes
+                    if p1.is_rnn and p1.states is not None:
+                        for s in p1.states:
+                            s[:, dones, :] = 0.0
+                    if p2.is_rnn and p2.states is not None:
+                        for s in p2.states:
+                            s[:, dones, :] = 0.0
+            if args_cli.video:
+                timestep += 1
+                # Exit the play loop after recording one video
+                if timestep == args_cli.video_length:
+                    break
+          
+        k = p1.index
+        j = p2.index
+        nash_matrix[k,j] = average_score_1/num_games
+        nash_matrix[j,k] = average_score_2/num_games
         
-        print(f"Round {i} completed. ELO scores:")
-        for p in players:
-            print(f"{p.name}: {p.elo}")
+        
+        
 
     # Plot ELO scores:
-    player_elos = np.array(player_elos)
-    
-    
-    
-    for i, p in enumerate(players):
-        plt.plot(player_elos[:, i], label=p.name)
-    plt.xlabel("game")
-    plt.ylabel("ELO")
-    plt.legend()
-    plt.grid()
-    plt.show()
-
+    print(nash_matrix)
+    print(nash_players)
     # close the simulator
+    nash_players = list(nash_players)    # in case it's not a list
+
+    # Set up the figure
+    plt.figure(figsize=(10, 8))
+    sns.set(font_scale=1.2)
+
+    # Create a heatmap
+    ax = sns.heatmap(
+        nash_matrix,
+        xticklabels=nash_players,
+        yticklabels=nash_players,
+        annot=True,        # Show score values
+        fmt=".2f",         # Format the scores
+        cmap="coolwarm",   # Color scheme
+        square=True,
+        cbar_kws={'label': 'Average Score'}
+    )
+
+    # Titles and labels
+    plt.title("Nash Matrix: Agent vs Agent Scores", fontsize=14)
+    plt.xlabel("Opponent")
+    plt.ylabel("Player")
+
+    # Rotate tick labels for readability
+    plt.xticks(rotation=90)
+    plt.yticks(rotation=0)
+
+    plt.tight_layout()
+    plt.show()
     env.close()
 
 

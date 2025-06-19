@@ -94,7 +94,7 @@ class KlaskSelfPlayManager(SelfPlayManager):
             data = algo.game_rewards
 
         if  algo.vec_env.training_curriculum:
-            algo.vec_env.should_update_agents()
+            algo.vec_env.should_update_agents(algo.get_weights())
         
         if len(data) >= self.games_to_check:
             mean_scores = data.get_mean()

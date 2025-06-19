@@ -5,13 +5,7 @@ from pathlib import Path
 import json
 import copy
 import re
-import argparse
 
-parser = argparse.ArgumentParser(description="Pool training")
-
-parser.add_argument("--pool_name", type=str, default="same_config", help="Name of the user")
-
-args = parser.parse_args()
 # List of config files to train with
 configs = [
     "planned_runs/training_curriculum/klask_config_1.yaml",
@@ -19,6 +13,7 @@ configs = [
     "planned_runs/training_curriculum/klask_config_3.yaml",
     "planned_runs/training_curriculum/klask_config_4.yaml"
 ]
+
 checkpoint = ["/home/student/klask_rl/IsaacLab/logs/rl_games/klask/pretrained_agent_action_1.0/nn/last_klask_ep_70_rew_2.950554.pth",
               "/home/student/klask_rl/IsaacLab/logs/rl_games/klask/pretrained_agent_action_1.0/nn/last_klask_ep_70_rew_2.950554.pth",
               "/home/student/klask_rl/IsaacLab/logs/rl_games/klask/pretrained_agent_action_1.0/nn/last_klask_ep_35_rew_3.9405801.pth",
@@ -29,9 +24,10 @@ checkpoint = ["/home/student/klask_rl/IsaacLab/logs/rl_games/klask/pretrained_ag
 PYTHON = "python3"
 TRAIN_SCRIPT = "scripts/reinforcement_learning/rl_games/train_klask.py"  # your main train script
 EVALUATE_SCRIPT = "scripts/reinforcement_learning/rl_games/evaluate_agents.py"
+
+MODE = 1 #either 0 --> opponent is chosen from a pool of players and periodically changed or 1 --> always the best opponent across 4 instances is chosen
 # Store process handles
 processes = []
-project_folder = Path("/home/student/klask_rl/IsaacLab/logs/rl_games/klask/pool_of_players") / Path(args.pool_name)
 
 
 
@@ -44,15 +40,13 @@ for i, cfg in enumerate(configs):
         "--device", f"cuda:{i}",
         "--headless",
         "--num_envs", "4096",
-        "--wandb-project-name", f"Training_curriculum_agent_{i+1}",
-        "--training_curriculum",
-        "--mode", "0",
         "--checkpoint", checkpoint[i],
-        "--project_folder", project_folder
+        "--wandb-project-name", f"Training_curriculum_agent_{i+1}"#, "--training_curriculum", "--mode", str(MODE)
     ]
 
     # Start process without redirecting output
     proc = subprocess.Popen(cmd)
+
     processes.append(proc)
 
 # Periodic progress check
@@ -94,10 +88,10 @@ try:
                     raise ValueError(f"Could not extract agent number from name: {name}")
                 agent_number = int(match.group(1))
 
-                checkpoint_benchmark = project_folder /Path("benchmark/benchmark.pth")
+                checkpoint_benchmark = '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/pool_of_players/action_1.0/benchmark/benchmark.pth'
                 checkpoints_paths = [checkpoint_benchmark]
                 checkpoints_paths.append(checkpoint[0])
-                config_benchmark = project_folder /Path("benchmark/benchmark.yaml")
+                config_benchmark = '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/pool_of_players/action_1.0/benchmark/benchmark.yaml'
                 configs_paths = [config_benchmark]
                 configs_paths.append(f"/home/student/klask_rl/IsaacLab/planned_runs/training_curriculum/klask_config_{agent_number}.yaml")
 
@@ -112,14 +106,14 @@ try:
                         "--run_number", str(run_number),  
                         "--num_games_per_round", "150" ,  
                         "--elo_thresehold", "1200",
-                        "--dir", project_folder           
+                        "--dir", "/home/student/klask_rl/IsaacLab/logs/rl_games/klask/pool_of_players/action_1.0"           
                 ]
                 for ckpt,cfpt in zip(checkpoints_paths,configs_paths):
                     cmd.extend(["--checkpoints", ckpt])
                     cmd.extend(["--player_configs", cfpt])
 
                 
-                proc = subprocess.Popen(cmd)
+                #proc = subprocess.Popen(cmd)
             new_files = {}
            
 

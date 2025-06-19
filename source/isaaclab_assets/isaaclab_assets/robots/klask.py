@@ -52,6 +52,7 @@ else:
         "ball_reset_position_y": (-0.12, 0.12),
         "max_ball_vel": 100.0,    # maximum speed the ball may have for a goal to be counted
         "edge": (-0.16, 0.16, -0.22,-0.02),
+        "additional_observations" : True,
         "domain_randomization": {
             "use_domain_randomization": False,
             "static_friction_range": (0.2, 0.5),

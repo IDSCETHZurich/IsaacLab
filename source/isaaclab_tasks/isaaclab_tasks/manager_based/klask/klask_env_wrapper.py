@@ -9,6 +9,8 @@ from pathlib import Path
 import re
 import yaml
 from isaaclab_assets.robots.klask import KLASK_PARAMS
+import random
+import shutil
 
 
 def find_wrapper(env, wrapper_type):
@@ -83,10 +85,12 @@ class CurriculumWrapper(Wrapper):
                         weight_step /= KLASK_PARAMS["decimation"] * KLASK_PARAMS["physics_dt"]
                     self.env.unwrapped.reward_manager._term_cfgs[term_idx].weight += weight_step
             
-                if self.dynamic and not (term =='time_punishment' or term =='goal_scored' or term =='goal_conceded' or term == 'opponent_in_goal' or term =='player_in_goal'):
+                if self.dynamic and not (term == 'ball_stationary' or term =='time_out_punishment' or term =='time_punishment' or term =='goal_scored' or term =='goal_conceded' or term == 'opponent_in_goal' or term =='player_in_goal'):
                     term_idx = self.env.unwrapped.reward_manager.active_terms.index(term)
-                    self.env.unwrapped.reward_manager._term_cfgs[term_idx].weight = weight*(torch.exp(-torch.tensor(self._step/10000000,device=self.env.unwrapped.device,dtype=torch.float32))) #coeff chosen sucht that half the max reward at 20 mio steps
-        
+                    self.env.unwrapped.reward_manager._term_cfgs[term_idx].weight = weight*(torch.exp(-torch.tensor(self._step/1000000,device=self.env.unwrapped.device,dtype=torch.float32))) #coeff chosen sucht that half the max reward at 20 mio steps
+                    if self._step>10_000_000:
+                        self.env.unwrapped.reward_manager._term_cfgs[term_idx].weight = torch.tensor(0.0,device=self.env.unwrapped.device,dtype=torch.float32)
+
         return self.env.step(actions)
                   
 
@@ -120,7 +124,7 @@ class OpponentObservationWrapper(Wrapper):
 
 class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
 
-    def __init__(self, config_name, num_actors, config, training_curriculum = False,is_deterministic=True, **kwargs):
+    def __init__(self, config_name, num_actors, config ,training_curriculum = False,mode =None,folder = None, is_deterministic=False, **kwargs):
         self.agent = None
         self.config = config
         self.instance_device = config["params"]["config"]["device"]
@@ -128,9 +132,17 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
         self.sum_rewards = 0
         self.training_curriculum = training_curriculum
         
-        self.folder_path_checkpoint = Path("/home/student/klask_rl/IsaacLab/logs/rl_games/klask/training_curriculum/best_agent")
-        self.folder_path_config = Path("/home/student/klask_rl/IsaacLab/planned_runs/training_curriculum")
-        self.current_checkpoint = str(list(self.folder_path_checkpoint.glob("*"))[-1])
+        if training_curriculum:
+            self.mode = mode
+            self.base_folder = Path(folder)
+            self.current_checkpoint = None
+            self.config_path = None
+            self.counter = 0
+            #self.folder_path_checkpoint = Path("/home/student/klask_rl/IsaacLab/logs/rl_games/klask/training_curriculum/best_agent")
+            #self.folder_path_config = Path("/home/student/klask_rl/IsaacLab/planned_runs/training_curriculum")
+            #self.current_checkpoint = str(list(self.folder_path_checkpoint.glob("*"))[-1])
+        #elif random_pool_curriculum:
+        #    self.folder_path_checkpoint = Path("/home/student/klask_rl/IsaacLab/logs/rl_games/klask/pool_of_players")
         self.current_config = self.config
         super().__init__(config_name, num_actors, **kwargs)
     
@@ -155,29 +167,61 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
         runner.load(self.current_config)
         
         #os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-        restore_checkpoint = self.training_curriculum and self.agent!=None
+        restore_checkpoint = self.training_curriculum and self.current_checkpoint is not None
         self.agent = runner.create_player()
         if restore_checkpoint:
             self.agent.restore(self.current_checkpoint)
         
         self.agent.has_batch_dimension = True
     
-    def should_update_agents(self):
-        matching_file = str(list(self.folder_path_checkpoint.glob("*"))[-1])
-        if matching_file == self.current_checkpoint:
-            return 
-        self.current_checkpoint = matching_file
-        
-        match = re.search(r'best_agent\((\d+)\)', self.current_checkpoint)
-        if match:
-            agent_number = match.group(1)
-        config_path = self.folder_path_config / f"klask_config_{agent_number}.yaml"
-        with open(config_path, 'r') as f:
-            self.current_config = yaml.safe_load(f)
-            self.current_config["params"]["config"]["device"] = self.instance_device
-            self.current_config["params"]["config"]["device_name"] = self.instance_device
+    def should_update_agents(self,weights =None):
+        if self.mode ==1:
+            matching_file = str(list(self.base_folder.glob("*"))[-1])
+            if matching_file == self.current_checkpoint:
+                return 
+            self.current_checkpoint = matching_file
+
+            match = re.search(r'best_agent\((\d+)\)', self.current_checkpoint)
+            if match:
+                agent_number = match.group(1)
+            self.config_path = Path(self.base_folder) / f"klask_config_{agent_number}.yaml"
             
-        self.create_agent()
+        if self.mode ==0 and self.counter > 8:
+            
+            
+            agent_folders = [f for f in self.base_folder.iterdir() if f.is_dir()]
+            agent_folders_sorted = sorted(agent_folders, key=lambda f: f.stat().st_ctime)
+            
+            if len(agent_folders)>4: #if only the benchmark folder is in there
+                folders_to_delete = agent_folders_sorted[1:-4]
+                for folder in folders_to_delete: 
+                    shutil.rmtree(folder)
+                    
+                use_self_play = random.random() < 0.5
+                if use_self_play and weights is not None:
+                    self.set_weights(indices=None,weigths=weights)
+                    self.counter = 1 
+                    return
+                # Choose one at random
+                chosen_folder = random.choice(agent_folders)
+
+                # Find the checkpoint and config file in the chosen folder
+                checkpoint_path = next(chosen_folder.glob("**/player_checkpoint.pth"), None)
+                self.config_path = next(chosen_folder.glob("**/player_config.yaml"), None)
+                self.current_checkpoint = checkpoint_path
+        
+        
+        
+        if self.counter>8 and self.current_checkpoint is not None:
+            with open(self.config_path, 'r') as f:
+                self.current_config = yaml.safe_load(f)
+                self.current_config["params"]["config"]["device"] = self.instance_device
+                self.current_config["params"]["config"]["device_name"] = self.instance_device
+                
+            self.create_agent()
+            self.counter=0
+        self.counter+=1
+        
 
     def step(self, action, *args, **kwargs):
         opponent_obs = self.agent.obs_to_torch(self.opponent_obs)
@@ -230,60 +274,95 @@ class KlaskAgentOpponentWrapper(Wrapper):
 
 class KlaskCollisionAvoidanceWrapper(Wrapper):
     
-    real_to_sim_factor = 0.0008285
+    real_to_sim_factor_long_side = 0.0008285
+    real_to_sim_factor_short_side = 1/1150
+    DEACCELERATION_DISTANCE = 0.09
+    PEG_RADIUS = 0.0075
+    X_EDGE = (-0.16,0.16)
+    Y_EDGE_PLAYER = (-0.03,-0.22)
+    Y_EDGE_OPPONENT =(-0.03,-0.22)
     board_dimensions = (0.32, 0.44)
     speed_limit_weight = 70.0
 
-    def __init__(self, env, action_factor=1.0):
+    def __init__(self, env, max_vel = 0.2):
         super().__init__(env)
-        self.action_factor = action_factor
+        
         self.x_min, self.x_max = 15.0, 360.0
         self.y_min_1, self.y_max_1 = 15.0, 235.0
         self.y_min_2, self.y_max_2 = 340.0, 530.0
+        self.MAX_VEL = max_vel
+        
 
     def reset(self, *args, **kwargs):
         obs, info = self.env.reset(*args, **kwargs)
         self.state_1 = obs["policy"].clone()[:, :2]
-        self.state_2 = obs["opponent"].clone()[:, 4:6]
-        self.state_1[:, 0] += self.board_dimensions[0] / 2 
-        self.state_1[:, 1] += self.board_dimensions[1] / 2
-        self.state_2[:, 0] += self.board_dimensions[0] / 2 
-        self.state_2[:, 1] += self.board_dimensions[1] / 2
-        self.state_1 /= self.real_to_sim_factor
-        self.state_2 /= self.real_to_sim_factor
+        self.state_2 = obs["opponent"].clone()[:, :2]
+        
 
         return obs, info
     
     def step(self, actions, *args, **kwargs):
-        actions *= self.action_factor
         
-        x_vel_max = torch.tanh((self.x_max - self.state_1[:, 0]) / self.speed_limit_weight).clamp(min=0.0)
-        x_vel_min = torch.tanh((self.x_min - self.state_1[:, 0]) / self.speed_limit_weight).clamp(max=0.0)
-        y_vel_max = torch.tanh((self.y_max_1 - self.state_1[:, 1]) / self.speed_limit_weight).clamp(min=0.0)
-        y_vel_min = torch.tanh((self.y_min_1 - self.state_1[:, 1]) / self.speed_limit_weight).clamp(max=0.0)
+        left_zone = self.state_1[:, 0] <= self.X_EDGE[0] + self.DEACCELERATION_DISTANCE + self.PEG_RADIUS
+        soft_dist_left = self.state_1[left_zone, 0] - self.X_EDGE[0] - self.PEG_RADIUS
+        actions[left_zone, 0] = torch.maximum(
+            actions[left_zone, 0],
+            -self.interpolate_vel(soft_dist_left)
+        )
 
-        actions[:, 0] = actions[:, 0].clamp(min=x_vel_min, max=x_vel_max)
-        actions[:, 1] = actions[:, 1].clamp(min=y_vel_min, max=y_vel_max)
+        left_zone_opp = self.state_2[:, 0] <= self.X_EDGE[0] + self.DEACCELERATION_DISTANCE + self.PEG_RADIUS
+        soft_dist_left_opp = self.state_2[left_zone_opp, 0] - self.X_EDGE[0] - self.PEG_RADIUS
+        actions[left_zone_opp, 2] = torch.maximum(
+            actions[left_zone_opp, 2],
+            -self.interpolate_vel(soft_dist_left_opp)
+        )
 
-        x_vel_max = torch.tanh((self.x_max - self.state_2[:, 0]) / self.speed_limit_weight).clamp(min=0.0)
-        x_vel_min = torch.tanh((self.x_min - self.state_2[:, 0]) / self.speed_limit_weight).clamp(max=0.0)
-        y_vel_max = torch.tanh((self.y_max_2 - self.state_2[:, 1]) / self.speed_limit_weight).clamp(min=0.0)
-        y_vel_min = torch.tanh((self.y_min_2 - self.state_2[:, 1]) / self.speed_limit_weight).clamp(max=0.0)
+        right_zone = self.state_1[:,0] + self.DEACCELERATION_DISTANCE + self.PEG_RADIUS >= self.X_EDGE[1]
+        actions[right_zone, 0] = torch.minimum(
+            actions[right_zone, 0],
+            self.interpolate_vel(self.X_EDGE[1] - self.state_1[right_zone,0] - self.PEG_RADIUS)
+        )
 
-        actions[:, 2] = actions[:, 2].clamp(min=x_vel_min, max=x_vel_max)
-        actions[:, 3] = actions[:, 3].clamp(min=y_vel_min, max=y_vel_max)
+        right_zone_opp = self.state_2[:,0] + self.DEACCELERATION_DISTANCE + self.PEG_RADIUS >= self.X_EDGE[1]
+        actions[right_zone_opp, 1] = torch.minimum(
+            actions[right_zone_opp, 1],
+            self.interpolate_vel(self.X_EDGE[1] - self.state_2[right_zone_opp,0] - self.PEG_RADIUS)
+        )
+
+        bottom_zone = self.state_1[:,1] <= self.Y_EDGE_PLAYER[0] + self.DEACCELERATION_DISTANCE + self.PEG_RADIUS
+        actions[bottom_zone, 1] = torch.maximum(
+            actions[bottom_zone, 1],
+            -self.interpolate_vel(self.state_1[:,1][bottom_zone] - self.Y_EDGE_PLAYER[0] - self.PEG_RADIUS)
+        )
+
+        bottom_zone_opp = self.state_2[:,1] <= self.Y_EDGE_OPPONENT[0] + self.DEACCELERATION_DISTANCE + self.PEG_RADIUS
+        actions[bottom_zone_opp, 1] = torch.maximum(
+            actions[bottom_zone_opp, 1],
+            -self.interpolate_vel(self.state_2[:,1][bottom_zone_opp] - self.Y_EDGE_OPPONENT[0] - self.PEG_RADIUS)
+        )
+
+        ### Y - TOP
+        top_zone = self.state_1[:,1]  + self.DEACCELERATION_DISTANCE + self.PEG_RADIUS >= self.Y_EDGE_PLAYER[1]
+        actions[top_zone, 1] = torch.minimum(
+            actions[top_zone, 1],
+            self.interpolate_vel(self.Y_EDGE_PLAYER[1] - self.state_1[:,1] [top_zone] + self.PEG_RADIUS)
+        )
+
+        top_zone_opp = self.state_2[:,1]  + self.DEACCELERATION_DISTANCE + self.PEG_RADIUS >= self.Y_EDGE_OPPONENT[1]
+        actions[top_zone_opp, 1] = torch.minimum(
+            actions[top_zone_opp, 1],
+            self.interpolate_vel(self.Y_EDGE_OPPONENT[1] - self.state_2[:,1] [top_zone_opp] + self.PEG_RADIUS)
+        )
 
         obs, rew, terminated, truncated, info = self.env.step(actions, *args, **kwargs)
         self.state_1 = obs["policy"].clone()[:, :2]
-        self.state_2 = obs["opponent"].clone()[:, 4:6]
-        self.state_1[:, 0] += self.board_dimensions[0] / 2 
-        self.state_1[:, 1] += self.board_dimensions[1] / 2
-        self.state_2[:, 0] += self.board_dimensions[0] / 2 
-        self.state_2[:, 1] += self.board_dimensions[1] / 2
-        self.state_1 /= self.real_to_sim_factor
-        self.state_2 /= self.real_to_sim_factor
+        self.state_2 = obs["opponent"].clone()[:, :2]
+        
 
         return obs, rew, terminated, truncated, info
+    
+    def interpolate_vel(self,distance):
+        return (self.MAX_VEL/self.DEACCELERATION_DISTANCE)*distance
     
 
 class ActionHistoryWrapper(Wrapper):

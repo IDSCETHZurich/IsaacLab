@@ -134,7 +134,55 @@ class ObservationsCfg:
         ball_pos_rel = ObsTerm(func=root_xy_pos_w, params={"asset_cfg": SceneEntityCfg(name="ball")})
         
         ball_vel_rel = ObsTerm(func=root_lin_xy_vel_w, params={"asset_cfg": SceneEntityCfg(name="ball")})
+        
+        if KLASK_PARAMS.get("additional_observations",0):
+            angle_pegball_pegoppgoal = ObsTerm(
+                func = angle_ball_goal, 
+                params={"ball_cfg" :SceneEntityCfg(name="ball"),
+                "player_cfg" :  SceneEntityCfg(name="klask", body_names=["Peg_1"]),
+                "goal": KLASK_PARAMS["opponent_goal"]})
+            
+            angle_oppball_oppgoal = ObsTerm(
+                func = angle_ball_goal, 
+                params={"ball_cfg" :SceneEntityCfg(name="ball"),
+                "player_cfg" :  SceneEntityCfg(name="klask", body_names=["Peg_2"]),
+                "goal": KLASK_PARAMS["player_goal"]})
+            
+            angle_pegball_pegopp =ObsTerm(
+                func = angle_ball_opp, 
+                params={"ball_cfg" :SceneEntityCfg(name="ball"),
+                "player_1_cfg" :  SceneEntityCfg(name="klask", body_names=["Peg_1"]),
+                "player_2_cfg" :SceneEntityCfg(name="klask", body_names=["Peg_2"])})
+            
+            angle_oppball_opppeg =ObsTerm(
+                func = angle_ball_opp, 
+                params={"ball_cfg" :SceneEntityCfg(name="ball"),
+                "player_1_cfg" :  SceneEntityCfg(name="klask", body_names=["Peg_2"]),
+                "player_2_cfg" :SceneEntityCfg(name="klask", body_names=["Peg_1"])})
+            
+            distance_ball_goal = ObsTerm(
+                func= distance_to_goal,
+                params = {"ball_cfg" :SceneEntityCfg(name="ball"),
+                "goal" :KLASK_PARAMS["player_goal"]}
+            )
+            distance_ball_oppgoal= ObsTerm(
+                func= distance_to_goal,
+                params = {"ball_cfg" :SceneEntityCfg(name="ball"),
+                "goal" :KLASK_PARAMS["opponent_goal"]}
+                )
 
+            distance_ball_player= ObsTerm(
+                func= distance_ball_to_player,
+                params = {"ball_cfg" :SceneEntityCfg(name="ball"),
+                "player_cfg" :  SceneEntityCfg(name="klask", body_names=["Peg_1"])
+                })
+            
+            distance_ball_opp= ObsTerm(
+                func= distance_ball_to_player,
+                params = {"ball_cfg" :SceneEntityCfg(name="ball"),
+                "player_cfg" :  SceneEntityCfg(name="klask", body_names=["Peg_2"])
+                })
+        
         if KLASK_PARAMS.get("action_history", 0):
             action_history_x = ObsTerm(func=mdp.last_action, params={"action_name": "player_x"}, 
                                      history_length=KLASK_PARAMS["action_history"])
@@ -186,6 +234,54 @@ class ObservationsCfg:
         ball_pos_rel = ObsTerm(func=root_xy_pos_w, params={"asset_cfg": SceneEntityCfg(name="ball")})
         
         ball_vel_rel = ObsTerm(func=root_lin_xy_vel_w, params={"asset_cfg": SceneEntityCfg(name="ball")})
+
+        if KLASK_PARAMS.get("additional_observations",0):
+            angle_oppball_oppgoal = ObsTerm(
+                func = angle_ball_goal, 
+                params={"ball_cfg" :SceneEntityCfg(name="ball"),
+                "player_cfg" :  SceneEntityCfg(name="klask", body_names=["Peg_2"]),
+                "goal": KLASK_PARAMS["player_goal"]})
+            
+            angle_pegball_pegoppgoal = ObsTerm(
+                func = angle_ball_goal, 
+                params={"ball_cfg" :SceneEntityCfg(name="ball"),
+                "player_cfg" :  SceneEntityCfg(name="klask", body_names=["Peg_1"]),
+                "goal": KLASK_PARAMS["opponent_goal"]})
+            
+            angle_oppball_opppeg =ObsTerm(
+                func = angle_ball_opp, 
+                params={"ball_cfg" :SceneEntityCfg(name="ball"),
+                "player_1_cfg" :  SceneEntityCfg(name="klask", body_names=["Peg_2"]),
+                "player_2_cfg" :SceneEntityCfg(name="klask", body_names=["Peg_1"])})
+            
+            angle_pegball_pegopp =ObsTerm(
+                func = angle_ball_opp, 
+                params={"ball_cfg" :SceneEntityCfg(name="ball"),
+                "player_1_cfg" :  SceneEntityCfg(name="klask", body_names=["Peg_1"]),
+                "player_2_cfg" :SceneEntityCfg(name="klask", body_names=["Peg_2"])})
+            
+            distance_ball_oppgoal = ObsTerm(
+                func= distance_to_goal,
+                params = {"ball_cfg" :SceneEntityCfg(name="ball"),
+                "goal" :KLASK_PARAMS["opponent_goal"]}
+            )
+            distance_ball_goal= ObsTerm(
+                func= distance_to_goal,
+                params = {"ball_cfg" :SceneEntityCfg(name="ball"),
+                "goal" :KLASK_PARAMS["player_goal"]}
+                )
+
+            distance_ball_opp= ObsTerm(
+                func= distance_ball_to_player,
+                params = {"ball_cfg" :SceneEntityCfg(name="ball"),
+                "player_cfg" :  SceneEntityCfg(name="klask", body_names=["Peg_2"])
+                })
+            
+            distance_ball_player= ObsTerm(
+                func= distance_ball_to_player,
+                params = {"ball_cfg" :SceneEntityCfg(name="ball"),
+                "player_cfg" :  SceneEntityCfg(name="klask", body_names=["Peg_1"])
+                })
         
         if KLASK_PARAMS.get("action_history", 0):
             action_history_x = ObsTerm(func=mdp.last_action, params={"action_name": "opponent_x"}, 
@@ -332,10 +428,10 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("klask", joint_names=["slider_to_peg_1"]),
-            "position_range": (0.0202, 0.0202),
-            "velocity_range": (0.086, 0.086)
-            #"position_range": (-0.15, 0.15),
-            #"velocity_range": (0.0, 0.0),
+            #"position_range": (0.0202, 0.0202),
+            #"velocity_range": (0.086, 0.086)
+            "position_range": (-0.1, 0.1),
+            "velocity_range": (0.0, 0.0),
         },
     )
 
@@ -344,7 +440,7 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("klask", joint_names=["slider_to_peg_2"]),
-            "position_range": (-0.15, 0.15),
+            "position_range": (-0.1, 0.1),
             "velocity_range": (0.0, 0.0),
         },
     )
@@ -354,10 +450,10 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("klask", joint_names=["ground_to_slider_1"]),
-            #"position_range": (-0.2, -0.03),
-            "position_range": (-0.1103, -0.1103),
-            "velocity_range": (-0.0043, -0.0043)
-            #"velocity_range": (0.0, 0.0),
+            "position_range": (-0.14, -0.03),
+            #"position_range": (-0.1103, -0.1103),
+            #"velocity_range": (-0.0043, -0.0043)
+            "velocity_range": (0.0, 0.0),
         },
     )
 
@@ -366,7 +462,7 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("klask", joint_names=["ground_to_slider_2"]),
-            "position_range": (0.03, 0.2),
+            "position_range": (0.03, 0.14),
             "velocity_range": (0.0, 0.0),
         },
     )
@@ -377,7 +473,7 @@ class EventCfg:
         params={
             "asset_cfg": SceneEntityCfg("ball"),
             "pose_range": {"x": KLASK_PARAMS["ball_reset_position_x"], "y": KLASK_PARAMS["ball_reset_position_y"], "z": (0.032, 0.032)},
-            "velocity_range": {"x": (-0.0, 0.0), "y": (-0.0, 0.0)}
+            "velocity_range": {"x": (-0.0, 0.0), "y": (-0.00, 0.00)}
         },
     )
 
@@ -387,6 +483,8 @@ class RewardsCfg:
     """Reward terms for the MDP."""
     
     time_punishment = RewTerm(func=mdp.is_alive, weight=0.0)
+
+    time_out_punishment = RewTerm(func = mdp.time_out, weight = 0.0)
 
     shot_over_middle_line = RewTerm(
         func = shot_over_middle,

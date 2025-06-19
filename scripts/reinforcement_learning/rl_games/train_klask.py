@@ -32,6 +32,8 @@ parser.add_argument("--full_experiment_name", type=str, default=None, help="Expe
 parser.add_argument("--wandb-project-name", type=str, default=None, help="the wandb's project name")
 parser.add_argument("--wandb-entity", type=str, default=None, help="the entity (team) of wandb's project")
 parser.add_argument("--training_curriculum", action="store_true", default=False)
+parser.add_argument("--mode", type=int, default=None, help ="mode for training curriculum")
+parser.add_argument("--project_folder", type=str, default=None, help ="mode for training curriculum")
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
@@ -181,8 +183,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         
 
     if agent_cfg["env"].get("collision_avoidance", False):
-        action_factor = agent_cfg["env"].get("action_factor", 1.0)
-        env = KlaskCollisionAvoidanceWrapper(env, action_factor)
+        env = KlaskCollisionAvoidanceWrapper(env,max_vel=clip_actions)
 
     if KLASK_PARAMS["action_history"] > 0:
         env = ActionHistoryWrapper(env, history_length=KLASK_PARAMS["action_history"])
@@ -211,7 +212,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     if agent_cfg["params"]["config"].get("self_play", False):
         vecenv.register(
             "IsaacRlgWrapper", lambda config_name, num_actors, **kwargs: RlGamesGpuEnvSelfPlay(
-                config_name, num_actors, agent_cfg.copy(),training_curriculum=args_cli.training_curriculum, **kwargs)
+                config_name, num_actors, agent_cfg.copy(),training_curriculum=args_cli.training_curriculum, mode = args_cli.mode,folder =args_cli.project_folder, **kwargs)
         )
         env_configurations.register("rlgpu", {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env})
 
