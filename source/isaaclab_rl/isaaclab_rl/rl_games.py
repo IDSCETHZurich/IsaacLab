@@ -79,7 +79,7 @@ class RlGamesVecEnvWrapper(IVecEnv):
         https://github.com/NVIDIA-Omniverse/IsaacGymEnvs
     """
 
-    def __init__(self, env: ManagerBasedRLEnv | DirectRLEnv, rl_device: str, clip_obs: float, clip_actions: float):
+    def __init__(self, env: ManagerBasedRLEnv | DirectRLEnv, rl_device: str, clip_obs: float, clip_actions: float, custom_obs = None, evaluation_mode = False):
         """Initializes the wrapper instance.
 
         Args:
@@ -100,9 +100,17 @@ class RlGamesVecEnvWrapper(IVecEnv):
             )
         # initialize the wrapper
         self.env = env
+        self.evaluation_mode = evaluation_mode
         # store provided arguments
         self._rl_device = rl_device
         self._clip_obs = clip_obs
+        self.custom_obs_implemented = False
+        if custom_obs is not None:
+            # Split into low and high bounds
+            self.clip_obs_low = custom_obs[::2]
+            self.clip_obs_high = custom_obs[1::2]
+            self.custom_obs_implemented = True
+
         self._clip_actions = clip_actions
         self._sim_device = env.unwrapped.device
         # information for privileged observations
@@ -147,6 +155,8 @@ class RlGamesVecEnvWrapper(IVecEnv):
             )
         # note: maybe should check if we are a sub-set of the actual space. don't do it right now since
         #   in ManagerBasedRLEnv we are setting action space as (-inf, inf).
+        if self.custom_obs_implemented:
+            return gym.spaces.Box(low=self.clip_obs_low,high=self.clip_obs_high)
         return gym.spaces.Box(-self._clip_obs, self._clip_obs, policy_obs_space.shape)
 
     @property
@@ -217,9 +227,22 @@ class RlGamesVecEnvWrapper(IVecEnv):
 
     def get_env_info(self) -> dict:
         """Returns the Gym spaces for the environment."""
+        original_space = self.action_space
+        new_space =  gym.spaces.Box(
+            low=original_space.low[:2],
+            high=original_space.high[:2],
+            dtype=original_space.dtype
+        )
+
+        if self.evaluation_mode:
+            return {
+                "observation_space": self.observation_space,
+                "action_space": self.action_space,
+                "state_space": self.state_space,
+            }
         return {
             "observation_space": self.observation_space,
-            "action_space": self.action_space,
+            "action_space": new_space,
             "state_space": self.state_space,
         }
 

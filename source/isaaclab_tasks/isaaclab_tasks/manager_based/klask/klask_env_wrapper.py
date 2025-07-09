@@ -25,7 +25,12 @@ def find_wrapper(env, wrapper_type):
 class KlaskRandomOpponentWrapper(Wrapper):
     
     def step(self, actions, *args, **kwargs):
-        actions[:, 2:] = 2 * torch.rand_like(actions)[:, :2] - 1
+        #CAREFUL: Opponent actions 
+        if actions.size()  == torch.Size([4096, 4]):
+            actions[:, 2:] = 2 * torch.rand_like(actions)[:, :2] - 1
+        else:
+            opponent_actions = 2 * torch.rand_like(actions) - 1  # shape: [4096, 2]
+            actions = torch.cat([actions, opponent_actions], dim=1) 
         return self.env.step(actions, *args, **kwargs)
     
     def reset(self, *args, **kwargs):
@@ -87,8 +92,8 @@ class CurriculumWrapper(Wrapper):
             
                 if self.dynamic and not (term == 'ball_stationary' or term =='time_out_punishment' or term =='time_punishment' or term =='goal_scored' or term =='goal_conceded' or term == 'opponent_in_goal' or term =='player_in_goal'):
                     term_idx = self.env.unwrapped.reward_manager.active_terms.index(term)
-                    self.env.unwrapped.reward_manager._term_cfgs[term_idx].weight = weight*(torch.exp(-torch.tensor(self._step/1000000,device=self.env.unwrapped.device,dtype=torch.float32))) #coeff chosen sucht that half the max reward at 20 mio steps
-                    if self._step>10_000_000:
+                    self.env.unwrapped.reward_manager._term_cfgs[term_idx].weight = weight*(torch.exp(-torch.tensor(self._step/5000000,device=self.env.unwrapped.device,dtype=torch.float32))) #coeff chosen sucht that half the max reward at 20 mio steps
+                    if self._step>15_000_000:
                         self.env.unwrapped.reward_manager._term_cfgs[term_idx].weight = torch.tensor(0.0,device=self.env.unwrapped.device,dtype=torch.float32)
 
         return self.env.step(actions)
@@ -175,6 +180,31 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
         self.agent.has_batch_dimension = True
     
     def should_update_agents(self,weights =None):
+        if self.mode ==2 and self.counter > 15:
+            use_old_opp = random.random() < 0.3
+            if not use_old_opp and weights is not None:
+                self.set_weights(indices=None,weigths=weights)
+                self.counter = 1 
+                return
+            
+            
+            base_folder = Path(self.base_folder)
+            checkpoints = list(base_folder.glob("last*.pth"))
+            
+            if len(checkpoints) == 0:
+                return
+            checkpoints_sorted = sorted(checkpoints, key=lambda f: f.stat().st_ctime)
+            decay = 0.9  # Closer to 1 → slower decay, closer to 0 → steeper bias to latest
+            n = len(checkpoints_sorted)
+            weights = np.array([decay ** (n - i - 1) for i in range(n)])  # newest gets highest weight
+            weights /= weights.sum()  # normalize to sum to 1
+
+            # Randomly choose using the computed weights
+            self.current_checkpoint = np.random.choice(checkpoints_sorted, p=weights)
+
+            self.create_agent()
+            self.counter = 0 
+
         if self.mode ==1:
             matching_file = str(list(self.base_folder.glob("*"))[-1])
             if matching_file == self.current_checkpoint:
@@ -212,7 +242,7 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
         
         
         
-        if self.counter>8 and self.current_checkpoint is not None:
+        if self.mode == 0 and self.counter>8 and self.current_checkpoint is not None:
             with open(self.config_path, 'r') as f:
                 self.current_config = yaml.safe_load(f)
                 self.current_config["params"]["config"]["device"] = self.instance_device

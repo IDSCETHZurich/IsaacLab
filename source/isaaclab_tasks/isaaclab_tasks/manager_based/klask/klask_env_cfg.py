@@ -548,6 +548,14 @@ class RewardsCfg:
         },
         weight=0.0
     )
+    distance_ball_own_goal = RewTerm(
+        func = distance_ball_goal,
+        params ={
+            "ball_cfg": SceneEntityCfg("ball"),
+            "goal": KLASK_PARAMS["player_goal"]
+        },
+        weight=0.0
+    )
 
     ball_speed = RewTerm(
         func=ball_speed, 
