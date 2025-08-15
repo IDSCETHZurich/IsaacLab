@@ -1,12 +1,12 @@
 params:
-  seed: 42
+  seed: 62
 
   # environment wrapper clipping
   env:
     # added to the wrapper
-    clip_observations: [-0.17,0.17,-0.23,0.0,0.0,0.4,0.0,0.4,-0.17,0.17,0.0,0.23,0.0,0.4,0.0,0.4,-0.17,0.17,-0.23,0.23,0.0,0.6,0.0,0.6]
+    clip_observations: 10.0
     # can make custom wrapper?
-    clip_actions: 0.2
+    clip_actions: 1.0
 
   algo:
     name: a2c_continuous
@@ -40,76 +40,76 @@ params:
         name: None
 
   load_checkpoint: False # flag which sets whether to load the checkpoint
-  load_path: 'logs/rl_games/klask/tuning/nn/klask.pth' # path to the checkpoint to load
+  load_path: '' # path to the checkpoint to load
 
   config:
-    full_experiment_name: odrive_new_estimator
+    full_experiment_name: pool_training_test
     name: klask
     env_name: rlgpu
     device: 'cuda:0'
     device_name: 'cuda:0'
     multi_gpu: False
     ppo: True
-    mixed_precision: False
+    mixed_precision: True
     normalize_input: True
     normalize_value: True
     num_actors: -1  # configured from the script (based on num_envs)
     reward_shaper:
       scale_value: 1.0
-    normalize_advantage: False
-    gamma: 0.99
+    normalize_advantage: True
+    gamma: 0.996
     tau : 0.95
-    learning_rate: 3e-4
+    learning_rate: 1e-4
     lr_schedule: adaptive
-    kl_threshold: 0.008
+    kl_threshold: 0.01
     #score_to_win: 20000
     max_epochs: -1
     max_frames: !!int 10_000_000_000
     save_best_after: 50
-    save_frequency: 25
-    grad_norm: 1.0
+    save_frequency: 40
+    grad_norm: 0.4
     entropy_coef: 0.0
     truncate_grads: True
     e_clip: 0.2
-    horizon_length: 128 #this is ca 3 s of play time at 50 Hz which should capture most things
+    horizon_length: 16 #this is ca 3 s of play time at 50 Hz which should capture most things
     minibatch_size: 4096
     mini_epochs: 8 #long horizon puts com overhead on algorithm, therefore you might as well simulate with fresh date more often
-    critic_coef: 4
+    critic_coef: 2.0
     clip_value: True
-    seq_length: 64
-    bounds_loss_coef: 0.00001
+    seq_length: 16
+    bounds_loss_coef: 0.0000001
     self_play: True
     games_to_track: 4096
     self_play_config:
       check_scores: True
-      update_score: 0.15
+      update_score: 0.20
       games_to_check: 1
       env_update_num: 4096
 
 env:
   obs_noise: 0.0
-  actuator_model: True
+  actuator_model: False
   collision_avoidance: False
 
 rewards:
-  time_punishment: !!float -0.0005
-  shot_over_middle_line: !!float 30.3 #13.33
-  player_in_goal: !!float -30.0
+  time_punishment: !!float 0.000
+  shot_over_middle_line: !!float 1000.0 #13.33
+  player_in_goal: !!float -1.0
   opponent_in_goal: !!float 0.0
-  goal_scored: !!float 50.0
-  goal_conceded: !!float -30.0
+  goal_scored: !!float 3.0
+  goal_conceded: !!float -1.0
   distance_player_ball_own_half: !!float 0.000
-  distance_ball_opponent_goal: !!float 0.000 #0.0066
+  distance_ball_opponent_goal: !!float 0.00 #0.0066
   ball_speed: !!float 0.00
-  ball_stationary: !!float -0.0005 #-0.002
-  collision_player_ball: !!float 0.09 #0.27
+  ball_stationary: !!float -0.0001 #-0.002
+  collision_player_ball: !!float 50.003 #0.27
   ball_in_own_half: !!float 0.00
-  close_to_boundaries: !!float -0.0005 #-0.001
-  player_strategically_positioned: !!float 0.001 #0.008
+  close_to_boundaries: !!float -0.000 #-0.001
+  player_strategically_positioned: !!float 0.00 #0.008
 
 terminations:
   time_out: True
   goal_scored: True
   goal_conceded: True
   player_in_goal: True
-  opponent_in_goal: True
+  opponent_in_goal: False

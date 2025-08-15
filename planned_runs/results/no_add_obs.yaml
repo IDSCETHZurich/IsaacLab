@@ -32,9 +32,9 @@ params:
       regularizer:
         name: None
   load_checkpoint: true
-  load_path: /home/student/klask_rl/IsaacLab/logs/rl_games/klask/pretrained_agent_action_1.0/nn/last_klask_ep_35_rew_3.9405801.pth
+  load_path: /home/student/klask_rl/IsaacLab/logs/rl_games/klask/pretrained_agent_action_1.0_no_add_obs/nn/last_klask_ep_35_rew_-0.8191687.pth
   config:
-    full_experiment_name: training_curriculum/agent_3
+    full_experiment_name: no_add_obs
     name: klask
     env_name: rlgpu
     device: cuda:2

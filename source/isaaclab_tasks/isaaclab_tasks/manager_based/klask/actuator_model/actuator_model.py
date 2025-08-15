@@ -91,7 +91,7 @@ class ActuatorModelWrapper(Wrapper):
     def step(self, actions, *args, **kwargs):
         # Peg 1 command history update:
 
-        
+            
         #actions = self.apply_boundary_limits(actions)
 
         command_1 = actions[:, :2]

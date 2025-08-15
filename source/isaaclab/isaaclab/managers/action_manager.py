@@ -228,7 +228,7 @@ class ActionManager(ManagerBase):
     @property
     def total_action_dim(self) -> int:
         """Total dimension of actions."""
-        return sum(self.action_term_dim)
+        return sum(self.action_term_dim) #
 
     @property
     def active_terms(self) -> list[str]:

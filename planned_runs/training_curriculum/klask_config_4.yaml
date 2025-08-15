@@ -39,8 +39,8 @@ params:
       regularizer:
         name: None
 
-  load_checkpoint: True # flag which sets whether to load the checkpoint
-  load_path: '/home/student/klask_rl/IsaacLab/logs/rl_games/klask/pretrained_agent_action_1.0/nn/last_klask_ep_35_rew_3.9405801.pth' # path to the checkpoint to load
+  load_checkpoint: False # flag which sets whether to load the checkpoint
+  load_path: '' # path to the checkpoint to load
 
   config:
     full_experiment_name: training_curriculum/agent_4
@@ -87,10 +87,10 @@ params:
     train_dir: /home/student/klask_rl/IsaacLab/logs/rl_games/klask
 env:
   obs_noise: 0.0
-  actuator_model: true
+  actuator_model: True
   collision_avoidance: false
 rewards:
-  time_punishment: -0.0005
+  time_punishment: -1.0
   time_out_punishment: 0.0
   shot_over_middle_line: 0.0
   player_in_goal: -3.0
@@ -98,13 +98,13 @@ rewards:
   goal_scored: 5.0
   goal_conceded: -3.0
   distance_player_ball_own_half: 0.0
-  distance_ball_opponent_goal: -1.0
-  distance_ball_own_goal: -1.0
+  distance_ball_opponent_goal: 5.1
+  distance_ball_own_goal: -5.1
   ball_speed: 0.0
-  ball_stationary: -0.00
-  collision_player_ball: 0.000
+  ball_stationary: -0.01
+  collision_player_ball: 0.5
   ball_in_own_half: 0.0
-  close_to_boundaries: -0.001
+  close_to_boundaries: -0.01
   player_strategically_positioned: 0.0
 terminations:
   time_out: true

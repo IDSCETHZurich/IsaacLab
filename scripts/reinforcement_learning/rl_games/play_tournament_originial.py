@@ -20,18 +20,11 @@ parser.add_argument(
 )
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
 parser.add_argument("--task", type=str, default="Isaac-Klask-v0", help="Name of the task.")
-parser.add_argument("--dir", type=str, default=None, help="Path to tournament directory containing config directories.")
-parser.add_argument(
-    "--checkpoints", action="append", help="Paths to agent checkpoints", default=[]
-)
+parser.add_argument("--dir", type=str, default=None, help="Path to tournament directory containing checkpoints and config directories.")
 parser.add_argument("--config", type=str, default=None, help="config.yaml file, rl_games_cfg_entry_point used when not provided")
-parser.add_argument("--num_rounds", type=int, default=1, help="Number of rounds in the tournament.")
-parser.add_argument("--num_games_per_round", type=int, default=5, help="Number of games per round.")
+parser.add_argument("--num_rounds", type=int, default=10, help="Number of rounds in the tournament.")
+parser.add_argument("--num_games_per_round", type=int, default=100, help="Number of games per round.")
 parser.add_argument("--tournament_name", type=str, default="tournament", help="Name used for logging videos.")
-parser.add_argument("--num_instances",type =int, default=4)
-parser.add_argument("--run_number", type=int, default=None)
-parser.add_argument("--player_configs", action="append")
-parser.add_argument("--elo_thresehold", type=int, default=None)
 
 
 # append AppLauncher cli args
@@ -57,8 +50,6 @@ import time
 import matplotlib.pyplot as plt
 import itertools
 import numpy as np
-import shutil
-from pathlib import Path
 
 from rl_games.common import env_configurations, vecenv
 from rl_games.common.player import BasePlayer
@@ -112,13 +103,12 @@ def main():
             config = yaml.safe_load(file)
         agent_cfg.update(config)
 
-    ## specify directory for logging experiments
-    #log_root_path = os.path.join("logs", "rl_games", agent_cfg["params"]["config"]["name"])
-    #log_root_path = os.path.abspath(log_root_path)
-    #log_dir = os.path.dirname(args_cli.tournament_name)
+    # specify directory for logging experiments
+    log_root_path = os.path.join("logs", "rl_games", agent_cfg["params"]["config"]["name"])
+    log_root_path = os.path.abspath(log_root_path)
+    log_dir = os.path.dirname(args_cli.tournament_name)
 
     # wrap around environment for rl-games
-    agent_cfg["terminations"]["opponent_in_goal"] = True
     rl_device = agent_cfg["params"]["config"]["device"]
     clip_obs = agent_cfg["params"]["env"].get("clip_observations", math.inf)
     clip_actions = agent_cfg["params"]["env"].get("clip_actions", math.inf)
@@ -126,20 +116,20 @@ def main():
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
     # wrap for video recording
-    #if args_cli.video:
-    #    video_kwargs = {
-    #        "video_folder": os.path.join(log_root_path, log_dir, "videos", "play"),
-    #        "step_trigger": lambda step: step == 0,
-    #        "video_length": args_cli.video_length,
-    #        "disable_logger": True,
-    #    }
-    #    print("[INFO] Recording videos during training.")
-    #    print_dict(video_kwargs, nesting=4)
-    #    env = gym.wrappers.RecordVideo(env, **video_kwargs)
+    if args_cli.video:
+        video_kwargs = {
+            "video_folder": os.path.join(log_root_path, log_dir, "videos", "play"),
+            "step_trigger": lambda step: step == 0,
+            "video_length": args_cli.video_length,
+            "disable_logger": True,
+        }
+        print("[INFO] Recording videos during training.")
+        print_dict(video_kwargs, nesting=4)
+        env = gym.wrappers.RecordVideo(env, **video_kwargs)
 
     # convert to single-agent instance if required by the RL algorithm
-    #if isinstance(env.unwrapped, DirectMARLEnv):
-    #    env = multi_agent_to_single_agent(env)
+    if isinstance(env.unwrapped, DirectMARLEnv):
+        env = multi_agent_to_single_agent(env)
 
     obs_noise = agent_cfg["env"].get("obs_noise", 0.0)
     env = ObservationNoiseWrapper(env, obs_noise)
@@ -148,7 +138,7 @@ def main():
         env = CurriculumWrapper(env, agent_cfg["rewards"], mode="test")
     
     # wrap around environment for rl-games
-    env = RlGamesVecEnvWrapper(env, rl_device, clip_obs = clip_obs, clip_actions=clip_actions,evaluation_mode = True)
+    env = RlGamesVecEnvWrapper(env, rl_device, clip_obs, clip_actions)
 
     # register the environment to rl-games registry
     # note: in agents configuration: environment name must be "rlgpu"
@@ -172,38 +162,31 @@ def main():
     # create runner from rl-games
     runner = Runner()
     players = []
-
-    for i in range (args_cli.num_instances):
-        model_file = args_cli.checkpoints[i]
-        player_name = f"agent_{i+1}"
-        with open(args_cli.player_configs[i], 'r') as file:
+    checkpoints_dir = os.path.join(args_cli.dir, "checkpoints")
+    for i, model_file in enumerate(os.listdir(checkpoints_dir)):
+        player_name = model_file.split(".")[0]
+        with open(os.path.join(args_cli.dir, "configs", f"{player_name}.yaml"), 'r') as file:
             config = yaml.safe_load(file)
-            
         runner.load(config)
         player = runner.create_player()
-        player.restore(model_file)
+        player.restore(os.path.join(checkpoints_dir, model_file))
         player.reset()
         # initialize RNN states if used
         if player.is_rnn:
             player.init_rnn()
         _ = player.get_batch_size(obs, 1)
         player.elo = 1200.0
-        player.config = args_cli.player_configs[i]
-        player.checkpoint = model_file
         player.name = player_name
-        player.device = config["params"]["config"]["device"]
         players.append(player)
 
     player_elos = []
-    
+            
     # simulate environment
     # note: We simplified the logic in rl-games player.py (:func:`BasePlayer.run()`) function in an
     #   attempt to have complete control over environment stepping. However, this removes other
     #   operations such as masking that is used for multi-agent learning by RL-Games.
-
     for i, _ in enumerate(range(args_cli.num_rounds)):
         for p1, p2 in itertools.combinations(players, 2):
-            
             num_games = 0
             average_score_1 = 0.0
             average_score_2 = 0.0
@@ -211,16 +194,14 @@ def main():
                 # run everything in inference mode
                 with torch.inference_mode():
                     # convert obs to agent format
-                    obs_1 = p1.obs_to_torch(obs.to(p1.device))
+                    obs_1 = p1.obs_to_torch(obs)
                     opponent_obs = find_wrapper(env, OpponentObservationWrapper).opponent_obs
-                    obs_2 = p2.obs_to_torch(opponent_obs.to(p2.device))
+                    obs_2 = p2.obs_to_torch(opponent_obs)
                     # agent stepping
-                    
-                    actions_p1 = p1.get_action(obs_1, is_deterministic=True)
-                    actions_p2 = -p2.get_action(obs_2, is_deterministic=True)
+                    actions = p1.get_action(obs_1, is_deterministic=True)
+                    actions[:, 2:] = -p2.get_action(obs_2, is_deterministic=True)[:, :2]
                     # env stepping
-
-                    obs, rew, dones, info = env.step(torch.cat([actions_p1.to(rl_device), actions_p2.to(rl_device)], dim=1))
+                    obs, rew, dones, info = env.step(actions)
                     # perform operations for terminated episodes
                     if len(dones) > 0:
                         num_games += dones.sum()
@@ -240,55 +221,24 @@ def main():
                     if timestep == args_cli.video_length:
                         break
             
-            
-            update_elo(p1, p2, average_score_1 / num_games, average_score_2 / num_games)                
-        player_elos.append([p.elo for p in players])
-        
+            update_elo(p1, p2, average_score_1 / num_games, average_score_2 / num_games)
+            player_elos.append([p.elo for p in players])
         
         print(f"Round {i} completed. ELO scores:")
         for p in players:
             print(f"{p.name}: {p.elo}")
-            if args_cli.elo_thresehold is not None and p.elo > args_cli.elo_thresehold:
-                if p.name != "agent_1": #this is the benchmark agent
-                    agent_dir = Path(args_cli.dir) / f"agent_{args_cli.run_number}"
-                    agent_dir.mkdir(parents=True, exist_ok=True)
-                    
-                    # Save checkpoint and config (replace with actual saving logic if needed)
-                    shutil.copy(p.checkpoint, agent_dir / "player_checkpoint.pth")
-                    shutil.copy(p.config, agent_dir / "player_config.yaml")
-                    break
 
     # Plot ELO scores:
     player_elos = np.array(player_elos)
-    max_elo = player_elos.max()
-    max_index = player_elos.argmax()
-    print("Players elo scores: ", player_elos)
-    print(f"Agent {max_index+1} has achieved the best elo score of: {max_elo}")
-
-
-    if args_cli.elo_thresehold is None:
-        source_path = Path(args_cli.checkpoints[i])
-        dest_path = source_path.parent.parent.parent / "best_agent"  # go two levels up (to agent_X folder)
-        for filename in os.listdir(dest_path):
-            file_path = os.path.join(dest_path, filename)
-            if os.path.isfile(file_path):
-                os.remove(file_path)
-
-        shutil.copyfile(source_path, dest_path / f"best_agent({max_index+1})_number_{args_cli.run_number}.pth")
-    
-
-  
-
-        
-    #kwargs = {p.name: player_elos[:, i] for i, p in enumerate(players)}
-    #np.savez(os.path.join(log_root_path, log_dir, "elos.npz"), **kwargs)
-    #for i, p in enumerate(players):
-    #    plt.plot(player_elos[:, i], label=p.name)
-    #plt.xlabel("game")
-    #plt.ylabel("ELO")
-    #plt.legend()
-    #plt.grid()
-    #plt.show()
+    kwargs = {p.name: player_elos[:, i] for i, p in enumerate(players)}
+    np.savez(os.path.join(log_root_path, log_dir, "elos.npz"), **kwargs)
+    for i, p in enumerate(players):
+        plt.plot(player_elos[:, i], label=p.name)
+    plt.xlabel("game")
+    plt.ylabel("ELO")
+    plt.legend()
+    plt.grid()
+    plt.show()
 
     # close the simulator
     env.close()
@@ -300,10 +250,3 @@ if __name__ == "__main__":
     main()
     # close sim app
     simulation_app.close()
-
-
-
-###DEGUB CONSOLE:
-
-#'Episode_Termination/time_out': 0, 'Episode_Termination/goal_scored': 0, 'Episode_Termination/goal_conceded': 0, 'Episode_Termination/player_in_goal': 0, 'Episode_Termination/opponent_in_goal': 2}}
-# BUT dones.sum() = tensor(0, device='cuda:0')

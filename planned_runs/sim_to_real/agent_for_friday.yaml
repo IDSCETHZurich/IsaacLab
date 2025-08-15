@@ -39,11 +39,11 @@ params:
       regularizer:
         name: None
 
-  load_checkpoint: True # flag which sets whether to load the checkpoint
-  load_path: 'logs/rl_games/klask/training_from_checkpoint/nn/klask.pth' # path to the checkpoint to load
+  load_checkpoint: False # flag which sets whether to load the checkpoint
+  load_path: 'logs/rl_games/klask/tuning/nn/klask.pth' # path to the checkpoint to load
 
   config:
-    full_experiment_name: agent_for_friday
+    full_experiment_name: odrive_new_estimator
     name: klask
     env_name: rlgpu
     device: 'cuda:0'
@@ -59,7 +59,7 @@ params:
     normalize_advantage: False
     gamma: 0.99
     tau : 0.95
-    learning_rate: 3e-4
+    learning_rate: 5e-4
     lr_schedule: adaptive
     kl_threshold: 0.008
     #score_to_win: 20000
@@ -72,12 +72,12 @@ params:
     truncate_grads: True
     e_clip: 0.2
     horizon_length: 128 #this is ca 3 s of play time at 50 Hz which should capture most things
-    minibatch_size: 4096
+    minibatch_size: 128
     mini_epochs: 8 #long horizon puts com overhead on algorithm, therefore you might as well simulate with fresh date more often
     critic_coef: 4
     clip_value: True
-    seq_length: 32
-    bounds_loss_coef: 0.000001
+    seq_length: 64
+    bounds_loss_coef: 0.00000001
     self_play: True
     games_to_track: 100
     self_play_config:
@@ -92,19 +92,20 @@ env:
   collision_avoidance: False
 
 rewards:
-  time_punishment: !!float 0.0
-  player_in_goal: !!float -5.0
-  opponent_in_goal: !!float 25.0
-  goal_scored: !!float 25.0
-  goal_conceded: !!float -5.0
-  distance_ball_opponent_goal: !!float 0.0
-  ball_speed: !!float 0.0
+  time_punishment: !!float 0.00
+  shot_over_middle_line: !!float 4.3 #13.33
+  player_in_goal: !!float -3.00
+  opponent_in_goal: !!float 0.0
+  goal_scored: !!float 20.0
+  goal_conceded: !!float -15.0
   distance_player_ball_own_half: !!float 0.000
-  ball_stationary: !!float -0.00
-  collision_player_ball: 0.0
+  distance_ball_opponent_goal: !!float 0.0033 #0.0066
+  ball_speed: !!float 0.00
+  ball_stationary: !!float -0.0025 #-0.002
+  collision_player_ball: !!float 0.1 #0.607
   ball_in_own_half: !!float 0.00
-  close_to_boundaries: !!float -0.0
-
+  close_to_boundaries: !!float -0.0115 #-0.001
+  player_strategically_positioned: !!float 0.092 #0.008
 
 terminations:
   time_out: True

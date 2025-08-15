@@ -1,46 +1,55 @@
 params:
-  seed: 3
+  seed: 1
+
+  # environment wrapper clipping
   env:
+    # added to the wrapper
     clip_observations: 10.0
+    # can make custom wrapper?
     clip_actions: 0.2
+
   algo:
     name: a2c_continuous
+
   model:
     name: continuous_a2c_logstd
+
+  # doesn't have this fine grained control but made it close
   network:
     name: actor_critic
-    separate: false
+    separate: False
     space:
       continuous:
         mu_activation: None
         sigma_activation: None
+
         mu_init:
           name: default
         sigma_init:
           name: const_initializer
           val: 0
-        fixed_sigma: true
+        fixed_sigma: True
     mlp:
-      units:
-      - 256
-      - 128
-      - 64
+      units: [256, 128, 64]
       activation: elu
-      d2rl: false
+      d2rl: False
+
       initializer:
         name: default
       regularizer:
         name: None
-  load_checkpoint: true
-  load_path: /home/student/klask_rl/IsaacLab/logs/rl_games/klask/pretrained_agent_action_1.0/nn/last_klask_ep_35_rew_3.9405801.pth
+
+  load_checkpoint: False # flag which sets whether to load the checkpoint
+  load_path: '' # path to the checkpoint to load
+
   config:
-    full_experiment_name: training_curriculum/agent_3
+    full_experiment_name: training_curriculum/agent_1
     name: klask
     env_name: rlgpu
-    device: cuda:2
-    device_name: cuda:2
-    multi_gpu: false
-    ppo: true
+    device: 'cuda:0'
+    device_name: 'cuda:0'
+    multi_gpu: False
+    ppo: True
     mixed_precision: true
     normalize_input: true
     normalize_value: true
@@ -68,7 +77,7 @@ params:
     clip_value: true
     seq_length: 128
     bounds_loss_coef: 1.0e-07
-    self_play: true
+    self_play: True
     games_to_track: 4096
     self_play_config:
       check_scores: true
@@ -78,19 +87,19 @@ params:
     train_dir: /home/student/klask_rl/IsaacLab/logs/rl_games/klask
 env:
   obs_noise: 0.0
-  actuator_model: true
+  actuator_model: True
   collision_avoidance: false
 rewards:
   time_punishment: -0.0
-  time_out_punishment: 0.0
+  time_out_punishment: -0.5
   shot_over_middle_line: 0.0
   player_in_goal: -3.0
   opponent_in_goal: 0.0
   goal_scored: 5.0
   goal_conceded: -3.0
   distance_player_ball_own_half: 0.0
-  distance_ball_opponent_goal: 10.1
-  distance_ball_own_goal: -10.1
+  distance_ball_opponent_goal: 1.1
+  distance_ball_own_goal: -1.1
   ball_speed: 0.0
   ball_stationary: -0.01
   collision_player_ball: 0.5

@@ -43,7 +43,8 @@ for i, cfg in enumerate(configs):
         "--checkpoint", checkpoint[i],
         "--wandb-project-name", f"Training_curriculum_agent_{i+1}",
         "--training_curriculum", "--mode", str(MODE),
-        "--project_folder", str(project_folder / f"agent_{i+1}/nn")
+        "--project_folder", str(project_folder / f"agent_{i+1}/nn"),
+
     ]
 
     # Start process without redirecting output

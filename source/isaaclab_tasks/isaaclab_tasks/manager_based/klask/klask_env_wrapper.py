@@ -92,8 +92,8 @@ class CurriculumWrapper(Wrapper):
             
                 if self.dynamic and not (term == 'ball_stationary' or term =='time_out_punishment' or term =='time_punishment' or term =='goal_scored' or term =='goal_conceded' or term == 'opponent_in_goal' or term =='player_in_goal'):
                     term_idx = self.env.unwrapped.reward_manager.active_terms.index(term)
-                    self.env.unwrapped.reward_manager._term_cfgs[term_idx].weight = weight*(torch.exp(-torch.tensor(self._step/5000000,device=self.env.unwrapped.device,dtype=torch.float32))) #coeff chosen sucht that half the max reward at 20 mio steps
-                    if self._step>15_000_000:
+                    self.env.unwrapped.reward_manager._term_cfgs[term_idx].weight = weight*(torch.exp(-torch.tensor(self._step/10000000,device=self.env.unwrapped.device,dtype=torch.float32))) #coeff chosen sucht that half the max reward at 20 mio steps
+                    if self._step>20_000_000:
                         self.env.unwrapped.reward_manager._term_cfgs[term_idx].weight = torch.tensor(0.0,device=self.env.unwrapped.device,dtype=torch.float32)
 
         return self.env.step(actions)
