@@ -62,13 +62,13 @@ params:
     truncate_grads: true
     e_clip: 0.2
     horizon_length: 128
-    minibatch_size: 4096
+    minibatch_size: 32
     mini_epochs: 8
     critic_coef: 2.0
     clip_value: true
     seq_length: 128
     bounds_loss_coef: 1.0e-07
-    self_play: true
+    self_play: false
     games_to_track: 4096
     self_play_config:
       check_scores: true

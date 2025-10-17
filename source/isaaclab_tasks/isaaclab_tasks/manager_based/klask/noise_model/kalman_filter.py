@@ -1,6 +1,8 @@
 import torch
 from isaaclab.envs import ManagerBasedRLEnv
 from isaaclab.managers import ManagerTermBase, ObservationTermCfg, SceneEntityCfg
+from isaaclab.markers import VisualizationMarkers
+from isaaclab.markers.config import RAY_CASTER_MARKER_CFG
 
 from ..utils_manager_based import body_xy_pos_w, root_lin_xy_vel_w, root_xy_pos_w
 
@@ -45,6 +47,9 @@ class KalmanFilter(ManagerTermBase):
         P = torch.eye(4, device=env.device)
         self.P = P.unsqueeze(0).repeat(env.num_envs, 1, 1)
 
+        self.visualizer = VisualizationMarkers(RAY_CASTER_MARKER_CFG)
+        self.visualizer.set_visibility(True)
+
     def __call__(
         self,
         env: ManagerBasedRLEnv,
@@ -63,16 +68,17 @@ class KalmanFilter(ManagerTermBase):
         ball_state = torch.cat([ball_pos, ball_vel], dim=1)
         peg_1_pos = body_xy_pos_w(env, asset_cfg=peg_1)
         peg_2_pos = body_xy_pos_w(env, asset_cfg=peg_2)
-        x_collision, y_collision = self.check_collision(
+        x_collision, y_collision = self._check_collision(
             ball_state, x_limits, y_limits, distance, peg_1_pos, peg_2_pos
         )
-        self.predict(x_collision, y_collision)
-        self.update(ball_state)
+        self._predict(x_collision, y_collision)
+        self._update(ball_state)
         print(f"True ball state: {ball_pos[0]}, {ball_vel[0]}")
         print(f"Estimated ball state: {self.ball_state[0]}")
+        self._debug_vis_callback()
         return self.ball_state
 
-    def check_collision(
+    def _check_collision(
         self,
         ball_state: torch.Tensor,
         x_limits: tuple[float, float],
@@ -92,7 +98,7 @@ class KalmanFilter(ManagerTermBase):
 
         return x_collision, y_collision
 
-    def predict(self, x_collision: torch.Tensor, y_collision: torch.Tensor):
+    def _predict(self, x_collision: torch.Tensor, y_collision: torch.Tensor):
         Q = self.Q.repeat(self._env.num_envs, 1, 1)
         Q[x_collision] += torch.diag(
             torch.tensor([4.0, 0.0, 10000.0, 0.0], device=Q.device)
@@ -104,7 +110,7 @@ class KalmanFilter(ManagerTermBase):
         self.ball_state = (self.F @ self.ball_state.unsqueeze(-1)).squeeze(-1)
         self.P = self.F @ self.P @ self.F.T + Q
 
-    def update(self, ball_state: torch.Tensor):
+    def _update(self, ball_state: torch.Tensor):
         pos_error = ball_state[:, :2] - (
             self.H @ self.ball_state.unsqueeze(-1)
         ).squeeze(-1)
@@ -112,3 +118,13 @@ class KalmanFilter(ManagerTermBase):
         K = self.P @ self.H.T @ torch.linalg.inv(S)
         self.ball_state = self.ball_state + (K @ pos_error.unsqueeze(-1)).squeeze(-1)
         self.P = (torch.eye(4, device=ball_state.device) - K @ self.H) @ self.P
+
+    def _debug_vis_callback(self):
+        marker_pos = torch.cat(
+            [
+                self.ball_state[:, :2],
+                0.1 * torch.ones(self._env.num_envs, 1, device=self._env.device),
+            ],
+            dim=1,
+        )
+        self.visualizer.visualize(marker_pos + self._env.scene.env_origins)
