@@ -16,8 +16,12 @@ import argparse
 from isaaclab.app import AppLauncher
 
 # add argparse arguments
-parser = argparse.ArgumentParser(description="Tutorial on creating a cartpole base environment.")
-parser.add_argument("--num_envs", type=int, default=16, help="Number of environments to spawn.")
+parser = argparse.ArgumentParser(
+    description="Tutorial on creating a cartpole base environment."
+)
+parser.add_argument(
+    "--num_envs", type=int, default=16, help="Number of environments to spawn."
+)
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
@@ -31,24 +35,27 @@ simulation_app = app_launcher.app
 """Rest everything follows."""
 
 import math
-import torch
 
 import isaaclab.envs.mdp as mdp
+import torch
 from isaaclab.envs import ManagerBasedEnv, ManagerBasedEnvCfg
-from isaaclab.managers import EventTermCfg as EventTerm
-from isaaclab.managers import ObservationGroupCfg as ObsGroup
-from isaaclab.managers import ObservationTermCfg as ObsTerm
+from isaaclab.managers import EventTermCfg as EventTermCfg
+from isaaclab.managers import ObservationGroupCfg as ObservationGroupCfg
+from isaaclab.managers import ObservationTermCfg as ObservationTermCfg
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
-
-from isaaclab_tasks.manager_based.classic.cartpole.cartpole_env_cfg import CartpoleSceneCfg
+from isaaclab_tasks.manager_based.classic.cartpole.cartpole_env_cfg import (
+    CartpoleSceneCfg,
+)
 
 
 @configclass
 class ActionsCfg:
     """Action specifications for the environment."""
 
-    joint_efforts = mdp.JointEffortActionCfg(asset_name="robot", joint_names=["slider_to_cart"], scale=5.0)
+    joint_efforts = mdp.JointEffortActionCfg(
+        asset_name="robot", joint_names=["slider_to_cart"], scale=5.0
+    )
 
 
 @configclass
@@ -56,12 +63,12 @@ class ObservationsCfg:
     """Observation specifications for the environment."""
 
     @configclass
-    class PolicyCfg(ObsGroup):
+    class PolicyCfg(ObservationGroupCfg):
         """Observations for policy group."""
 
         # observation terms (order preserved)
-        joint_pos_rel = ObsTerm(func=mdp.joint_pos_rel)
-        joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel)
+        joint_pos_rel = ObservationTermCfg(func=mdp.joint_pos_rel)
+        joint_vel_rel = ObservationTermCfg(func=mdp.joint_vel_rel)
 
         def __post_init__(self) -> None:
             self.enable_corruption = False
@@ -76,7 +83,7 @@ class EventCfg:
     """Configuration for events."""
 
     # on startup
-    add_pole_mass = EventTerm(
+    add_pole_mass = EventTermCfg(
         func=mdp.randomize_rigid_body_mass,
         mode="startup",
         params={
@@ -87,7 +94,7 @@ class EventCfg:
     )
 
     # on reset
-    reset_cart_position = EventTerm(
+    reset_cart_position = EventTermCfg(
         func=mdp.reset_joints_by_offset,
         mode="reset",
         params={
@@ -97,7 +104,7 @@ class EventCfg:
         },
     )
 
-    reset_pole_position = EventTerm(
+    reset_pole_position = EventTermCfg(
         func=mdp.reset_joints_by_offset,
         mode="reset",
         params={

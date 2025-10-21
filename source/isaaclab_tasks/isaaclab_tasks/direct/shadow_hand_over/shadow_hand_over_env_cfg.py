@@ -4,19 +4,18 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 
-from isaaclab_assets.robots.shadow_hand import SHADOW_HAND_CFG
-
 import isaaclab.envs.mdp as mdp
 import isaaclab.sim as sim_utils
 from isaaclab.assets import ArticulationCfg, RigidObjectCfg
 from isaaclab.envs import DirectMARLEnvCfg
-from isaaclab.managers import EventTermCfg as EventTerm
+from isaaclab.managers import EventTermCfg as EventTermCfg
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.markers import VisualizationMarkersCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sim import PhysxCfg, SimulationCfg
 from isaaclab.sim.spawners.materials.physics_materials_cfg import RigidBodyMaterialCfg
 from isaaclab.utils import configclass
+from isaaclab_assets.robots.shadow_hand import SHADOW_HAND_CFG
 
 
 @configclass
@@ -24,7 +23,7 @@ class EventCfg:
     """Configuration for randomization."""
 
     # -- robot
-    robot_physics_material = EventTerm(
+    robot_physics_material = EventTermCfg(
         func=mdp.randomize_rigid_body_material,
         mode="reset",
         min_step_count_between_reset=720,
@@ -36,7 +35,7 @@ class EventCfg:
             "num_buckets": 250,
         },
     )
-    robot_joint_stiffness_and_damping = EventTerm(
+    robot_joint_stiffness_and_damping = EventTermCfg(
         func=mdp.randomize_actuator_gains,
         min_step_count_between_reset=720,
         mode="reset",
@@ -48,7 +47,7 @@ class EventCfg:
             "distribution": "log_uniform",
         },
     )
-    robot_joint_limits = EventTerm(
+    robot_joint_limits = EventTermCfg(
         func=mdp.randomize_joint_parameters,
         min_step_count_between_reset=720,
         mode="reset",
@@ -60,7 +59,7 @@ class EventCfg:
             "distribution": "gaussian",
         },
     )
-    robot_tendon_properties = EventTerm(
+    robot_tendon_properties = EventTermCfg(
         func=mdp.randomize_fixed_tendon_parameters,
         min_step_count_between_reset=720,
         mode="reset",
@@ -74,7 +73,7 @@ class EventCfg:
     )
 
     # -- object
-    object_physics_material = EventTerm(
+    object_physics_material = EventTermCfg(
         func=mdp.randomize_rigid_body_material,
         min_step_count_between_reset=720,
         mode="reset",
@@ -86,7 +85,7 @@ class EventCfg:
             "num_buckets": 250,
         },
     )
-    object_scale_mass = EventTerm(
+    object_scale_mass = EventTermCfg(
         func=mdp.randomize_rigid_body_mass,
         min_step_count_between_reset=720,
         mode="reset",
@@ -99,7 +98,7 @@ class EventCfg:
     )
 
     # -- scene
-    reset_gravity = EventTerm(
+    reset_gravity = EventTermCfg(
         func=mdp.randomize_physics_scene_gravity,
         mode="interval",
         is_global_time=True,
@@ -135,14 +134,18 @@ class ShadowHandOverEnvCfg(DirectMARLEnvCfg):
         ),
     )
     # robot
-    right_robot_cfg: ArticulationCfg = SHADOW_HAND_CFG.replace(prim_path="/World/envs/env_.*/RightRobot").replace(
+    right_robot_cfg: ArticulationCfg = SHADOW_HAND_CFG.replace(
+        prim_path="/World/envs/env_.*/RightRobot"
+    ).replace(
         init_state=ArticulationCfg.InitialStateCfg(
             pos=(0.0, 0.0, 0.5),
             rot=(1.0, 0.0, 0.0, 0.0),
             joint_pos={".*": 0.0},
         )
     )
-    left_robot_cfg: ArticulationCfg = SHADOW_HAND_CFG.replace(prim_path="/World/envs/env_.*/LeftRobot").replace(
+    left_robot_cfg: ArticulationCfg = SHADOW_HAND_CFG.replace(
+        prim_path="/World/envs/env_.*/LeftRobot"
+    ).replace(
         init_state=ArticulationCfg.InitialStateCfg(
             pos=(0.0, -1.0, 0.5),
             rot=(0.0, 0.0, 0.0, 1.0),
@@ -199,7 +202,9 @@ class ShadowHandOverEnvCfg(DirectMARLEnvCfg):
             collision_props=sim_utils.CollisionPropertiesCfg(),
             mass_props=sim_utils.MassPropertiesCfg(density=500.0),
         ),
-        init_state=RigidObjectCfg.InitialStateCfg(pos=(0.0, -0.39, 0.54), rot=(1.0, 0.0, 0.0, 0.0)),
+        init_state=RigidObjectCfg.InitialStateCfg(
+            pos=(0.0, -0.39, 0.54), rot=(1.0, 0.0, 0.0, 0.0)
+        ),
     )
     # goal object
     goal_object_cfg: VisualizationMarkersCfg = VisualizationMarkersCfg(
@@ -207,12 +212,16 @@ class ShadowHandOverEnvCfg(DirectMARLEnvCfg):
         markers={
             "goal": sim_utils.SphereCfg(
                 radius=0.0335,
-                visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.4, 0.3, 1.0)),
+                visual_material=sim_utils.PreviewSurfaceCfg(
+                    diffuse_color=(0.4, 0.3, 1.0)
+                ),
             ),
         },
     )
     # scene
-    scene: InteractiveSceneCfg = InteractiveSceneCfg(num_envs=2048, env_spacing=1.5, replicate_physics=True)
+    scene: InteractiveSceneCfg = InteractiveSceneCfg(
+        num_envs=2048, env_spacing=1.5, replicate_physics=True
+    )
 
     # reset
     reset_position_noise = 0.01  # range of position at reset

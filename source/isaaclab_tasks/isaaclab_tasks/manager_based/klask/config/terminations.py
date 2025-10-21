@@ -1,0 +1,45 @@
+import isaaclab.envs.mdp as mdp
+from isaaclab.managers import SceneEntityCfg, TerminationTermCfg
+from isaaclab.utils import configclass
+from isaaclab_assets.robots.klask import KLASK_PARAMS
+
+from ..utils_manager_based import ball_in_goal, in_goal
+
+
+@configclass
+class TerminationsCfg:
+    time_out = TerminationTermCfg(func=mdp.time_out, time_out=True)
+
+    goal_scored = TerminationTermCfg(
+        func=ball_in_goal,
+        params={
+            "asset_cfg": SceneEntityCfg("ball"),
+            "goal": KLASK_PARAMS["opponent_goal"],
+            "max_ball_vel": KLASK_PARAMS["max_ball_vel"],
+        },
+    )
+
+    goal_conceded = TerminationTermCfg(
+        func=ball_in_goal,
+        params={
+            "asset_cfg": SceneEntityCfg("ball"),
+            "goal": KLASK_PARAMS["player_goal"],
+            "max_ball_vel": KLASK_PARAMS["max_ball_vel"],
+        },
+    )
+
+    player_in_goal = TerminationTermCfg(
+        func=in_goal,
+        params={
+            "asset_cfg": SceneEntityCfg("klask", body_names=["Peg_1"]),
+            "goal": KLASK_PARAMS["player_goal"],
+        },
+    )
+
+    opponent_in_goal = TerminationTermCfg(
+        func=in_goal,
+        params={
+            "asset_cfg": SceneEntityCfg("klask", body_names=["Peg_2"]),
+            "goal": KLASK_PARAMS["opponent_goal"],
+        },
+    )

@@ -3,12 +3,15 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-from isaaclab.managers import RewardTermCfg as RewTerm
+from isaaclab.managers import RewardTermCfg as RewardTermCfg
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 
 import isaaclab_tasks.manager_based.locomotion.velocity.mdp as mdp
-from isaaclab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg, RewardsCfg
+from isaaclab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import (
+    LocomotionVelocityRoughEnvCfg,
+    RewardsCfg,
+)
 
 ##
 # Pre-defined configs
@@ -18,8 +21,8 @@ from isaaclab_assets.robots.cassie import CASSIE_CFG  # isort: skip
 
 @configclass
 class CassieRewardsCfg(RewardsCfg):
-    termination_penalty = RewTerm(func=mdp.is_terminated, weight=-200.0)
-    feet_air_time = RewTerm(
+    termination_penalty = RewardTermCfg(func=mdp.is_terminated, weight=-200.0)
+    feet_air_time = RewardTermCfg(
         func=mdp.feet_air_time_positive_biped,
         weight=2.5,
         params={
@@ -28,18 +31,22 @@ class CassieRewardsCfg(RewardsCfg):
             "threshold": 0.3,
         },
     )
-    joint_deviation_hip = RewTerm(
+    joint_deviation_hip = RewardTermCfg(
         func=mdp.joint_deviation_l1,
         weight=-0.2,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["hip_abduction_.*", "hip_rotation_.*"])},
+        params={
+            "asset_cfg": SceneEntityCfg(
+                "robot", joint_names=["hip_abduction_.*", "hip_rotation_.*"]
+            )
+        },
     )
-    joint_deviation_toes = RewTerm(
+    joint_deviation_toes = RewardTermCfg(
         func=mdp.joint_deviation_l1,
         weight=-0.2,
         params={"asset_cfg": SceneEntityCfg("robot", joint_names=["toe_joint_.*"])},
     )
     # penalize toe joint limits
-    dof_pos_limits = RewTerm(
+    dof_pos_limits = RewardTermCfg(
         func=mdp.joint_pos_limits,
         weight=-1.0,
         params={"asset_cfg": SceneEntityCfg("robot", joint_names="toe_joint_.*")},
@@ -65,7 +72,9 @@ class CassieRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.events.push_robot = None
         self.events.add_base_mass = None
         self.events.reset_robot_joints.params["position_range"] = (1.0, 1.0)
-        self.events.base_external_force_torque.params["asset_cfg"].body_names = [".*pelvis"]
+        self.events.base_external_force_torque.params["asset_cfg"].body_names = [
+            ".*pelvis"
+        ]
         self.events.reset_base.params = {
             "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "yaw": (-3.14, 3.14)},
             "velocity_range": {

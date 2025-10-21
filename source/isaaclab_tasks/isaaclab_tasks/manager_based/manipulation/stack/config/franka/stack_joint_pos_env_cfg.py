@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 from isaaclab.assets import RigidObjectCfg
-from isaaclab.managers import EventTermCfg as EventTerm
+from isaaclab.managers import EventTermCfg as EventTermCfg
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.sensors import FrameTransformerCfg
 from isaaclab.sensors.frame_transformer.frame_transformer_cfg import OffsetCfg
@@ -28,15 +28,25 @@ from isaaclab_assets.robots.franka import FRANKA_PANDA_CFG  # isort: skip
 class EventCfg:
     """Configuration for events."""
 
-    init_franka_arm_pose = EventTerm(
+    init_franka_arm_pose = EventTermCfg(
         func=franka_stack_events.set_default_joint_pose,
         mode="startup",
         params={
-            "default_pose": [0.0444, -0.1894, -0.1107, -2.5148, 0.0044, 2.3775, 0.6952, 0.0400, 0.0400],
+            "default_pose": [
+                0.0444,
+                -0.1894,
+                -0.1107,
+                -2.5148,
+                0.0044,
+                2.3775,
+                0.6952,
+                0.0400,
+                0.0400,
+            ],
         },
     )
 
-    randomize_franka_joint_state = EventTerm(
+    randomize_franka_joint_state = EventTermCfg(
         func=franka_stack_events.randomize_joint_by_gaussian_offset,
         mode="reset",
         params={
@@ -46,13 +56,22 @@ class EventCfg:
         },
     )
 
-    randomize_cube_positions = EventTerm(
+    randomize_cube_positions = EventTermCfg(
         func=franka_stack_events.randomize_object_pose,
         mode="reset",
         params={
-            "pose_range": {"x": (0.4, 0.6), "y": (-0.10, 0.10), "z": (0.0203, 0.0203), "yaw": (-1.0, 1, 0)},
+            "pose_range": {
+                "x": (0.4, 0.6),
+                "y": (-0.10, 0.10),
+                "z": (0.0203, 0.0203),
+                "yaw": (-1.0, 1, 0),
+            },
             "min_separation": 0.1,
-            "asset_cfgs": [SceneEntityCfg("cube_1"), SceneEntityCfg("cube_2"), SceneEntityCfg("cube_3")],
+            "asset_cfgs": [
+                SceneEntityCfg("cube_1"),
+                SceneEntityCfg("cube_2"),
+                SceneEntityCfg("cube_3"),
+            ],
         },
     )
 
@@ -71,7 +90,10 @@ class FrankaCubeStackEnvCfg(StackEnvCfg):
 
         # Set actions for the specific robot type (franka)
         self.actions.arm_action = mdp.JointPositionActionCfg(
-            asset_name="robot", joint_names=["panda_joint.*"], scale=0.5, use_default_offset=True
+            asset_name="robot",
+            joint_names=["panda_joint.*"],
+            scale=0.5,
+            use_default_offset=True,
         )
         self.actions.gripper_action = mdp.BinaryJointPositionActionCfg(
             asset_name="robot",
@@ -93,7 +115,9 @@ class FrankaCubeStackEnvCfg(StackEnvCfg):
         # Set each stacking cube deterministically
         self.scene.cube_1 = RigidObjectCfg(
             prim_path="{ENV_REGEX_NS}/Cube_1",
-            init_state=RigidObjectCfg.InitialStateCfg(pos=[0.4, 0.0, 0.0203], rot=[1, 0, 0, 0]),
+            init_state=RigidObjectCfg.InitialStateCfg(
+                pos=[0.4, 0.0, 0.0203], rot=[1, 0, 0, 0]
+            ),
             spawn=UsdFileCfg(
                 usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/blue_block.usd",
                 scale=(1.0, 1.0, 1.0),
@@ -102,7 +126,9 @@ class FrankaCubeStackEnvCfg(StackEnvCfg):
         )
         self.scene.cube_2 = RigidObjectCfg(
             prim_path="{ENV_REGEX_NS}/Cube_2",
-            init_state=RigidObjectCfg.InitialStateCfg(pos=[0.55, 0.05, 0.0203], rot=[1, 0, 0, 0]),
+            init_state=RigidObjectCfg.InitialStateCfg(
+                pos=[0.55, 0.05, 0.0203], rot=[1, 0, 0, 0]
+            ),
             spawn=UsdFileCfg(
                 usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/red_block.usd",
                 scale=(1.0, 1.0, 1.0),
@@ -111,7 +137,9 @@ class FrankaCubeStackEnvCfg(StackEnvCfg):
         )
         self.scene.cube_3 = RigidObjectCfg(
             prim_path="{ENV_REGEX_NS}/Cube_3",
-            init_state=RigidObjectCfg.InitialStateCfg(pos=[0.60, -0.1, 0.0203], rot=[1, 0, 0, 0]),
+            init_state=RigidObjectCfg.InitialStateCfg(
+                pos=[0.60, -0.1, 0.0203], rot=[1, 0, 0, 0]
+            ),
             spawn=UsdFileCfg(
                 usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/green_block.usd",
                 scale=(1.0, 1.0, 1.0),

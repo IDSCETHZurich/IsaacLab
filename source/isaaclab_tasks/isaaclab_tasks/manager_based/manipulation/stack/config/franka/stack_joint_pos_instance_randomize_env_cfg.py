@@ -3,11 +3,10 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-import torch
-
 import isaaclab.sim as sim_utils
+import torch
 from isaaclab.assets import RigidObjectCfg, RigidObjectCollectionCfg
-from isaaclab.managers import EventTermCfg as EventTerm
+from isaaclab.managers import EventTermCfg as EventTermCfg
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.sensors import CameraCfg, FrameTransformerCfg
 from isaaclab.sensors.frame_transformer.frame_transformer_cfg import OffsetCfg
@@ -33,15 +32,25 @@ from isaaclab_assets.robots.franka import FRANKA_PANDA_CFG  # isort: skip
 class EventCfg:
     """Configuration for events."""
 
-    init_franka_arm_pose = EventTerm(
+    init_franka_arm_pose = EventTermCfg(
         func=franka_stack_events.set_default_joint_pose,
         mode="startup",
         params={
-            "default_pose": [0.0444, -0.1894, -0.1107, -2.5148, 0.0044, 2.3775, 0.6952, 0.0400, 0.0400],
+            "default_pose": [
+                0.0444,
+                -0.1894,
+                -0.1107,
+                -2.5148,
+                0.0044,
+                2.3775,
+                0.6952,
+                0.0400,
+                0.0400,
+            ],
         },
     )
 
-    randomize_franka_joint_state = EventTerm(
+    randomize_franka_joint_state = EventTermCfg(
         func=franka_stack_events.randomize_joint_by_gaussian_offset,
         mode="reset",
         params={
@@ -51,13 +60,24 @@ class EventCfg:
         },
     )
 
-    randomize_cubes_in_focus = EventTerm(
+    randomize_cubes_in_focus = EventTermCfg(
         func=franka_stack_events.randomize_rigid_objects_in_focus,
         mode="reset",
         params={
-            "asset_cfgs": [SceneEntityCfg("cube_1"), SceneEntityCfg("cube_2"), SceneEntityCfg("cube_3")],
-            "out_focus_state": torch.tensor([10.0, 10.0, 10.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
-            "pose_range": {"x": (0.4, 0.6), "y": (-0.10, 0.10), "z": (0.0203, 0.0203), "yaw": (-1.0, 1, 0)},
+            "asset_cfgs": [
+                SceneEntityCfg("cube_1"),
+                SceneEntityCfg("cube_2"),
+                SceneEntityCfg("cube_3"),
+            ],
+            "out_focus_state": torch.tensor(
+                [10.0, 10.0, 10.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            ),
+            "pose_range": {
+                "x": (0.4, 0.6),
+                "y": (-0.10, 0.10),
+                "z": (0.0203, 0.0203),
+                "yaw": (-1.0, 1, 0),
+            },
             "min_separation": 0.1,
         },
     )
@@ -77,7 +97,10 @@ class FrankaCubeStackInstanceRandomizeEnvCfg(StackInstanceRandomizeEnvCfg):
 
         # Set actions for the specific robot type (franka)
         self.actions.arm_action = mdp.JointPositionActionCfg(
-            asset_name="robot", joint_names=["panda_joint.*"], scale=0.5, use_default_offset=True
+            asset_name="robot",
+            joint_names=["panda_joint.*"],
+            scale=0.5,
+            use_default_offset=True,
         )
         self.actions.gripper_action = mdp.BinaryJointPositionActionCfg(
             asset_name="robot",
@@ -100,7 +123,9 @@ class FrankaCubeStackInstanceRandomizeEnvCfg(StackInstanceRandomizeEnvCfg):
         cube_1_config_dict = {
             "blue_cube": RigidObjectCfg(
                 prim_path="{ENV_REGEX_NS}/Cube_1_Blue",
-                init_state=RigidObjectCfg.InitialStateCfg(pos=[0.4, 0.0, 0.0203], rot=[1, 0, 0, 0]),
+                init_state=RigidObjectCfg.InitialStateCfg(
+                    pos=[0.4, 0.0, 0.0203], rot=[1, 0, 0, 0]
+                ),
                 spawn=UsdFileCfg(
                     usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/blue_block.usd",
                     scale=(1.0, 1.0, 1.0),
@@ -109,7 +134,9 @@ class FrankaCubeStackInstanceRandomizeEnvCfg(StackInstanceRandomizeEnvCfg):
             ),
             "red_cube": RigidObjectCfg(
                 prim_path="{ENV_REGEX_NS}/Cube_1_Red",
-                init_state=RigidObjectCfg.InitialStateCfg(pos=[0.4, 0.0, 0.0403], rot=[1, 0, 0, 0]),
+                init_state=RigidObjectCfg.InitialStateCfg(
+                    pos=[0.4, 0.0, 0.0403], rot=[1, 0, 0, 0]
+                ),
                 spawn=UsdFileCfg(
                     usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/red_block.usd",
                     scale=(1.0, 1.0, 1.0),
@@ -121,7 +148,9 @@ class FrankaCubeStackInstanceRandomizeEnvCfg(StackInstanceRandomizeEnvCfg):
         cube_2_config_dict = {
             "red_cube": RigidObjectCfg(
                 prim_path="{ENV_REGEX_NS}/Cube_2_Red",
-                init_state=RigidObjectCfg.InitialStateCfg(pos=[0.55, 0.05, 0.0203], rot=[1, 0, 0, 0]),
+                init_state=RigidObjectCfg.InitialStateCfg(
+                    pos=[0.55, 0.05, 0.0203], rot=[1, 0, 0, 0]
+                ),
                 spawn=UsdFileCfg(
                     usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/red_block.usd",
                     scale=(1.0, 1.0, 1.0),
@@ -130,7 +159,9 @@ class FrankaCubeStackInstanceRandomizeEnvCfg(StackInstanceRandomizeEnvCfg):
             ),
             "yellow_cube": RigidObjectCfg(
                 prim_path="{ENV_REGEX_NS}/Cube_2_Yellow",
-                init_state=RigidObjectCfg.InitialStateCfg(pos=[0.55, 0.05, 0.0403], rot=[1, 0, 0, 0]),
+                init_state=RigidObjectCfg.InitialStateCfg(
+                    pos=[0.55, 0.05, 0.0403], rot=[1, 0, 0, 0]
+                ),
                 spawn=UsdFileCfg(
                     usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/yellow_block.usd",
                     scale=(1.0, 1.0, 1.0),
@@ -142,7 +173,9 @@ class FrankaCubeStackInstanceRandomizeEnvCfg(StackInstanceRandomizeEnvCfg):
         cube_3_config_dict = {
             "yellow_cube": RigidObjectCfg(
                 prim_path="{ENV_REGEX_NS}/Cube_3_Yellow",
-                init_state=RigidObjectCfg.InitialStateCfg(pos=[0.60, -0.1, 0.0203], rot=[1, 0, 0, 0]),
+                init_state=RigidObjectCfg.InitialStateCfg(
+                    pos=[0.60, -0.1, 0.0203], rot=[1, 0, 0, 0]
+                ),
                 spawn=UsdFileCfg(
                     usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/yellow_block.usd",
                     scale=(1.0, 1.0, 1.0),
@@ -151,7 +184,9 @@ class FrankaCubeStackInstanceRandomizeEnvCfg(StackInstanceRandomizeEnvCfg):
             ),
             "green_cube": RigidObjectCfg(
                 prim_path="{ENV_REGEX_NS}/Cube_2_Green",
-                init_state=RigidObjectCfg.InitialStateCfg(pos=[0.60, -0.1, 0.0403], rot=[1, 0, 0, 0]),
+                init_state=RigidObjectCfg.InitialStateCfg(
+                    pos=[0.60, -0.1, 0.0403], rot=[1, 0, 0, 0]
+                ),
                 spawn=UsdFileCfg(
                     usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/green_block.usd",
                     scale=(1.0, 1.0, 1.0),
@@ -172,9 +207,14 @@ class FrankaCubeStackInstanceRandomizeEnvCfg(StackInstanceRandomizeEnvCfg):
             width=84,
             data_types=["rgb", "distance_to_image_plane"],
             spawn=sim_utils.PinholeCameraCfg(
-                focal_length=24.0, focus_distance=400.0, horizontal_aperture=20.955, clipping_range=(0.1, 1.0e5)
+                focal_length=24.0,
+                focus_distance=400.0,
+                horizontal_aperture=20.955,
+                clipping_range=(0.1, 1.0e5),
             ),
-            offset=CameraCfg.OffsetCfg(pos=(0.025, 0.0, 0.0), rot=(0.707, 0.0, 0.0, 0.707), convention="ros"),
+            offset=CameraCfg.OffsetCfg(
+                pos=(0.025, 0.0, 0.0), rot=(0.707, 0.0, 0.0, 0.707), convention="ros"
+            ),
         )
 
         # Set table view camera
@@ -185,9 +225,16 @@ class FrankaCubeStackInstanceRandomizeEnvCfg(StackInstanceRandomizeEnvCfg):
             width=84,
             data_types=["rgb", "distance_to_image_plane"],
             spawn=sim_utils.PinholeCameraCfg(
-                focal_length=24.0, focus_distance=400.0, horizontal_aperture=20.955, clipping_range=(0.1, 1.0e5)
+                focal_length=24.0,
+                focus_distance=400.0,
+                horizontal_aperture=20.955,
+                clipping_range=(0.1, 1.0e5),
             ),
-            offset=CameraCfg.OffsetCfg(pos=(1.0, 0.0, 0.33), rot=(-0.3799, 0.5963, 0.5963, -0.3799), convention="ros"),
+            offset=CameraCfg.OffsetCfg(
+                pos=(1.0, 0.0, 0.33),
+                rot=(-0.3799, 0.5963, 0.5963, -0.3799),
+                convention="ros",
+            ),
         )
 
         # Listens to the required transforms

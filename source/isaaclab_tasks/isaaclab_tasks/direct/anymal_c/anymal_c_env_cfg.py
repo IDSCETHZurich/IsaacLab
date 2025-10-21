@@ -7,7 +7,7 @@ import isaaclab.envs.mdp as mdp
 import isaaclab.sim as sim_utils
 from isaaclab.assets import ArticulationCfg
 from isaaclab.envs import DirectRLEnvCfg
-from isaaclab.managers import EventTermCfg as EventTerm
+from isaaclab.managers import EventTermCfg as EventTermCfg
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sensors import ContactSensorCfg, RayCasterCfg, patterns
@@ -26,7 +26,7 @@ from isaaclab.terrains.config.rough import ROUGH_TERRAINS_CFG  # isort: skip
 class EventCfg:
     """Configuration for randomization."""
 
-    physics_material = EventTerm(
+    physics_material = EventTermCfg(
         func=mdp.randomize_rigid_body_material,
         mode="startup",
         params={
@@ -38,7 +38,7 @@ class EventCfg:
         },
     )
 
-    add_base_mass = EventTerm(
+    add_base_mass = EventTermCfg(
         func=mdp.randomize_rigid_body_mass,
         mode="startup",
         params={
@@ -87,7 +87,9 @@ class AnymalCFlatEnvCfg(DirectRLEnvCfg):
     )
 
     # scene
-    scene: InteractiveSceneCfg = InteractiveSceneCfg(num_envs=4096, env_spacing=4.0, replicate_physics=True)
+    scene: InteractiveSceneCfg = InteractiveSceneCfg(
+        num_envs=4096, env_spacing=4.0, replicate_physics=True
+    )
 
     # events
     events: EventCfg = EventCfg()
@@ -95,7 +97,10 @@ class AnymalCFlatEnvCfg(DirectRLEnvCfg):
     # robot
     robot: ArticulationCfg = ANYMAL_C_CFG.replace(prim_path="/World/envs/env_.*/Robot")
     contact_sensor: ContactSensorCfg = ContactSensorCfg(
-        prim_path="/World/envs/env_.*/Robot/.*", history_length=3, update_period=0.005, track_air_time=True
+        prim_path="/World/envs/env_.*/Robot/.*",
+        history_length=3,
+        update_period=0.005,
+        track_air_time=True,
     )
 
     # reward scales

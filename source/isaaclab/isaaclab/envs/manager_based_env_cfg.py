@@ -12,7 +12,7 @@ configuring the environment instances, viewer settings, and simulation parameter
 from dataclasses import MISSING
 
 import isaaclab.envs.mdp as mdp
-from isaaclab.managers import EventTermCfg as EventTerm
+from isaaclab.managers import EventTermCfg as EventTermCfg
 from isaaclab.managers import RecorderManagerBaseCfg as DefaultEmptyRecorderManagerCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sim import SimulationCfg
@@ -30,7 +30,7 @@ class DefaultEventManagerCfg:
     by the scene configuration.
     """
 
-    reset_scene_to_default = EventTerm(func=mdp.reset_scene_to_default, mode="reset")
+    reset_scene_to_default = EventTermCfg(func=mdp.reset_scene_to_default, mode="reset")
 
 
 @configclass

@@ -16,8 +16,12 @@ import argparse
 from isaaclab.app import AppLauncher
 
 # add argparse arguments
-parser = argparse.ArgumentParser(description="This script demonstrates how to use the concept of an Environment.")
-parser.add_argument("--num_envs", type=int, default=64, help="Number of environments to spawn.")
+parser = argparse.ArgumentParser(
+    description="This script demonstrates how to use the concept of an Environment."
+)
+parser.add_argument(
+    "--num_envs", type=int, default=64, help="Number of environments to spawn."
+)
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
@@ -30,15 +34,14 @@ simulation_app = app_launcher.app
 
 """Rest everything follows."""
 
-import torch
-
 import isaaclab.envs.mdp as mdp
 import isaaclab.sim as sim_utils
+import torch
 from isaaclab.assets import AssetBaseCfg, RigidObject, RigidObjectCfg
 from isaaclab.envs import ManagerBasedEnv, ManagerBasedEnvCfg
-from isaaclab.managers import EventTermCfg as EventTerm
-from isaaclab.managers import ObservationGroupCfg as ObsGroup
-from isaaclab.managers import ObservationTermCfg as ObsTerm
+from isaaclab.managers import EventTermCfg as EventTermCfg
+from isaaclab.managers import ObservationGroupCfg as ObservationGroupCfg
+from isaaclab.managers import ObservationTermCfg as ObservationTermCfg
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers.action_manager import ActionTerm, ActionTermCfg
 from isaaclab.scene import InteractiveSceneCfg
@@ -55,14 +58,18 @@ class MySceneCfg(InteractiveSceneCfg):
     """Example scene configuration."""
 
     # add terrain
-    terrain = TerrainImporterCfg(prim_path="/World/ground", terrain_type="plane", debug_vis=False)
+    terrain = TerrainImporterCfg(
+        prim_path="/World/ground", terrain_type="plane", debug_vis=False
+    )
 
     # add cube
     cube: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/cube",
         spawn=sim_utils.CuboidCfg(
             size=(0.2, 0.2, 0.2),
-            rigid_props=sim_utils.RigidBodyPropertiesCfg(max_depenetration_velocity=1.0),
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                max_depenetration_velocity=1.0
+            ),
             mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
             physics_material=sim_utils.RigidBodyMaterialCfg(),
             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.5, 0.0, 0.0)),
@@ -128,7 +135,9 @@ class CubeActionTerm(ActionTerm):
 
     def apply_actions(self):
         # implement a PD controller to track the target position
-        pos_error = self._processed_actions - (self._asset.data.root_pos_w - self._env.scene.env_origins)
+        pos_error = self._processed_actions - (
+            self._asset.data.root_pos_w - self._env.scene.env_origins
+        )
         vel_error = -self._asset.data.root_lin_vel_w
         # set velocity targets
         self._vel_command[:, :3] = self.p_gain * pos_error + self.d_gain * vel_error
@@ -171,11 +180,13 @@ class ObservationsCfg:
     """Observation specifications for the MDP."""
 
     @configclass
-    class PolicyCfg(ObsGroup):
+    class PolicyCfg(ObservationGroupCfg):
         """Observations for policy group."""
 
         # cube velocity
-        position = ObsTerm(func=base_position, params={"asset_cfg": SceneEntityCfg("cube")})
+        position = ObservationTermCfg(
+            func=base_position, params={"asset_cfg": SceneEntityCfg("cube")}
+        )
 
         def __post_init__(self):
             self.enable_corruption = True
@@ -189,7 +200,7 @@ class ObservationsCfg:
 class EventCfg:
     """Configuration for events."""
 
-    reset_base = EventTerm(
+    reset_base = EventTermCfg(
         func=mdp.reset_root_state_uniform,
         mode="reset",
         params={
@@ -214,7 +225,9 @@ class CubeEnvCfg(ManagerBasedEnvCfg):
     """Configuration for the locomotion velocity-tracking environment."""
 
     # Scene settings
-    scene: MySceneCfg = MySceneCfg(num_envs=args_cli.num_envs, env_spacing=2.5, replicate_physics=True)
+    scene: MySceneCfg = MySceneCfg(
+        num_envs=args_cli.num_envs, env_spacing=2.5, replicate_physics=True
+    )
     # Basic settings
     observations: ObservationsCfg = ObservationsCfg()
     actions: ActionsCfg = ActionsCfg()

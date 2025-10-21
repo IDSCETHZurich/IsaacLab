@@ -4,13 +4,11 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 
-from isaaclab_assets.robots.shadow_hand import SHADOW_HAND_CFG
-
 import isaaclab.envs.mdp as mdp
 import isaaclab.sim as sim_utils
 from isaaclab.assets import ArticulationCfg, RigidObjectCfg
 from isaaclab.envs import DirectRLEnvCfg
-from isaaclab.managers import EventTermCfg as EventTerm
+from isaaclab.managers import EventTermCfg as EventTermCfg
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.markers import VisualizationMarkersCfg
 from isaaclab.scene import InteractiveSceneCfg
@@ -19,6 +17,7 @@ from isaaclab.sim.spawners.materials.physics_materials_cfg import RigidBodyMater
 from isaaclab.utils import configclass
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
 from isaaclab.utils.noise import GaussianNoiseCfg, NoiseModelWithAdditiveBiasCfg
+from isaaclab_assets.robots.shadow_hand import SHADOW_HAND_CFG
 
 
 @configclass
@@ -26,7 +25,7 @@ class EventCfg:
     """Configuration for randomization."""
 
     # -- robot
-    robot_physics_material = EventTerm(
+    robot_physics_material = EventTermCfg(
         func=mdp.randomize_rigid_body_material,
         mode="reset",
         min_step_count_between_reset=720,
@@ -38,7 +37,7 @@ class EventCfg:
             "num_buckets": 250,
         },
     )
-    robot_joint_stiffness_and_damping = EventTerm(
+    robot_joint_stiffness_and_damping = EventTermCfg(
         func=mdp.randomize_actuator_gains,
         min_step_count_between_reset=720,
         mode="reset",
@@ -50,7 +49,7 @@ class EventCfg:
             "distribution": "log_uniform",
         },
     )
-    robot_joint_limits = EventTerm(
+    robot_joint_limits = EventTermCfg(
         func=mdp.randomize_joint_parameters,
         min_step_count_between_reset=720,
         mode="reset",
@@ -62,7 +61,7 @@ class EventCfg:
             "distribution": "gaussian",
         },
     )
-    robot_tendon_properties = EventTerm(
+    robot_tendon_properties = EventTermCfg(
         func=mdp.randomize_fixed_tendon_parameters,
         min_step_count_between_reset=720,
         mode="reset",
@@ -76,7 +75,7 @@ class EventCfg:
     )
 
     # -- object
-    object_physics_material = EventTerm(
+    object_physics_material = EventTermCfg(
         func=mdp.randomize_rigid_body_material,
         min_step_count_between_reset=720,
         mode="reset",
@@ -88,7 +87,7 @@ class EventCfg:
             "num_buckets": 250,
         },
     )
-    object_scale_mass = EventTerm(
+    object_scale_mass = EventTermCfg(
         func=mdp.randomize_rigid_body_mass,
         min_step_count_between_reset=720,
         mode="reset",
@@ -101,7 +100,7 @@ class EventCfg:
     )
 
     # -- scene
-    reset_gravity = EventTerm(
+    reset_gravity = EventTermCfg(
         func=mdp.randomize_physics_scene_gravity,
         mode="interval",
         is_global_time=True,
@@ -138,7 +137,9 @@ class ShadowHandEnvCfg(DirectRLEnvCfg):
         ),
     )
     # robot
-    robot_cfg: ArticulationCfg = SHADOW_HAND_CFG.replace(prim_path="/World/envs/env_.*/Robot").replace(
+    robot_cfg: ArticulationCfg = SHADOW_HAND_CFG.replace(
+        prim_path="/World/envs/env_.*/Robot"
+    ).replace(
         init_state=ArticulationCfg.InitialStateCfg(
             pos=(0.0, 0.0, 0.5),
             rot=(1.0, 0.0, 0.0, 0.0),
@@ -192,7 +193,9 @@ class ShadowHandEnvCfg(DirectRLEnvCfg):
             ),
             mass_props=sim_utils.MassPropertiesCfg(density=567.0),
         ),
-        init_state=RigidObjectCfg.InitialStateCfg(pos=(0.0, -0.39, 0.6), rot=(1.0, 0.0, 0.0, 0.0)),
+        init_state=RigidObjectCfg.InitialStateCfg(
+            pos=(0.0, -0.39, 0.6), rot=(1.0, 0.0, 0.0, 0.0)
+        ),
     )
     # goal object
     goal_object_cfg: VisualizationMarkersCfg = VisualizationMarkersCfg(
@@ -205,7 +208,9 @@ class ShadowHandEnvCfg(DirectRLEnvCfg):
         },
     )
     # scene
-    scene: InteractiveSceneCfg = InteractiveSceneCfg(num_envs=8192, env_spacing=0.75, replicate_physics=True)
+    scene: InteractiveSceneCfg = InteractiveSceneCfg(
+        num_envs=8192, env_spacing=0.75, replicate_physics=True
+    )
 
     # reset
     reset_position_noise = 0.01  # range of position at reset
@@ -277,7 +282,9 @@ class ShadowHandOpenAIEnvCfg(ShadowHandEnvCfg):
         bias_noise_cfg=GaussianNoiseCfg(mean=0.0, std=0.015, operation="abs"),
     )
     # at every time-step add gaussian noise + bias. The bias is a gaussian sampled at reset
-    observation_noise_model: NoiseModelWithAdditiveBiasCfg = NoiseModelWithAdditiveBiasCfg(
-        noise_cfg=GaussianNoiseCfg(mean=0.0, std=0.002, operation="add"),
-        bias_noise_cfg=GaussianNoiseCfg(mean=0.0, std=0.0001, operation="abs"),
+    observation_noise_model: NoiseModelWithAdditiveBiasCfg = (
+        NoiseModelWithAdditiveBiasCfg(
+            noise_cfg=GaussianNoiseCfg(mean=0.0, std=0.002, operation="add"),
+            bias_noise_cfg=GaussianNoiseCfg(mean=0.0, std=0.0001, operation="abs"),
+        )
     )

@@ -25,8 +25,12 @@ import argparse
 from isaaclab.app import AppLauncher
 
 # add argparse arguments
-parser = argparse.ArgumentParser(description="Tutorial on creating a quadruped base environment.")
-parser.add_argument("--num_envs", type=int, default=64, help="Number of environments to spawn.")
+parser = argparse.ArgumentParser(
+    description="Tutorial on creating a quadruped base environment."
+)
+parser.add_argument(
+    "--num_envs", type=int, default=64, help="Number of environments to spawn."
+)
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
@@ -39,15 +43,14 @@ simulation_app = app_launcher.app
 
 """Rest everything follows."""
 
-import torch
-
 import isaaclab.envs.mdp as mdp
 import isaaclab.sim as sim_utils
+import torch
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg
 from isaaclab.envs import ManagerBasedEnv, ManagerBasedEnvCfg
-from isaaclab.managers import EventTermCfg as EventTerm
-from isaaclab.managers import ObservationGroupCfg as ObsGroup
-from isaaclab.managers import ObservationTermCfg as ObsTerm
+from isaaclab.managers import EventTermCfg as EventTermCfg
+from isaaclab.managers import ObservationGroupCfg as ObservationGroupCfg
+from isaaclab.managers import ObservationTermCfg as ObservationTermCfg
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sensors import RayCasterCfg, patterns
@@ -127,7 +130,9 @@ class MySceneCfg(InteractiveSceneCfg):
 class ActionsCfg:
     """Action specifications for the MDP."""
 
-    joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=[".*"], scale=0.5, use_default_offset=True)
+    joint_pos = mdp.JointPositionActionCfg(
+        asset_name="robot", joint_names=[".*"], scale=0.5, use_default_offset=True
+    )
 
 
 @configclass
@@ -135,21 +140,29 @@ class ObservationsCfg:
     """Observation specifications for the MDP."""
 
     @configclass
-    class PolicyCfg(ObsGroup):
+    class PolicyCfg(ObservationGroupCfg):
         """Observations for policy group."""
 
         # observation terms (order preserved)
-        base_lin_vel = ObsTerm(func=mdp.base_lin_vel, noise=Unoise(n_min=-0.1, n_max=0.1))
-        base_ang_vel = ObsTerm(func=mdp.base_ang_vel, noise=Unoise(n_min=-0.2, n_max=0.2))
-        projected_gravity = ObsTerm(
+        base_lin_vel = ObservationTermCfg(
+            func=mdp.base_lin_vel, noise=Unoise(n_min=-0.1, n_max=0.1)
+        )
+        base_ang_vel = ObservationTermCfg(
+            func=mdp.base_ang_vel, noise=Unoise(n_min=-0.2, n_max=0.2)
+        )
+        projected_gravity = ObservationTermCfg(
             func=mdp.projected_gravity,
             noise=Unoise(n_min=-0.05, n_max=0.05),
         )
-        velocity_commands = ObsTerm(func=constant_commands)
-        joint_pos = ObsTerm(func=mdp.joint_pos_rel, noise=Unoise(n_min=-0.01, n_max=0.01))
-        joint_vel = ObsTerm(func=mdp.joint_vel_rel, noise=Unoise(n_min=-1.5, n_max=1.5))
-        actions = ObsTerm(func=mdp.last_action)
-        height_scan = ObsTerm(
+        velocity_commands = ObservationTermCfg(func=constant_commands)
+        joint_pos = ObservationTermCfg(
+            func=mdp.joint_pos_rel, noise=Unoise(n_min=-0.01, n_max=0.01)
+        )
+        joint_vel = ObservationTermCfg(
+            func=mdp.joint_vel_rel, noise=Unoise(n_min=-1.5, n_max=1.5)
+        )
+        actions = ObservationTermCfg(func=mdp.last_action)
+        height_scan = ObservationTermCfg(
             func=mdp.height_scan,
             params={"sensor_cfg": SceneEntityCfg("height_scanner")},
             noise=Unoise(n_min=-0.1, n_max=0.1),
@@ -168,7 +181,7 @@ class ObservationsCfg:
 class EventCfg:
     """Configuration for events."""
 
-    reset_scene = EventTerm(func=mdp.reset_scene_to_default, mode="reset")
+    reset_scene = EventTermCfg(func=mdp.reset_scene_to_default, mode="reset")
 
 
 ##
@@ -197,7 +210,9 @@ class QuadrupedEnvCfg(ManagerBasedEnvCfg):
         # update sensor update periods
         # we tick all the sensors based on the smallest update period (physics update period)
         if self.scene.height_scanner is not None:
-            self.scene.height_scanner.update_period = self.decimation * self.sim.dt  # 50 Hz
+            self.scene.height_scanner.update_period = (
+                self.decimation * self.sim.dt
+            )  # 50 Hz
 
 
 def main():

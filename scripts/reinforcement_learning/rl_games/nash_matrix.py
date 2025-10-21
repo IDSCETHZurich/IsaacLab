@@ -12,18 +12,51 @@ import argparse
 from isaaclab.app import AppLauncher
 
 # add argparse arguments
-parser = argparse.ArgumentParser(description="Play a tournament between RL agents from RL-Games.")
-parser.add_argument("--video", action="store_true", default=False, help="Record videos during training.")
-parser.add_argument("--video_length", type=int, default=200, help="Length of the recorded video (in steps).")
-parser.add_argument(
-    "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
+parser = argparse.ArgumentParser(
+    description="Play a tournament between RL agents from RL-Games."
 )
-parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
-parser.add_argument("--task", type=str, default="Isaac-Klask-v0", help="Name of the task.")
-parser.add_argument("--dir", type=str, default=None, help="Path to tournament directory containing checkpoints and config directories.")
-parser.add_argument("--config", type=str, default=None, help="config.yaml file, rl_games_cfg_entry_point used when not provided")
-parser.add_argument("--num_games_per_round", type=int, default=100, help="Number of games per round.")
-parser.add_argument("--tournament_name", type=str, default="tournament", help="Name used for logging videos.")
+parser.add_argument(
+    "--video", action="store_true", default=False, help="Record videos during training."
+)
+parser.add_argument(
+    "--video_length",
+    type=int,
+    default=200,
+    help="Length of the recorded video (in steps).",
+)
+parser.add_argument(
+    "--disable_fabric",
+    action="store_true",
+    default=False,
+    help="Disable fabric and use USD I/O operations.",
+)
+parser.add_argument(
+    "--num_envs", type=int, default=None, help="Number of environments to simulate."
+)
+parser.add_argument(
+    "--task", type=str, default="Isaac-Klask-v0", help="Name of the task."
+)
+parser.add_argument(
+    "--dir",
+    type=str,
+    default=None,
+    help="Path to tournament directory containing checkpoints and config directories.",
+)
+parser.add_argument(
+    "--config",
+    type=str,
+    default=None,
+    help="config.yaml file, rl_games_cfg_entry_point used when not provided",
+)
+parser.add_argument(
+    "--num_games_per_round", type=int, default=100, help="Number of games per round."
+)
+parser.add_argument(
+    "--tournament_name",
+    type=str,
+    default="tournament",
+    help="Name used for logging videos.",
+)
 
 
 # append AppLauncher cli args
@@ -40,39 +73,41 @@ simulation_app = app_launcher.app
 
 """Rest everything follows."""
 
-import gymnasium as gym
+import itertools
 import math
 import os
+import re
+import time
+from pathlib import Path
+
+import gymnasium as gym
+import isaaclab_tasks  # noqa: F401
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
 import torch
 import yaml
-import time
-import matplotlib.pyplot as plt
-import itertools
-import numpy as np
-import re
-from pathlib import Path
-import seaborn as sns
-
+from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
+from isaaclab.utils.assets import retrieve_file_path
+from isaaclab.utils.dict import print_dict
+from isaaclab_rl.rl_games import RlGamesGpuEnv, RlGamesVecEnvWrapper
+from isaaclab_tasks.manager_based.klask import (
+    CurriculumWrapper,
+    ObservationNoiseWrapper,
+    OpponentObservationWrapper,
+    RlGamesGpuEnvSelfPlay,
+    find_wrapper,
+)
+from isaaclab_tasks.utils import (
+    get_checkpoint_path,
+    load_cfg_from_registry,
+    parse_env_cfg,
+)
 from rl_games.common import env_configurations, vecenv
 from rl_games.common.player import BasePlayer
 from rl_games.torch_runner import Runner
 
-from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
-from isaaclab.utils.assets import retrieve_file_path
-from isaaclab.utils.dict import print_dict
-
-import isaaclab_tasks  # noqa: F401
-from isaaclab_tasks.utils import get_checkpoint_path, load_cfg_from_registry, parse_env_cfg
-from isaaclab_rl.rl_games import RlGamesGpuEnv, RlGamesVecEnvWrapper
-
-from isaaclab_tasks.manager_based.klask import (
-    OpponentObservationWrapper,
-    CurriculumWrapper,
-    RlGamesGpuEnvSelfPlay,
-    ObservationNoiseWrapper,
-    find_wrapper
-)
-from isaaclab_tasks.manager_based.klask.utils_manager_based import set_terminations
+from .utils import set_terminations
 
 
 def update_elo(p1, p2, score_1, score_2, k=10.0):
@@ -83,14 +118,18 @@ def update_elo(p1, p2, score_1, score_2, k=10.0):
 
 
 def compute_scores(info):
-    average_score_1 = (info["episode"]["Episode_Termination/goal_scored"]
-                     + info["episode"]["Episode_Termination/opponent_in_goal"]
-                     -info["episode"]["Episode_Termination/goal_conceded"]
-                     - info["episode"]["Episode_Termination/player_in_goal"])
-    average_score_2 = (info["episode"]["Episode_Termination/goal_conceded"]
-                     + info["episode"]["Episode_Termination/player_in_goal"]
-                     -info["episode"]["Episode_Termination/goal_scored"]
-                     - info["episode"]["Episode_Termination/opponent_in_goal"])
+    average_score_1 = (
+        info["episode"]["Episode_Termination/goal_scored"]
+        + info["episode"]["Episode_Termination/opponent_in_goal"]
+        - info["episode"]["Episode_Termination/goal_conceded"]
+        - info["episode"]["Episode_Termination/player_in_goal"]
+    )
+    average_score_2 = (
+        info["episode"]["Episode_Termination/goal_conceded"]
+        + info["episode"]["Episode_Termination/player_in_goal"]
+        - info["episode"]["Episode_Termination/goal_scored"]
+        - info["episode"]["Episode_Termination/opponent_in_goal"]
+    )
     return average_score_1, average_score_2
 
 
@@ -98,17 +137,20 @@ def main():
     """Play with RL-Games agent."""
     # parse env configuration
     env_cfg = parse_env_cfg(
-        args_cli.task, device=args_cli.device, num_envs=args_cli.num_envs, use_fabric=not args_cli.disable_fabric
+        args_cli.task,
+        device=args_cli.device,
+        num_envs=args_cli.num_envs,
+        use_fabric=not args_cli.disable_fabric,
     )
     agent_cfg = load_cfg_from_registry(args_cli.task, "rl_games_cfg_entry_point")
 
     if args_cli.config is not None:
-        with open(args_cli.config, 'r') as file:
+        with open(args_cli.config, "r") as file:
             config = yaml.safe_load(file)
         agent_cfg.update(config)
 
     else:
-        with open(os.path.join(args_cli.dir , "benchmark/benchmark.yaml"),'r') as file:
+        with open(os.path.join(args_cli.dir, "benchmark/benchmark.yaml"), "r") as file:
             config = yaml.safe_load(file)
         agent_cfg.update(config)
 
@@ -116,11 +158,12 @@ def main():
     rl_device = agent_cfg["params"]["config"]["device"]
     clip_obs = agent_cfg["params"]["env"].get("clip_observations", math.inf)
     clip_actions = agent_cfg["params"]["env"].get("clip_actions", math.inf)
-    
+
     # create isaac environment
-    env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
+    env = gym.make(
+        args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None
+    )
     # wrap for video recording
- 
 
     # convert to single-agent instance if required by the RL algorithm
     if isinstance(env.unwrapped, DirectMARLEnv):
@@ -131,40 +174,45 @@ def main():
     env = OpponentObservationWrapper(env)
     if "rewards" in agent_cfg.keys():
         env = CurriculumWrapper(env, agent_cfg["rewards"], mode="test")
-    
+
     # wrap around environment for rl-games
     env = RlGamesVecEnvWrapper(env, rl_device, clip_obs, clip_actions)
 
     # register the environment to rl-games registry
     # note: in agents configuration: environment name must be "rlgpu"
     vecenv.register(
-        "IsaacRlgWrapper", lambda config_name, num_actors, **kwargs: RlGamesGpuEnvSelfPlay(
-            config_name, num_actors, agent_cfg.copy(), **kwargs)
+        "IsaacRlgWrapper",
+        lambda config_name, num_actors, **kwargs: RlGamesGpuEnvSelfPlay(
+            config_name, num_actors, agent_cfg.copy(), **kwargs
+        ),
     )
-    env_configurations.register("rlgpu", {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env})
- 
+    env_configurations.register(
+        "rlgpu", {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env}
+    )
+
     # set active termination terms specified in agent_cfg:
     if "terminations" in agent_cfg.keys():
         set_terminations(env, agent_cfg["terminations"])
-    
+
     # set number of actors into agent config
     agent_cfg["params"]["config"]["num_actors"] = env.unwrapped.num_envs
-    
+
     # reset environment
     obs = env.reset()
     timestep = 0
-    
+
     # create runner from rl-games
     runner = Runner()
     players = []
     base_path = Path(args_cli.dir)
     checkpoints_dir = list(base_path.glob("agent_*"))
     for i, model_file in enumerate(checkpoints_dir):
-        
-        match = re.search(r'agent_(\d+)', str(model_file))
+        match = re.search(r"agent_(\d+)", str(model_file))
         player_name = f"agent_{int(match.group(1))}"
 
-        with open(os.path.join(args_cli.dir, player_name, f"player_config.yaml"), 'r') as file:
+        with open(
+            os.path.join(args_cli.dir, player_name, f"player_config.yaml"), "r"
+        ) as file:
             config = yaml.safe_load(file)
         runner.load(config)
         player = runner.create_player()
@@ -179,7 +227,6 @@ def main():
         player.name = player_name
         players.append(player)
 
-    
     nash_matrix = np.zeros((len(checkpoints_dir), len(checkpoints_dir)))
     nash_players = [p.name for p in players]
     # simulate environment
@@ -196,13 +243,19 @@ def main():
             with torch.inference_mode():
                 # convert obs to agent format
                 obs_1 = p1.obs_to_torch(obs.to(p1.device))
-                opponent_obs = find_wrapper(env, OpponentObservationWrapper).opponent_obs
+                opponent_obs = find_wrapper(
+                    env, OpponentObservationWrapper
+                ).opponent_obs
                 obs_2 = p2.obs_to_torch(opponent_obs.to(p2.device))
                 # agent stepping
                 actions_p1 = p1.get_action(obs_1, is_deterministic=True)
                 actions_p2 = -p2.get_action(obs_2, is_deterministic=True)
                 # env stepping
-                obs, rew, dones, info = env.step(torch.cat([actions_p1.to(rl_device), actions_p2.to(rl_device)], dim=1))
+                obs, rew, dones, info = env.step(
+                    torch.cat(
+                        [actions_p1.to(rl_device), actions_p2.to(rl_device)], dim=1
+                    )
+                )
                 if len(dones) > 0:
                     num_games += dones.sum()
                     score_1, score_2 = compute_scores(info)
@@ -220,20 +273,17 @@ def main():
                 # Exit the play loop after recording one video
                 if timestep == args_cli.video_length:
                     break
-          
+
         k = p1.index
         j = p2.index
-        nash_matrix[k,j] = average_score_1/num_games
-        nash_matrix[j,k] = average_score_2/num_games
-        
-        
-        
+        nash_matrix[k, j] = average_score_1 / num_games
+        nash_matrix[j, k] = average_score_2 / num_games
 
     # Plot ELO scores:
     print(nash_matrix)
     print(nash_players)
     # close the simulator
-    nash_players = list(nash_players)    # in case it's not a list
+    nash_players = list(nash_players)  # in case it's not a list
 
     # Set up the figure
     plt.figure(figsize=(10, 8))
@@ -244,11 +294,11 @@ def main():
         nash_matrix,
         xticklabels=nash_players,
         yticklabels=nash_players,
-        annot=True,        # Show score values
-        fmt=".2f",         # Format the scores
-        cmap="coolwarm",   # Color scheme
+        annot=True,  # Show score values
+        fmt=".2f",  # Format the scores
+        cmap="coolwarm",  # Color scheme
         square=True,
-        cbar_kws={'label': 'Average Score'}
+        cbar_kws={"label": "Average Score"},
     )
 
     # Titles and labels
@@ -263,7 +313,6 @@ def main():
     plt.tight_layout()
     plt.show()
     env.close()
-
 
 
 if __name__ == "__main__":

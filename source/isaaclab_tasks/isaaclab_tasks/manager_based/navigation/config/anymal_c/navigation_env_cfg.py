@@ -6,17 +6,19 @@
 import math
 
 from isaaclab.envs import ManagerBasedRLEnvCfg
-from isaaclab.managers import EventTermCfg as EventTerm
-from isaaclab.managers import ObservationGroupCfg as ObsGroup
-from isaaclab.managers import ObservationTermCfg as ObsTerm
-from isaaclab.managers import RewardTermCfg as RewTerm
+from isaaclab.managers import EventTermCfg as EventTermCfg
+from isaaclab.managers import ObservationGroupCfg as ObservationGroupCfg
+from isaaclab.managers import ObservationTermCfg as ObservationTermCfg
+from isaaclab.managers import RewardTermCfg as RewardTermCfg
 from isaaclab.managers import SceneEntityCfg
-from isaaclab.managers import TerminationTermCfg as DoneTerm
+from isaaclab.managers import TerminationTermCfg as TerminationTermCfg
 from isaaclab.utils import configclass
 from isaaclab.utils.assets import ISAACLAB_NUCLEUS_DIR
 
 import isaaclab_tasks.manager_based.navigation.mdp as mdp
-from isaaclab_tasks.manager_based.locomotion.velocity.config.anymal_c.flat_env_cfg import AnymalCFlatEnvCfg
+from isaaclab_tasks.manager_based.locomotion.velocity.config.anymal_c.flat_env_cfg import (
+    AnymalCFlatEnvCfg,
+)
 
 LOW_LEVEL_ENV_CFG = AnymalCFlatEnvCfg()
 
@@ -25,7 +27,7 @@ LOW_LEVEL_ENV_CFG = AnymalCFlatEnvCfg()
 class EventCfg:
     """Configuration for events."""
 
-    reset_base = EventTerm(
+    reset_base = EventTermCfg(
         func=mdp.reset_root_state_uniform,
         mode="reset",
         params={
@@ -46,12 +48,14 @@ class EventCfg:
 class ActionsCfg:
     """Action terms for the MDP."""
 
-    pre_trained_policy_action: mdp.PreTrainedPolicyActionCfg = mdp.PreTrainedPolicyActionCfg(
-        asset_name="robot",
-        policy_path=f"{ISAACLAB_NUCLEUS_DIR}/Policies/ANYmal-C/Blind/policy.pt",
-        low_level_decimation=4,
-        low_level_actions=LOW_LEVEL_ENV_CFG.actions.joint_pos,
-        low_level_observations=LOW_LEVEL_ENV_CFG.observations.policy,
+    pre_trained_policy_action: mdp.PreTrainedPolicyActionCfg = (
+        mdp.PreTrainedPolicyActionCfg(
+            asset_name="robot",
+            policy_path=f"{ISAACLAB_NUCLEUS_DIR}/Policies/ANYmal-C/Blind/policy.pt",
+            low_level_decimation=4,
+            low_level_actions=LOW_LEVEL_ENV_CFG.actions.joint_pos,
+            low_level_observations=LOW_LEVEL_ENV_CFG.observations.policy,
+        )
     )
 
 
@@ -60,13 +64,15 @@ class ObservationsCfg:
     """Observation specifications for the MDP."""
 
     @configclass
-    class PolicyCfg(ObsGroup):
+    class PolicyCfg(ObservationGroupCfg):
         """Observations for policy group."""
 
         # observation terms (order preserved)
-        base_lin_vel = ObsTerm(func=mdp.base_lin_vel)
-        projected_gravity = ObsTerm(func=mdp.projected_gravity)
-        pose_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "pose_command"})
+        base_lin_vel = ObservationTermCfg(func=mdp.base_lin_vel)
+        projected_gravity = ObservationTermCfg(func=mdp.projected_gravity)
+        pose_command = ObservationTermCfg(
+            func=mdp.generated_commands, params={"command_name": "pose_command"}
+        )
 
     # observation groups
     policy: PolicyCfg = PolicyCfg()
@@ -76,18 +82,18 @@ class ObservationsCfg:
 class RewardsCfg:
     """Reward terms for the MDP."""
 
-    termination_penalty = RewTerm(func=mdp.is_terminated, weight=-400.0)
-    position_tracking = RewTerm(
+    termination_penalty = RewardTermCfg(func=mdp.is_terminated, weight=-400.0)
+    position_tracking = RewardTermCfg(
         func=mdp.position_command_error_tanh,
         weight=0.5,
         params={"std": 2.0, "command_name": "pose_command"},
     )
-    position_tracking_fine_grained = RewTerm(
+    position_tracking_fine_grained = RewardTermCfg(
         func=mdp.position_command_error_tanh,
         weight=0.5,
         params={"std": 0.2, "command_name": "pose_command"},
     )
-    orientation_tracking = RewTerm(
+    orientation_tracking = RewardTermCfg(
         func=mdp.heading_command_error_abs,
         weight=-0.2,
         params={"command_name": "pose_command"},
@@ -103,7 +109,9 @@ class CommandsCfg:
         simple_heading=False,
         resampling_time_range=(8.0, 8.0),
         debug_vis=True,
-        ranges=mdp.UniformPose2dCommandCfg.Ranges(pos_x=(-3.0, 3.0), pos_y=(-3.0, 3.0), heading=(-math.pi, math.pi)),
+        ranges=mdp.UniformPose2dCommandCfg.Ranges(
+            pos_x=(-3.0, 3.0), pos_y=(-3.0, 3.0), heading=(-math.pi, math.pi)
+        ),
     )
 
 
@@ -111,10 +119,13 @@ class CommandsCfg:
 class TerminationsCfg:
     """Termination terms for the MDP."""
 
-    time_out = DoneTerm(func=mdp.time_out, time_out=True)
-    base_contact = DoneTerm(
+    time_out = TerminationTermCfg(func=mdp.time_out, time_out=True)
+    base_contact = TerminationTermCfg(
         func=mdp.illegal_contact,
-        params={"sensor_cfg": SceneEntityCfg("contact_forces", body_names="base"), "threshold": 1.0},
+        params={
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names="base"),
+            "threshold": 1.0,
+        },
     )
 
 
@@ -142,7 +153,8 @@ class NavigationEnvCfg(ManagerBasedRLEnvCfg):
 
         if self.scene.height_scanner is not None:
             self.scene.height_scanner.update_period = (
-                self.actions.pre_trained_policy_action.low_level_decimation * self.sim.dt
+                self.actions.pre_trained_policy_action.low_level_decimation
+                * self.sim.dt
             )
         if self.scene.contact_forces is not None:
             self.scene.contact_forces.update_period = self.sim.dt

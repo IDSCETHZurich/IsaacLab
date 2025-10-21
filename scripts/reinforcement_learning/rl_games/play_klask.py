@@ -12,21 +12,44 @@ import argparse
 from isaaclab.app import AppLauncher
 
 # add argparse arguments
-parser = argparse.ArgumentParser(description="Play a checkpoint of an RL agent from RL-Games.")
-parser.add_argument("--video", action="store_true", default=False, help="Record videos during training.")
-parser.add_argument("--video_length", type=int, default=200, help="Length of the recorded video (in steps).")
-parser.add_argument(
-    "--disable_fabric", action="store_true", default=False, help="Disable fabric and use USD I/O operations."
+parser = argparse.ArgumentParser(
+    description="Play a checkpoint of an RL agent from RL-Games."
 )
-parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
-parser.add_argument("--task", type=str, default="Isaac-Klask-v0", help="Name of the task.")
-parser.add_argument("--checkpoint", type=str, default=None, help="Path to model checkpoint.")
+parser.add_argument(
+    "--video", action="store_true", default=False, help="Record videos during training."
+)
+parser.add_argument(
+    "--video_length",
+    type=int,
+    default=200,
+    help="Length of the recorded video (in steps).",
+)
+parser.add_argument(
+    "--disable_fabric",
+    action="store_true",
+    default=False,
+    help="Disable fabric and use USD I/O operations.",
+)
+parser.add_argument(
+    "--num_envs", type=int, default=None, help="Number of environments to simulate."
+)
+parser.add_argument(
+    "--task", type=str, default="Isaac-Klask-v0", help="Name of the task."
+)
+parser.add_argument(
+    "--checkpoint", type=str, default=None, help="Path to model checkpoint."
+)
 parser.add_argument(
     "--use_last_checkpoint",
     action="store_true",
     help="When no checkpoint provided, use the last saved model. Otherwise use the best saved model.",
 )
-parser.add_argument("--config", type=str, default=None, help="config.yaml file, rl_games_cfg_entry_point used when not provided")
+parser.add_argument(
+    "--config",
+    type=str,
+    default=None,
+    help="config.yaml file, rl_games_cfg_entry_point used when not provided",
+)
 
 
 # append AppLauncher cli args
@@ -43,56 +66,64 @@ simulation_app = app_launcher.app
 
 """Rest everything follows."""
 
-import gymnasium as gym
 import math
 import os
+import time
+
+import gymnasium as gym
+import isaaclab_tasks  # noqa: F401
+import matplotlib.pyplot as plt
+import numpy as np
 import torch
 import yaml
-import time
-import matplotlib.pyplot as plt
-
+from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
+from isaaclab.utils.assets import retrieve_file_path
+from isaaclab.utils.dict import print_dict
+from isaaclab_assets.robots.klask import KLASK_PARAMS
+from isaaclab_rl.rl_games import RlGamesGpuEnv, RlGamesVecEnvWrapper
+from isaaclab_tasks.manager_based.klask.actuator_model import ActuatorModelWrapper
+from isaaclab_tasks.manager_based.klask.env_wrapper import (
+    ActionHistoryWrapper,
+    CurriculumWrapper,
+    KlaskAgentOpponentWrapper,
+    KlaskCollisionAvoidanceWrapper,
+    KlaskRandomOpponentWrapper,
+    ObservationNoiseWrapper,
+    RlGamesGpuEnvSelfPlay,
+    find_wrapper,
+)
+from isaaclab_tasks.utils import (
+    get_checkpoint_path,
+    load_cfg_from_registry,
+    parse_env_cfg,
+)
 from rl_games.common import env_configurations, vecenv
 from rl_games.common.player import BasePlayer
 from rl_games.torch_runner import Runner
 
-from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
-from isaaclab.utils.assets import retrieve_file_path
-from isaaclab.utils.dict import print_dict
+from .utils import set_terminations
 
-import isaaclab_tasks  # noqa: F401
-from isaaclab_tasks.utils import get_checkpoint_path, load_cfg_from_registry, parse_env_cfg
-from isaaclab_rl.rl_games import RlGamesGpuEnv, RlGamesVecEnvWrapper
-
-from isaaclab_tasks.manager_based.klask import (
-    KlaskRandomOpponentWrapper,
-    CurriculumWrapper,
-    RlGamesGpuEnvSelfPlay,
-    KlaskAgentOpponentWrapper,
-    ObservationNoiseWrapper,
-    KlaskCollisionAvoidanceWrapper,
-    ActionHistoryWrapper,
-    find_wrapper
-)
-from isaaclab_tasks.manager_based.klask.utils_manager_based import set_terminations
-from isaaclab_tasks.manager_based.klask.actuator_model import ActuatorModelWrapper
-from isaaclab_assets.robots.klask import KLASK_PARAMS
-import numpy as np
 
 def main():
     """Play with RL-Games agent."""
     # parse env configuration
     env_cfg = parse_env_cfg(
-        args_cli.task, device=args_cli.device, num_envs=args_cli.num_envs, use_fabric=not args_cli.disable_fabric
+        args_cli.task,
+        device=args_cli.device,
+        num_envs=args_cli.num_envs,
+        use_fabric=not args_cli.disable_fabric,
     )
     agent_cfg = load_cfg_from_registry(args_cli.task, "rl_games_cfg_entry_point")
 
     if args_cli.config is not None:
-        with open(args_cli.config, 'r') as file:
+        with open(args_cli.config, "r") as file:
             config = yaml.safe_load(file)
         agent_cfg.update(config)
 
     # specify directory for logging experiments
-    log_root_path = os.path.join("logs", "rl_games", agent_cfg["params"]["config"]["name"])
+    log_root_path = os.path.join(
+        "logs", "rl_games", agent_cfg["params"]["config"]["name"]
+    )
     log_root_path = os.path.abspath(log_root_path)
     print(f"[INFO] Loading experiment from directory: {log_root_path}")
     # find checkpoint
@@ -106,24 +137,26 @@ def main():
             # this loads the best checkpoint
             checkpoint_file = f"{agent_cfg['params']['config']['name']}.pth"
         # get path to previous checkpoint
-        resume_path = get_checkpoint_path(log_root_path, run_dir, checkpoint_file, other_dirs=["nn"])
+        resume_path = get_checkpoint_path(
+            log_root_path, run_dir, checkpoint_file, other_dirs=["nn"]
+        )
     else:
         resume_path = retrieve_file_path(args_cli.checkpoint)
     log_dir = os.path.dirname(os.path.dirname(resume_path))
 
     # wrap around environment for rl-games
-    
+
     rl_device = agent_cfg["params"]["config"]["device"]
     rl_device = args_cli.device
-    
-    
+
     clip_obs = agent_cfg["params"]["env"].get("clip_observations", math.inf)
     clip_actions = agent_cfg["params"]["env"].get("clip_actions", math.inf)
-    
-    # create isaac environment
-    env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
 
-    
+    # create isaac environment
+    env = gym.make(
+        args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None
+    )
+
     # wrap for video recording
     if args_cli.video:
         video_kwargs = {
@@ -142,7 +175,6 @@ def main():
 
     if agent_cfg["env"].get("actuator_model", False):
         env = ActuatorModelWrapper(env, device=args_cli.device)
-        
 
     if agent_cfg["env"].get("collision_avoidance", False):
         env = KlaskCollisionAvoidanceWrapper(env)
@@ -160,24 +192,37 @@ def main():
         env = KlaskRandomOpponentWrapper(env)
     if "rewards" in agent_cfg.keys():
         env = CurriculumWrapper(env, agent_cfg["rewards"], mode="test")
-    
+
     # wrap around environment for rl-games
-    env = RlGamesVecEnvWrapper(env, rl_device, clip_obs = clip_obs, clip_actions=clip_actions)
+    env = RlGamesVecEnvWrapper(
+        env, rl_device, clip_obs=clip_obs, clip_actions=clip_actions
+    )
 
     # register the environment to rl-games registry
     # note: in agents configuration: environment name must be "rlgpu"
     if agent_cfg["params"]["config"].get("self_play", False):
         vecenv.register(
-            "IsaacRlgWrapper", lambda config_name, num_actors, **kwargs: RlGamesGpuEnvSelfPlay(
-                config_name, num_actors, agent_cfg.copy(), **kwargs)
+            "IsaacRlgWrapper",
+            lambda config_name, num_actors, **kwargs: RlGamesGpuEnvSelfPlay(
+                config_name, num_actors, agent_cfg.copy(), **kwargs
+            ),
         )
-        env_configurations.register("rlgpu", {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env})
+        env_configurations.register(
+            "rlgpu",
+            {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env},
+        )
 
     else:
         vecenv.register(
-            "IsaacRlgWrapper", lambda config_name, num_actors, **kwargs: RlGamesGpuEnv(config_name, num_actors, **kwargs)
+            "IsaacRlgWrapper",
+            lambda config_name, num_actors, **kwargs: RlGamesGpuEnv(
+                config_name, num_actors, **kwargs
+            ),
         )
-        env_configurations.register("rlgpu", {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env})
+        env_configurations.register(
+            "rlgpu",
+            {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env},
+        )
 
     # set active termination terms specified in agent_cfg:
     if "terminations" in agent_cfg.keys():
@@ -230,7 +275,7 @@ def main():
     start_time = time.time()
     while simulation_app.is_running() and time.time() - start_time < 1000.0:
         # run everything in inference mode
-        
+
         with torch.inference_mode():
             # convert obs to agent format
             obs = agent.obs_to_torch(obs)

@@ -8,10 +8,10 @@ from dataclasses import MISSING
 import isaaclab.sim as sim_utils
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg
 from isaaclab.envs import ManagerBasedRLEnvCfg
-from isaaclab.managers import ObservationGroupCfg as ObsGroup
-from isaaclab.managers import ObservationTermCfg as ObsTerm
+from isaaclab.managers import ObservationGroupCfg as ObservationGroupCfg
+from isaaclab.managers import ObservationTermCfg as ObservationTermCfg
 from isaaclab.managers import SceneEntityCfg
-from isaaclab.managers import TerminationTermCfg as DoneTerm
+from isaaclab.managers import TerminationTermCfg as TerminationTermCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sensors.frame_transformer.frame_transformer_cfg import FrameTransformerCfg
 from isaaclab.sim.spawners.from_files.from_files_cfg import GroundPlaneCfg, UsdFileCfg
@@ -39,8 +39,12 @@ class ObjectTableSceneCfg(InteractiveSceneCfg):
     # Table
     table = AssetBaseCfg(
         prim_path="{ENV_REGEX_NS}/Table",
-        init_state=AssetBaseCfg.InitialStateCfg(pos=[0.5, 0, 0], rot=[0.707, 0, 0, 0.707]),
-        spawn=UsdFileCfg(usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd"),
+        init_state=AssetBaseCfg.InitialStateCfg(
+            pos=[0.5, 0, 0], rot=[0.707, 0, 0, 0.707]
+        ),
+        spawn=UsdFileCfg(
+            usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd"
+        ),
     )
 
     # plane
@@ -74,25 +78,27 @@ class ObservationsCfg:
     """Observation specifications for the MDP."""
 
     @configclass
-    class PolicyCfg(ObsGroup):
+    class PolicyCfg(ObservationGroupCfg):
         """Observations for policy group with state values."""
 
-        actions = ObsTerm(func=mdp.last_action)
-        joint_pos = ObsTerm(func=mdp.joint_pos_rel)
-        joint_vel = ObsTerm(func=mdp.joint_vel_rel)
-        object = ObsTerm(func=mdp.object_obs)
-        cube_positions = ObsTerm(func=mdp.cube_positions_in_world_frame)
-        cube_orientations = ObsTerm(func=mdp.cube_orientations_in_world_frame)
-        eef_pos = ObsTerm(func=mdp.ee_frame_pos)
-        eef_quat = ObsTerm(func=mdp.ee_frame_quat)
-        gripper_pos = ObsTerm(func=mdp.gripper_pos)
+        actions = ObservationTermCfg(func=mdp.last_action)
+        joint_pos = ObservationTermCfg(func=mdp.joint_pos_rel)
+        joint_vel = ObservationTermCfg(func=mdp.joint_vel_rel)
+        object = ObservationTermCfg(func=mdp.object_obs)
+        cube_positions = ObservationTermCfg(func=mdp.cube_positions_in_world_frame)
+        cube_orientations = ObservationTermCfg(
+            func=mdp.cube_orientations_in_world_frame
+        )
+        eef_pos = ObservationTermCfg(func=mdp.ee_frame_pos)
+        eef_quat = ObservationTermCfg(func=mdp.ee_frame_quat)
+        gripper_pos = ObservationTermCfg(func=mdp.gripper_pos)
 
         def __post_init__(self):
             self.enable_corruption = False
             self.concatenate_terms = False
 
     @configclass
-    class RGBCameraPolicyCfg(ObsGroup):
+    class RGBCameraPolicyCfg(ObservationGroupCfg):
         """Observations for policy group with RGB images."""
 
         def __post_init__(self):
@@ -100,10 +106,10 @@ class ObservationsCfg:
             self.concatenate_terms = False
 
     @configclass
-    class SubtaskCfg(ObsGroup):
+    class SubtaskCfg(ObservationGroupCfg):
         """Observations for subtask group."""
 
-        grasp_1 = ObsTerm(
+        grasp_1 = ObservationTermCfg(
             func=mdp.object_grasped,
             params={
                 "robot_cfg": SceneEntityCfg("robot"),
@@ -111,7 +117,7 @@ class ObservationsCfg:
                 "object_cfg": SceneEntityCfg("cube_2"),
             },
         )
-        stack_1 = ObsTerm(
+        stack_1 = ObservationTermCfg(
             func=mdp.object_stacked,
             params={
                 "robot_cfg": SceneEntityCfg("robot"),
@@ -119,7 +125,7 @@ class ObservationsCfg:
                 "lower_object_cfg": SceneEntityCfg("cube_1"),
             },
         )
-        grasp_2 = ObsTerm(
+        grasp_2 = ObservationTermCfg(
             func=mdp.object_grasped,
             params={
                 "robot_cfg": SceneEntityCfg("robot"),
@@ -142,21 +148,24 @@ class ObservationsCfg:
 class TerminationsCfg:
     """Termination terms for the MDP."""
 
-    time_out = DoneTerm(func=mdp.time_out, time_out=True)
+    time_out = TerminationTermCfg(func=mdp.time_out, time_out=True)
 
-    cube_1_dropping = DoneTerm(
-        func=mdp.root_height_below_minimum, params={"minimum_height": -0.05, "asset_cfg": SceneEntityCfg("cube_1")}
+    cube_1_dropping = TerminationTermCfg(
+        func=mdp.root_height_below_minimum,
+        params={"minimum_height": -0.05, "asset_cfg": SceneEntityCfg("cube_1")},
     )
 
-    cube_2_dropping = DoneTerm(
-        func=mdp.root_height_below_minimum, params={"minimum_height": -0.05, "asset_cfg": SceneEntityCfg("cube_2")}
+    cube_2_dropping = TerminationTermCfg(
+        func=mdp.root_height_below_minimum,
+        params={"minimum_height": -0.05, "asset_cfg": SceneEntityCfg("cube_2")},
     )
 
-    cube_3_dropping = DoneTerm(
-        func=mdp.root_height_below_minimum, params={"minimum_height": -0.05, "asset_cfg": SceneEntityCfg("cube_3")}
+    cube_3_dropping = TerminationTermCfg(
+        func=mdp.root_height_below_minimum,
+        params={"minimum_height": -0.05, "asset_cfg": SceneEntityCfg("cube_3")},
     )
 
-    success = DoneTerm(func=mdp.cubes_stacked)
+    success = TerminationTermCfg(func=mdp.cubes_stacked)
 
 
 @configclass
@@ -164,7 +173,9 @@ class StackEnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the stacking environment."""
 
     # Scene settings
-    scene: ObjectTableSceneCfg = ObjectTableSceneCfg(num_envs=4096, env_spacing=2.5, replicate_physics=False)
+    scene: ObjectTableSceneCfg = ObjectTableSceneCfg(
+        num_envs=4096, env_spacing=2.5, replicate_physics=False
+    )
     # Basic settings
     observations: ObservationsCfg = ObservationsCfg()
     actions: ActionsCfg = ActionsCfg()

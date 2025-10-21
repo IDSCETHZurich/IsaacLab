@@ -10,12 +10,12 @@ from isaaclab.assets import ArticulationCfg, AssetBaseCfg
 from isaaclab.envs import ManagerBasedRLEnvCfg
 from isaaclab.managers import ActionTermCfg as ActionTerm
 from isaaclab.managers import CurriculumTermCfg as CurrTerm
-from isaaclab.managers import EventTermCfg as EventTerm
-from isaaclab.managers import ObservationGroupCfg as ObsGroup
-from isaaclab.managers import ObservationTermCfg as ObsTerm
-from isaaclab.managers import RewardTermCfg as RewTerm
+from isaaclab.managers import EventTermCfg as EventTermCfg
+from isaaclab.managers import ObservationGroupCfg as ObservationGroupCfg
+from isaaclab.managers import ObservationTermCfg as ObservationTermCfg
+from isaaclab.managers import RewardTermCfg as RewardTermCfg
 from isaaclab.managers import SceneEntityCfg
-from isaaclab.managers import TerminationTermCfg as DoneTerm
+from isaaclab.managers import TerminationTermCfg as TerminationTermCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.utils import configclass
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
@@ -44,7 +44,9 @@ class ReachSceneCfg(InteractiveSceneCfg):
         spawn=sim_utils.UsdFileCfg(
             usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd",
         ),
-        init_state=AssetBaseCfg.InitialStateCfg(pos=(0.55, 0.0, 0.0), rot=(0.70711, 0.0, 0.0, 0.70711)),
+        init_state=AssetBaseCfg.InitialStateCfg(
+            pos=(0.55, 0.0, 0.0), rot=(0.70711, 0.0, 0.0, 0.70711)
+        ),
     )
 
     # robots
@@ -95,14 +97,20 @@ class ObservationsCfg:
     """Observation specifications for the MDP."""
 
     @configclass
-    class PolicyCfg(ObsGroup):
+    class PolicyCfg(ObservationGroupCfg):
         """Observations for policy group."""
 
         # observation terms (order preserved)
-        joint_pos = ObsTerm(func=mdp.joint_pos_rel, noise=Unoise(n_min=-0.01, n_max=0.01))
-        joint_vel = ObsTerm(func=mdp.joint_vel_rel, noise=Unoise(n_min=-0.01, n_max=0.01))
-        pose_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "ee_pose"})
-        actions = ObsTerm(func=mdp.last_action)
+        joint_pos = ObservationTermCfg(
+            func=mdp.joint_pos_rel, noise=Unoise(n_min=-0.01, n_max=0.01)
+        )
+        joint_vel = ObservationTermCfg(
+            func=mdp.joint_vel_rel, noise=Unoise(n_min=-0.01, n_max=0.01)
+        )
+        pose_command = ObservationTermCfg(
+            func=mdp.generated_commands, params={"command_name": "ee_pose"}
+        )
+        actions = ObservationTermCfg(func=mdp.last_action)
 
         def __post_init__(self):
             self.enable_corruption = True
@@ -116,7 +124,7 @@ class ObservationsCfg:
 class EventCfg:
     """Configuration for events."""
 
-    reset_robot_joints = EventTerm(
+    reset_robot_joints = EventTermCfg(
         func=mdp.reset_joints_by_scale,
         mode="reset",
         params={
@@ -131,25 +139,35 @@ class RewardsCfg:
     """Reward terms for the MDP."""
 
     # task terms
-    end_effector_position_tracking = RewTerm(
+    end_effector_position_tracking = RewardTermCfg(
         func=mdp.position_command_error,
         weight=-0.2,
-        params={"asset_cfg": SceneEntityCfg("robot", body_names=MISSING), "command_name": "ee_pose"},
+        params={
+            "asset_cfg": SceneEntityCfg("robot", body_names=MISSING),
+            "command_name": "ee_pose",
+        },
     )
-    end_effector_position_tracking_fine_grained = RewTerm(
+    end_effector_position_tracking_fine_grained = RewardTermCfg(
         func=mdp.position_command_error_tanh,
         weight=0.1,
-        params={"asset_cfg": SceneEntityCfg("robot", body_names=MISSING), "std": 0.1, "command_name": "ee_pose"},
+        params={
+            "asset_cfg": SceneEntityCfg("robot", body_names=MISSING),
+            "std": 0.1,
+            "command_name": "ee_pose",
+        },
     )
-    end_effector_orientation_tracking = RewTerm(
+    end_effector_orientation_tracking = RewardTermCfg(
         func=mdp.orientation_command_error,
         weight=-0.1,
-        params={"asset_cfg": SceneEntityCfg("robot", body_names=MISSING), "command_name": "ee_pose"},
+        params={
+            "asset_cfg": SceneEntityCfg("robot", body_names=MISSING),
+            "command_name": "ee_pose",
+        },
     )
 
     # action penalty
-    action_rate = RewTerm(func=mdp.action_rate_l2, weight=-0.0001)
-    joint_vel = RewTerm(
+    action_rate = RewardTermCfg(func=mdp.action_rate_l2, weight=-0.0001)
+    joint_vel = RewardTermCfg(
         func=mdp.joint_vel_l2,
         weight=-0.0001,
         params={"asset_cfg": SceneEntityCfg("robot")},
@@ -160,7 +178,7 @@ class RewardsCfg:
 class TerminationsCfg:
     """Termination terms for the MDP."""
 
-    time_out = DoneTerm(func=mdp.time_out, time_out=True)
+    time_out = TerminationTermCfg(func=mdp.time_out, time_out=True)
 
 
 @configclass
@@ -168,11 +186,13 @@ class CurriculumCfg:
     """Curriculum terms for the MDP."""
 
     action_rate = CurrTerm(
-        func=mdp.modify_reward_weight, params={"term_name": "action_rate", "weight": -0.005, "num_steps": 4500}
+        func=mdp.modify_reward_weight,
+        params={"term_name": "action_rate", "weight": -0.005, "num_steps": 4500},
     )
 
     joint_vel = CurrTerm(
-        func=mdp.modify_reward_weight, params={"term_name": "joint_vel", "weight": -0.001, "num_steps": 4500}
+        func=mdp.modify_reward_weight,
+        params={"term_name": "joint_vel", "weight": -0.001, "num_steps": 4500},
     )
 
 

@@ -8,10 +8,10 @@ from dataclasses import MISSING
 import isaaclab.sim as sim_utils
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg
 from isaaclab.envs import ManagerBasedRLEnvCfg
-from isaaclab.managers import ObservationGroupCfg as ObsGroup
-from isaaclab.managers import ObservationTermCfg as ObsTerm
+from isaaclab.managers import ObservationGroupCfg as ObservationGroupCfg
+from isaaclab.managers import ObservationTermCfg as ObservationTermCfg
 from isaaclab.managers import SceneEntityCfg
-from isaaclab.managers import TerminationTermCfg as DoneTerm
+from isaaclab.managers import TerminationTermCfg as TerminationTermCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sensors import CameraCfg
 from isaaclab.sensors.frame_transformer.frame_transformer_cfg import FrameTransformerCfg
@@ -44,8 +44,12 @@ class ObjectTableSceneCfg(InteractiveSceneCfg):
     # Table
     table = AssetBaseCfg(
         prim_path="{ENV_REGEX_NS}/Table",
-        init_state=AssetBaseCfg.InitialStateCfg(pos=[0.5, 0, 0], rot=[0.707, 0, 0, 0.707]),
-        spawn=UsdFileCfg(usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd"),
+        init_state=AssetBaseCfg.InitialStateCfg(
+            pos=[0.5, 0, 0], rot=[0.707, 0, 0, 0.707]
+        ),
+        spawn=UsdFileCfg(
+            usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd"
+        ),
     )
 
     # plane
@@ -79,32 +83,46 @@ class ObservationsCfg:
     """Observation specifications for the MDP."""
 
     @configclass
-    class PolicyCfg(ObsGroup):
+    class PolicyCfg(ObservationGroupCfg):
         """Observations for policy group with state values."""
 
-        actions = ObsTerm(func=mdp.last_action)
-        joint_pos = ObsTerm(func=mdp.joint_pos_rel)
-        joint_vel = ObsTerm(func=mdp.joint_vel_rel)
-        object = ObsTerm(func=mdp.instance_randomize_object_obs)
-        cube_positions = ObsTerm(func=mdp.instance_randomize_cube_positions_in_world_frame)
-        cube_orientations = ObsTerm(func=mdp.instance_randomize_cube_orientations_in_world_frame)
-        eef_pos = ObsTerm(func=mdp.ee_frame_pos)
-        eef_quat = ObsTerm(func=mdp.ee_frame_quat)
-        gripper_pos = ObsTerm(func=mdp.gripper_pos)
+        actions = ObservationTermCfg(func=mdp.last_action)
+        joint_pos = ObservationTermCfg(func=mdp.joint_pos_rel)
+        joint_vel = ObservationTermCfg(func=mdp.joint_vel_rel)
+        object = ObservationTermCfg(func=mdp.instance_randomize_object_obs)
+        cube_positions = ObservationTermCfg(
+            func=mdp.instance_randomize_cube_positions_in_world_frame
+        )
+        cube_orientations = ObservationTermCfg(
+            func=mdp.instance_randomize_cube_orientations_in_world_frame
+        )
+        eef_pos = ObservationTermCfg(func=mdp.ee_frame_pos)
+        eef_quat = ObservationTermCfg(func=mdp.ee_frame_quat)
+        gripper_pos = ObservationTermCfg(func=mdp.gripper_pos)
 
         def __post_init__(self):
             self.enable_corruption = False
             self.concatenate_terms = False
 
     @configclass
-    class RGBCameraPolicyCfg(ObsGroup):
+    class RGBCameraPolicyCfg(ObservationGroupCfg):
         """Observations for policy group with RGB images."""
 
-        table_cam = ObsTerm(
-            func=mdp.image, params={"sensor_cfg": SceneEntityCfg("table_cam"), "data_type": "rgb", "normalize": False}
+        table_cam = ObservationTermCfg(
+            func=mdp.image,
+            params={
+                "sensor_cfg": SceneEntityCfg("table_cam"),
+                "data_type": "rgb",
+                "normalize": False,
+            },
         )
-        wrist_cam = ObsTerm(
-            func=mdp.image, params={"sensor_cfg": SceneEntityCfg("wrist_cam"), "data_type": "rgb", "normalize": False}
+        wrist_cam = ObservationTermCfg(
+            func=mdp.image,
+            params={
+                "sensor_cfg": SceneEntityCfg("wrist_cam"),
+                "data_type": "rgb",
+                "normalize": False,
+            },
         )
 
         def __post_init__(self):
@@ -120,7 +138,7 @@ class ObservationsCfg:
 class TerminationsCfg:
     """Termination terms for the MDP."""
 
-    time_out = DoneTerm(func=mdp.time_out, time_out=True)
+    time_out = TerminationTermCfg(func=mdp.time_out, time_out=True)
 
 
 @configclass
@@ -128,7 +146,9 @@ class StackInstanceRandomizeEnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the stacking environment."""
 
     # Scene settings
-    scene: ObjectTableSceneCfg = ObjectTableSceneCfg(num_envs=4096, env_spacing=2.5, replicate_physics=False)
+    scene: ObjectTableSceneCfg = ObjectTableSceneCfg(
+        num_envs=4096, env_spacing=2.5, replicate_physics=False
+    )
     # Basic settings
     observations: ObservationsCfg = ObservationsCfg()
     actions: ActionsCfg = ActionsCfg()

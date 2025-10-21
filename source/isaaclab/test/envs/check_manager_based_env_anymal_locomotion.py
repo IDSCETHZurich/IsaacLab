@@ -19,8 +19,12 @@ import argparse
 from isaaclab.app import AppLauncher
 
 # add argparse arguments
-parser = argparse.ArgumentParser(description="This script demonstrates how to use the concept of an Environment.")
-parser.add_argument("--num_envs", type=int, default=64, help="Number of environments to spawn.")
+parser = argparse.ArgumentParser(
+    description="This script demonstrates how to use the concept of an Environment."
+)
+parser.add_argument(
+    "--num_envs", type=int, default=64, help="Number of environments to spawn."
+)
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
@@ -33,21 +37,25 @@ simulation_app = app_launcher.app
 
 """Rest everything follows."""
 
-import torch
-
 import isaaclab.envs.mdp as mdp
 import isaaclab.sim as sim_utils
+import torch
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg
 from isaaclab.envs import ManagerBasedEnv, ManagerBasedEnvCfg
-from isaaclab.managers import EventTermCfg as EventTerm
-from isaaclab.managers import ObservationGroupCfg as ObsGroup
-from isaaclab.managers import ObservationTermCfg as ObsTerm
+from isaaclab.managers import EventTermCfg as EventTermCfg
+from isaaclab.managers import ObservationGroupCfg as ObservationGroupCfg
+from isaaclab.managers import ObservationTermCfg as ObservationTermCfg
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sensors import RayCasterCfg, patterns
 from isaaclab.terrains import TerrainImporterCfg
 from isaaclab.utils import configclass
-from isaaclab.utils.assets import ISAACLAB_NUCLEUS_DIR, NVIDIA_NUCLEUS_DIR, check_file_path, read_file
+from isaaclab.utils.assets import (
+    ISAACLAB_NUCLEUS_DIR,
+    NVIDIA_NUCLEUS_DIR,
+    check_file_path,
+    read_file,
+)
 from isaaclab.utils.noise import AdditiveUniformNoiseCfg as Unoise
 
 ##
@@ -123,7 +131,9 @@ def constant_commands(env: ManagerBasedEnv) -> torch.Tensor:
 class ActionsCfg:
     """Action specifications for the MDP."""
 
-    joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=[".*"], scale=0.5, use_default_offset=True)
+    joint_pos = mdp.JointPositionActionCfg(
+        asset_name="robot", joint_names=[".*"], scale=0.5, use_default_offset=True
+    )
 
 
 @configclass
@@ -131,21 +141,29 @@ class ObservationsCfg:
     """Observation specifications for the MDP."""
 
     @configclass
-    class PolicyCfg(ObsGroup):
+    class PolicyCfg(ObservationGroupCfg):
         """Observations for policy group."""
 
         # observation terms (order preserved)
-        base_lin_vel = ObsTerm(func=mdp.base_lin_vel, noise=Unoise(n_min=-0.1, n_max=0.1))
-        base_ang_vel = ObsTerm(func=mdp.base_ang_vel, noise=Unoise(n_min=-0.2, n_max=0.2))
-        projected_gravity = ObsTerm(
+        base_lin_vel = ObservationTermCfg(
+            func=mdp.base_lin_vel, noise=Unoise(n_min=-0.1, n_max=0.1)
+        )
+        base_ang_vel = ObservationTermCfg(
+            func=mdp.base_ang_vel, noise=Unoise(n_min=-0.2, n_max=0.2)
+        )
+        projected_gravity = ObservationTermCfg(
             func=mdp.projected_gravity,
             noise=Unoise(n_min=-0.05, n_max=0.05),
         )
-        velocity_commands = ObsTerm(func=constant_commands)
-        joint_pos = ObsTerm(func=mdp.joint_pos_rel, noise=Unoise(n_min=-0.01, n_max=0.01))
-        joint_vel = ObsTerm(func=mdp.joint_vel_rel, noise=Unoise(n_min=-1.5, n_max=1.5))
-        actions = ObsTerm(func=mdp.last_action)
-        height_scan = ObsTerm(
+        velocity_commands = ObservationTermCfg(func=constant_commands)
+        joint_pos = ObservationTermCfg(
+            func=mdp.joint_pos_rel, noise=Unoise(n_min=-0.01, n_max=0.01)
+        )
+        joint_vel = ObservationTermCfg(
+            func=mdp.joint_vel_rel, noise=Unoise(n_min=-1.5, n_max=1.5)
+        )
+        actions = ObservationTermCfg(func=mdp.last_action)
+        height_scan = ObservationTermCfg(
             func=mdp.height_scan,
             params={"sensor_cfg": SceneEntityCfg("height_scanner")},
             noise=Unoise(n_min=-0.1, n_max=0.1),
@@ -164,7 +182,7 @@ class ObservationsCfg:
 class EventCfg:
     """Configuration for events."""
 
-    reset_base = EventTerm(
+    reset_base = EventTermCfg(
         func=mdp.reset_root_state_uniform,
         mode="reset",
         params={
@@ -191,7 +209,9 @@ class QuadrupedEnvCfg(ManagerBasedEnvCfg):
     """Configuration for the locomotion velocity-tracking environment."""
 
     # Scene settings
-    scene: MySceneCfg = MySceneCfg(num_envs=args_cli.num_envs, env_spacing=2.5, replicate_physics=True)
+    scene: MySceneCfg = MySceneCfg(
+        num_envs=args_cli.num_envs, env_spacing=2.5, replicate_physics=True
+    )
     # Basic settings
     observations: ObservationsCfg = ObservationsCfg()
     actions: ActionsCfg = ActionsCfg()

@@ -6,15 +6,20 @@
 from dataclasses import MISSING
 
 import isaaclab.sim as sim_utils
-from isaaclab.assets import ArticulationCfg, AssetBaseCfg, DeformableObjectCfg, RigidObjectCfg
+from isaaclab.assets import (
+    ArticulationCfg,
+    AssetBaseCfg,
+    DeformableObjectCfg,
+    RigidObjectCfg,
+)
 from isaaclab.envs import ManagerBasedRLEnvCfg
 from isaaclab.managers import CurriculumTermCfg as CurrTerm
-from isaaclab.managers import EventTermCfg as EventTerm
-from isaaclab.managers import ObservationGroupCfg as ObsGroup
-from isaaclab.managers import ObservationTermCfg as ObsTerm
-from isaaclab.managers import RewardTermCfg as RewTerm
+from isaaclab.managers import EventTermCfg as EventTermCfg
+from isaaclab.managers import ObservationGroupCfg as ObservationGroupCfg
+from isaaclab.managers import ObservationTermCfg as ObservationTermCfg
+from isaaclab.managers import RewardTermCfg as RewardTermCfg
 from isaaclab.managers import SceneEntityCfg
-from isaaclab.managers import TerminationTermCfg as DoneTerm
+from isaaclab.managers import TerminationTermCfg as TerminationTermCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sensors.frame_transformer.frame_transformer_cfg import FrameTransformerCfg
 from isaaclab.sim.spawners.from_files.from_files_cfg import GroundPlaneCfg, UsdFileCfg
@@ -45,8 +50,12 @@ class ObjectTableSceneCfg(InteractiveSceneCfg):
     # Table
     table = AssetBaseCfg(
         prim_path="{ENV_REGEX_NS}/Table",
-        init_state=AssetBaseCfg.InitialStateCfg(pos=[0.5, 0, 0], rot=[0.707, 0, 0, 0.707]),
-        spawn=UsdFileCfg(usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd"),
+        init_state=AssetBaseCfg.InitialStateCfg(
+            pos=[0.5, 0, 0], rot=[0.707, 0, 0, 0.707]
+        ),
+        spawn=UsdFileCfg(
+            usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd"
+        ),
     )
 
     # plane
@@ -78,7 +87,12 @@ class CommandsCfg:
         resampling_time_range=(5.0, 5.0),
         debug_vis=True,
         ranges=mdp.UniformPoseCommandCfg.Ranges(
-            pos_x=(0.4, 0.6), pos_y=(-0.25, 0.25), pos_z=(0.25, 0.5), roll=(0.0, 0.0), pitch=(0.0, 0.0), yaw=(0.0, 0.0)
+            pos_x=(0.4, 0.6),
+            pos_y=(-0.25, 0.25),
+            pos_z=(0.25, 0.5),
+            roll=(0.0, 0.0),
+            pitch=(0.0, 0.0),
+            yaw=(0.0, 0.0),
         ),
     )
 
@@ -88,7 +102,9 @@ class ActionsCfg:
     """Action specifications for the MDP."""
 
     # will be set by agent env cfg
-    arm_action: mdp.JointPositionActionCfg | mdp.DifferentialInverseKinematicsActionCfg = MISSING
+    arm_action: (
+        mdp.JointPositionActionCfg | mdp.DifferentialInverseKinematicsActionCfg
+    ) = MISSING
     gripper_action: mdp.BinaryJointPositionActionCfg = MISSING
 
 
@@ -97,14 +113,18 @@ class ObservationsCfg:
     """Observation specifications for the MDP."""
 
     @configclass
-    class PolicyCfg(ObsGroup):
+    class PolicyCfg(ObservationGroupCfg):
         """Observations for policy group."""
 
-        joint_pos = ObsTerm(func=mdp.joint_pos_rel)
-        joint_vel = ObsTerm(func=mdp.joint_vel_rel)
-        object_position = ObsTerm(func=mdp.object_position_in_robot_root_frame)
-        target_object_position = ObsTerm(func=mdp.generated_commands, params={"command_name": "object_pose"})
-        actions = ObsTerm(func=mdp.last_action)
+        joint_pos = ObservationTermCfg(func=mdp.joint_pos_rel)
+        joint_vel = ObservationTermCfg(func=mdp.joint_vel_rel)
+        object_position = ObservationTermCfg(
+            func=mdp.object_position_in_robot_root_frame
+        )
+        target_object_position = ObservationTermCfg(
+            func=mdp.generated_commands, params={"command_name": "object_pose"}
+        )
+        actions = ObservationTermCfg(func=mdp.last_action)
 
         def __post_init__(self):
             self.enable_corruption = True
@@ -118,9 +138,9 @@ class ObservationsCfg:
 class EventCfg:
     """Configuration for events."""
 
-    reset_all = EventTerm(func=mdp.reset_scene_to_default, mode="reset")
+    reset_all = EventTermCfg(func=mdp.reset_scene_to_default, mode="reset")
 
-    reset_object_position = EventTerm(
+    reset_object_position = EventTermCfg(
         func=mdp.reset_root_state_uniform,
         mode="reset",
         params={
@@ -135,26 +155,30 @@ class EventCfg:
 class RewardsCfg:
     """Reward terms for the MDP."""
 
-    reaching_object = RewTerm(func=mdp.object_ee_distance, params={"std": 0.1}, weight=1.0)
+    reaching_object = RewardTermCfg(
+        func=mdp.object_ee_distance, params={"std": 0.1}, weight=1.0
+    )
 
-    lifting_object = RewTerm(func=mdp.object_is_lifted, params={"minimal_height": 0.04}, weight=15.0)
+    lifting_object = RewardTermCfg(
+        func=mdp.object_is_lifted, params={"minimal_height": 0.04}, weight=15.0
+    )
 
-    object_goal_tracking = RewTerm(
+    object_goal_tracking = RewardTermCfg(
         func=mdp.object_goal_distance,
         params={"std": 0.3, "minimal_height": 0.04, "command_name": "object_pose"},
         weight=16.0,
     )
 
-    object_goal_tracking_fine_grained = RewTerm(
+    object_goal_tracking_fine_grained = RewardTermCfg(
         func=mdp.object_goal_distance,
         params={"std": 0.05, "minimal_height": 0.04, "command_name": "object_pose"},
         weight=5.0,
     )
 
     # action penalty
-    action_rate = RewTerm(func=mdp.action_rate_l2, weight=-1e-4)
+    action_rate = RewardTermCfg(func=mdp.action_rate_l2, weight=-1e-4)
 
-    joint_vel = RewTerm(
+    joint_vel = RewardTermCfg(
         func=mdp.joint_vel_l2,
         weight=-1e-4,
         params={"asset_cfg": SceneEntityCfg("robot")},
@@ -165,10 +189,11 @@ class RewardsCfg:
 class TerminationsCfg:
     """Termination terms for the MDP."""
 
-    time_out = DoneTerm(func=mdp.time_out, time_out=True)
+    time_out = TerminationTermCfg(func=mdp.time_out, time_out=True)
 
-    object_dropping = DoneTerm(
-        func=mdp.root_height_below_minimum, params={"minimum_height": -0.05, "asset_cfg": SceneEntityCfg("object")}
+    object_dropping = TerminationTermCfg(
+        func=mdp.root_height_below_minimum,
+        params={"minimum_height": -0.05, "asset_cfg": SceneEntityCfg("object")},
     )
 
 
@@ -177,11 +202,13 @@ class CurriculumCfg:
     """Curriculum terms for the MDP."""
 
     action_rate = CurrTerm(
-        func=mdp.modify_reward_weight, params={"term_name": "action_rate", "weight": -1e-1, "num_steps": 10000}
+        func=mdp.modify_reward_weight,
+        params={"term_name": "action_rate", "weight": -1e-1, "num_steps": 10000},
     )
 
     joint_vel = CurrTerm(
-        func=mdp.modify_reward_weight, params={"term_name": "joint_vel", "weight": -1e-1, "num_steps": 10000}
+        func=mdp.modify_reward_weight,
+        params={"term_name": "joint_vel", "weight": -1e-1, "num_steps": 10000},
     )
 
 

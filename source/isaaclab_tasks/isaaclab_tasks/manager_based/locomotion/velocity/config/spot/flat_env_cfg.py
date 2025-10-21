@@ -6,11 +6,11 @@
 import isaaclab.sim as sim_utils
 import isaaclab.terrains as terrain_gen
 from isaaclab.envs import ViewerCfg
-from isaaclab.managers import EventTermCfg as EventTerm
-from isaaclab.managers import ObservationGroupCfg as ObsGroup
-from isaaclab.managers import ObservationTermCfg as ObsTerm
+from isaaclab.managers import EventTermCfg as EventTermCfg
+from isaaclab.managers import ObservationGroupCfg as ObservationGroupCfg
+from isaaclab.managers import ObservationTermCfg as ObservationTermCfg
 from isaaclab.managers import RewardTermCfg, SceneEntityCfg
-from isaaclab.managers import TerminationTermCfg as DoneTerm
+from isaaclab.managers import TerminationTermCfg as TerminationTermCfg
 from isaaclab.terrains import TerrainImporterCfg
 from isaaclab.utils import configclass
 from isaaclab.utils.assets import ISAACLAB_NUCLEUS_DIR
@@ -18,7 +18,9 @@ from isaaclab.utils.noise import AdditiveUniformNoiseCfg as Unoise
 
 import isaaclab_tasks.manager_based.locomotion.velocity.config.spot.mdp as spot_mdp
 import isaaclab_tasks.manager_based.locomotion.velocity.mdp as mdp
-from isaaclab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg
+from isaaclab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import (
+    LocomotionVelocityRoughEnvCfg,
+)
 
 ##
 # Pre-defined configs
@@ -49,7 +51,9 @@ COBBLESTONE_ROAD_CFG = terrain_gen.TerrainGeneratorCfg(
 class SpotActionsCfg:
     """Action specifications for the MDP."""
 
-    joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=[".*"], scale=0.2, use_default_offset=True)
+    joint_pos = mdp.JointPositionActionCfg(
+        asset_name="robot", joint_names=[".*"], scale=0.2, use_default_offset=True
+    )
 
 
 @configclass
@@ -74,29 +78,39 @@ class SpotObservationsCfg:
     """Observation specifications for the MDP."""
 
     @configclass
-    class PolicyCfg(ObsGroup):
+    class PolicyCfg(ObservationGroupCfg):
         """Observations for policy group."""
 
         # `` observation terms (order preserved)
-        base_lin_vel = ObsTerm(
-            func=mdp.base_lin_vel, params={"asset_cfg": SceneEntityCfg("robot")}, noise=Unoise(n_min=-0.1, n_max=0.1)
+        base_lin_vel = ObservationTermCfg(
+            func=mdp.base_lin_vel,
+            params={"asset_cfg": SceneEntityCfg("robot")},
+            noise=Unoise(n_min=-0.1, n_max=0.1),
         )
-        base_ang_vel = ObsTerm(
-            func=mdp.base_ang_vel, params={"asset_cfg": SceneEntityCfg("robot")}, noise=Unoise(n_min=-0.1, n_max=0.1)
+        base_ang_vel = ObservationTermCfg(
+            func=mdp.base_ang_vel,
+            params={"asset_cfg": SceneEntityCfg("robot")},
+            noise=Unoise(n_min=-0.1, n_max=0.1),
         )
-        projected_gravity = ObsTerm(
+        projected_gravity = ObservationTermCfg(
             func=mdp.projected_gravity,
             params={"asset_cfg": SceneEntityCfg("robot")},
             noise=Unoise(n_min=-0.05, n_max=0.05),
         )
-        velocity_commands = ObsTerm(func=mdp.generated_commands, params={"command_name": "base_velocity"})
-        joint_pos = ObsTerm(
-            func=mdp.joint_pos_rel, params={"asset_cfg": SceneEntityCfg("robot")}, noise=Unoise(n_min=-0.05, n_max=0.05)
+        velocity_commands = ObservationTermCfg(
+            func=mdp.generated_commands, params={"command_name": "base_velocity"}
         )
-        joint_vel = ObsTerm(
-            func=mdp.joint_vel_rel, params={"asset_cfg": SceneEntityCfg("robot")}, noise=Unoise(n_min=-0.5, n_max=0.5)
+        joint_pos = ObservationTermCfg(
+            func=mdp.joint_pos_rel,
+            params={"asset_cfg": SceneEntityCfg("robot")},
+            noise=Unoise(n_min=-0.05, n_max=0.05),
         )
-        actions = ObsTerm(func=mdp.last_action)
+        joint_vel = ObservationTermCfg(
+            func=mdp.joint_vel_rel,
+            params={"asset_cfg": SceneEntityCfg("robot")},
+            noise=Unoise(n_min=-0.5, n_max=0.5),
+        )
+        actions = ObservationTermCfg(func=mdp.last_action)
 
         def __post_init__(self):
             self.enable_corruption = False
@@ -111,7 +125,7 @@ class SpotEventCfg:
     """Configuration for randomization."""
 
     # startup
-    physics_material = EventTerm(
+    physics_material = EventTermCfg(
         func=mdp.randomize_rigid_body_material,
         mode="startup",
         params={
@@ -123,7 +137,7 @@ class SpotEventCfg:
         },
     )
 
-    add_base_mass = EventTerm(
+    add_base_mass = EventTermCfg(
         func=mdp.randomize_rigid_body_mass,
         mode="startup",
         params={
@@ -134,7 +148,7 @@ class SpotEventCfg:
     )
 
     # reset
-    base_external_force_torque = EventTerm(
+    base_external_force_torque = EventTermCfg(
         func=mdp.apply_external_force_torque,
         mode="reset",
         params={
@@ -144,7 +158,7 @@ class SpotEventCfg:
         },
     )
 
-    reset_base = EventTerm(
+    reset_base = EventTermCfg(
         func=mdp.reset_root_state_uniform,
         mode="reset",
         params={
@@ -161,7 +175,7 @@ class SpotEventCfg:
         },
     )
 
-    reset_robot_joints = EventTerm(
+    reset_robot_joints = EventTermCfg(
         func=spot_mdp.reset_joints_around_default,
         mode="reset",
         params={
@@ -172,7 +186,7 @@ class SpotEventCfg:
     )
 
     # interval
-    push_robot = EventTerm(
+    push_robot = EventTermCfg(
         func=mdp.push_by_setting_velocity,
         mode="interval",
         interval_range_s=(10.0, 15.0),
@@ -204,7 +218,12 @@ class SpotRewardsCfg:
     base_linear_velocity = RewardTermCfg(
         func=spot_mdp.base_linear_velocity_reward,
         weight=5.0,
-        params={"std": 1.0, "ramp_rate": 0.5, "ramp_at_vel": 1.0, "asset_cfg": SceneEntityCfg("robot")},
+        params={
+            "std": 1.0,
+            "ramp_rate": 0.5,
+            "ramp_at_vel": 1.0,
+            "asset_cfg": SceneEntityCfg("robot"),
+        },
     )
     foot_clearance = RewardTermCfg(
         func=spot_mdp.foot_clearance_reward,
@@ -230,17 +249,23 @@ class SpotRewardsCfg:
     )
 
     # -- penalties
-    action_smoothness = RewardTermCfg(func=spot_mdp.action_smoothness_penalty, weight=-1.0)
+    action_smoothness = RewardTermCfg(
+        func=spot_mdp.action_smoothness_penalty, weight=-1.0
+    )
     air_time_variance = RewardTermCfg(
         func=spot_mdp.air_time_variance_penalty,
         weight=-1.0,
         params={"sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_foot")},
     )
     base_motion = RewardTermCfg(
-        func=spot_mdp.base_motion_penalty, weight=-2.0, params={"asset_cfg": SceneEntityCfg("robot")}
+        func=spot_mdp.base_motion_penalty,
+        weight=-2.0,
+        params={"asset_cfg": SceneEntityCfg("robot")},
     )
     base_orientation = RewardTermCfg(
-        func=spot_mdp.base_orientation_penalty, weight=-3.0, params={"asset_cfg": SceneEntityCfg("robot")}
+        func=spot_mdp.base_orientation_penalty,
+        weight=-3.0,
+        params={"asset_cfg": SceneEntityCfg("robot")},
     )
     foot_slip = RewardTermCfg(
         func=spot_mdp.foot_slip_penalty,
@@ -281,12 +306,17 @@ class SpotRewardsCfg:
 class SpotTerminationsCfg:
     """Termination terms for the MDP."""
 
-    time_out = DoneTerm(func=mdp.time_out, time_out=True)
-    body_contact = DoneTerm(
+    time_out = TerminationTermCfg(func=mdp.time_out, time_out=True)
+    body_contact = TerminationTermCfg(
         func=mdp.illegal_contact,
-        params={"sensor_cfg": SceneEntityCfg("contact_forces", body_names=["body", ".*leg"]), "threshold": 1.0},
+        params={
+            "sensor_cfg": SceneEntityCfg(
+                "contact_forces", body_names=["body", ".*leg"]
+            ),
+            "threshold": 1.0,
+        },
     )
-    terrain_out_of_bounds = DoneTerm(
+    terrain_out_of_bounds = TerminationTermCfg(
         func=mdp.terrain_out_of_bounds,
         params={"asset_cfg": SceneEntityCfg("robot"), "distance_buffer": 3.0},
         time_out=True,
@@ -295,7 +325,6 @@ class SpotTerminationsCfg:
 
 @configclass
 class SpotFlatEnvCfg(LocomotionVelocityRoughEnvCfg):
-
     # Basic settings'
     observations: SpotObservationsCfg = SpotObservationsCfg()
     actions: SpotActionsCfg = SpotActionsCfg()
@@ -307,7 +336,9 @@ class SpotFlatEnvCfg(LocomotionVelocityRoughEnvCfg):
     events: SpotEventCfg = SpotEventCfg()
 
     # Viewer
-    viewer = ViewerCfg(eye=(10.5, 10.5, 0.3), origin_type="world", env_index=0, asset_name="robot")
+    viewer = ViewerCfg(
+        eye=(10.5, 10.5, 0.3), origin_type="world", env_index=0, asset_name="robot"
+    )
 
     def __post_init__(self):
         # post init of parent

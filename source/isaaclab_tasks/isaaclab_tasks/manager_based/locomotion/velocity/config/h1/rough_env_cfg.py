@@ -3,12 +3,15 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-from isaaclab.managers import RewardTermCfg as RewTerm
+from isaaclab.managers import RewardTermCfg as RewardTermCfg
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 
 import isaaclab_tasks.manager_based.locomotion.velocity.mdp as mdp
-from isaaclab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg, RewardsCfg
+from isaaclab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import (
+    LocomotionVelocityRoughEnvCfg,
+    RewardsCfg,
+)
 
 ##
 # Pre-defined configs
@@ -20,17 +23,19 @@ from isaaclab_assets import H1_MINIMAL_CFG  # isort: skip
 class H1Rewards(RewardsCfg):
     """Reward terms for the MDP."""
 
-    termination_penalty = RewTerm(func=mdp.is_terminated, weight=-200.0)
+    termination_penalty = RewardTermCfg(func=mdp.is_terminated, weight=-200.0)
     lin_vel_z_l2 = None
-    track_lin_vel_xy_exp = RewTerm(
+    track_lin_vel_xy_exp = RewardTermCfg(
         func=mdp.track_lin_vel_xy_yaw_frame_exp,
         weight=1.0,
         params={"command_name": "base_velocity", "std": 0.5},
     )
-    track_ang_vel_z_exp = RewTerm(
-        func=mdp.track_ang_vel_z_world_exp, weight=1.0, params={"command_name": "base_velocity", "std": 0.5}
+    track_ang_vel_z_exp = RewardTermCfg(
+        func=mdp.track_ang_vel_z_world_exp,
+        weight=1.0,
+        params={"command_name": "base_velocity", "std": 0.5},
     )
-    feet_air_time = RewTerm(
+    feet_air_time = RewardTermCfg(
         func=mdp.feet_air_time_positive_biped,
         weight=0.25,
         params={
@@ -39,7 +44,7 @@ class H1Rewards(RewardsCfg):
             "threshold": 0.4,
         },
     )
-    feet_slide = RewTerm(
+    feet_slide = RewardTermCfg(
         func=mdp.feet_slide,
         weight=-0.25,
         params={
@@ -48,22 +53,34 @@ class H1Rewards(RewardsCfg):
         },
     )
     # Penalize ankle joint limits
-    dof_pos_limits = RewTerm(
-        func=mdp.joint_pos_limits, weight=-1.0, params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*_ankle")}
+    dof_pos_limits = RewardTermCfg(
+        func=mdp.joint_pos_limits,
+        weight=-1.0,
+        params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*_ankle")},
     )
     # Penalize deviation from default of the joints that are not essential for locomotion
-    joint_deviation_hip = RewTerm(
+    joint_deviation_hip = RewardTermCfg(
         func=mdp.joint_deviation_l1,
         weight=-0.2,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_hip_yaw", ".*_hip_roll"])},
+        params={
+            "asset_cfg": SceneEntityCfg(
+                "robot", joint_names=[".*_hip_yaw", ".*_hip_roll"]
+            )
+        },
     )
-    joint_deviation_arms = RewTerm(
+    joint_deviation_arms = RewardTermCfg(
         func=mdp.joint_deviation_l1,
         weight=-0.2,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_shoulder_.*", ".*_elbow"])},
+        params={
+            "asset_cfg": SceneEntityCfg(
+                "robot", joint_names=[".*_shoulder_.*", ".*_elbow"]
+            )
+        },
     )
-    joint_deviation_torso = RewTerm(
-        func=mdp.joint_deviation_l1, weight=-0.1, params={"asset_cfg": SceneEntityCfg("robot", joint_names="torso")}
+    joint_deviation_torso = RewardTermCfg(
+        func=mdp.joint_deviation_l1,
+        weight=-0.1,
+        params={"asset_cfg": SceneEntityCfg("robot", joint_names="torso")},
     )
 
 
@@ -83,7 +100,9 @@ class H1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.events.push_robot = None
         self.events.add_base_mass = None
         self.events.reset_robot_joints.params["position_range"] = (1.0, 1.0)
-        self.events.base_external_force_torque.params["asset_cfg"].body_names = [".*torso_link"]
+        self.events.base_external_force_torque.params["asset_cfg"].body_names = [
+            ".*torso_link"
+        ]
         self.events.reset_base.params = {
             "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "yaw": (-3.14, 3.14)},
             "velocity_range": {
@@ -97,7 +116,9 @@ class H1RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         }
 
         # Terminations
-        self.terminations.base_contact.params["sensor_cfg"].body_names = [".*torso_link"]
+        self.terminations.base_contact.params["sensor_cfg"].body_names = [
+            ".*torso_link"
+        ]
 
         # Rewards
         self.rewards.undesired_contacts = None

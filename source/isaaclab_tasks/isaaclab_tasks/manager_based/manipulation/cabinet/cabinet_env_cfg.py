@@ -10,12 +10,12 @@ import isaaclab.sim as sim_utils
 from isaaclab.actuators.actuator_cfg import ImplicitActuatorCfg
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg
 from isaaclab.envs import ManagerBasedRLEnvCfg
-from isaaclab.managers import EventTermCfg as EventTerm
-from isaaclab.managers import ObservationGroupCfg as ObsGroup
-from isaaclab.managers import ObservationTermCfg as ObsTerm
-from isaaclab.managers import RewardTermCfg as RewTerm
+from isaaclab.managers import EventTermCfg as EventTermCfg
+from isaaclab.managers import ObservationGroupCfg as ObservationGroupCfg
+from isaaclab.managers import ObservationTermCfg as ObservationTermCfg
+from isaaclab.managers import RewardTermCfg as RewardTermCfg
 from isaaclab.managers import SceneEntityCfg
-from isaaclab.managers import TerminationTermCfg as DoneTerm
+from isaaclab.managers import TerminationTermCfg as TerminationTermCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sensors import FrameTransformerCfg
 from isaaclab.sensors.frame_transformer import OffsetCfg
@@ -90,7 +90,9 @@ class CabinetSceneCfg(InteractiveSceneCfg):
     cabinet_frame = FrameTransformerCfg(
         prim_path="{ENV_REGEX_NS}/Cabinet/sektion",
         debug_vis=True,
-        visualizer_cfg=FRAME_MARKER_SMALL_CFG.replace(prim_path="/Visuals/CabinetFrameTransformer"),
+        visualizer_cfg=FRAME_MARKER_SMALL_CFG.replace(
+            prim_path="/Visuals/CabinetFrameTransformer"
+        ),
         target_frames=[
             FrameTransformerCfg.FrameCfg(
                 prim_path="{ENV_REGEX_NS}/Cabinet/drawer_handle_top",
@@ -136,22 +138,26 @@ class ObservationsCfg:
     """Observation specifications for the MDP."""
 
     @configclass
-    class PolicyCfg(ObsGroup):
+    class PolicyCfg(ObservationGroupCfg):
         """Observations for policy group."""
 
-        joint_pos = ObsTerm(func=mdp.joint_pos_rel)
-        joint_vel = ObsTerm(func=mdp.joint_vel_rel)
-        cabinet_joint_pos = ObsTerm(
+        joint_pos = ObservationTermCfg(func=mdp.joint_pos_rel)
+        joint_vel = ObservationTermCfg(func=mdp.joint_vel_rel)
+        cabinet_joint_pos = ObservationTermCfg(
             func=mdp.joint_pos_rel,
-            params={"asset_cfg": SceneEntityCfg("cabinet", joint_names=["drawer_top_joint"])},
+            params={
+                "asset_cfg": SceneEntityCfg("cabinet", joint_names=["drawer_top_joint"])
+            },
         )
-        cabinet_joint_vel = ObsTerm(
+        cabinet_joint_vel = ObservationTermCfg(
             func=mdp.joint_vel_rel,
-            params={"asset_cfg": SceneEntityCfg("cabinet", joint_names=["drawer_top_joint"])},
+            params={
+                "asset_cfg": SceneEntityCfg("cabinet", joint_names=["drawer_top_joint"])
+            },
         )
-        rel_ee_drawer_distance = ObsTerm(func=mdp.rel_ee_drawer_distance)
+        rel_ee_drawer_distance = ObservationTermCfg(func=mdp.rel_ee_drawer_distance)
 
-        actions = ObsTerm(func=mdp.last_action)
+        actions = ObservationTermCfg(func=mdp.last_action)
 
         def __post_init__(self):
             self.enable_corruption = True
@@ -165,7 +171,7 @@ class ObservationsCfg:
 class EventCfg:
     """Configuration for events."""
 
-    robot_physics_material = EventTerm(
+    robot_physics_material = EventTermCfg(
         func=mdp.randomize_rigid_body_material,
         mode="startup",
         params={
@@ -177,7 +183,7 @@ class EventCfg:
         },
     )
 
-    cabinet_physics_material = EventTerm(
+    cabinet_physics_material = EventTermCfg(
         func=mdp.randomize_rigid_body_material,
         mode="startup",
         params={
@@ -189,9 +195,9 @@ class EventCfg:
         },
     )
 
-    reset_all = EventTerm(func=mdp.reset_scene_to_default, mode="reset")
+    reset_all = EventTermCfg(func=mdp.reset_scene_to_default, mode="reset")
 
-    reset_robot_joints = EventTerm(
+    reset_robot_joints = EventTermCfg(
         func=mdp.reset_joints_by_offset,
         mode="reset",
         params={
@@ -206,13 +212,19 @@ class RewardsCfg:
     """Reward terms for the MDP."""
 
     # 1. Approach the handle
-    approach_ee_handle = RewTerm(func=mdp.approach_ee_handle, weight=2.0, params={"threshold": 0.2})
-    align_ee_handle = RewTerm(func=mdp.align_ee_handle, weight=0.5)
+    approach_ee_handle = RewardTermCfg(
+        func=mdp.approach_ee_handle, weight=2.0, params={"threshold": 0.2}
+    )
+    align_ee_handle = RewardTermCfg(func=mdp.align_ee_handle, weight=0.5)
 
     # 2. Grasp the handle
-    approach_gripper_handle = RewTerm(func=mdp.approach_gripper_handle, weight=5.0, params={"offset": MISSING})
-    align_grasp_around_handle = RewTerm(func=mdp.align_grasp_around_handle, weight=0.125)
-    grasp_handle = RewTerm(
+    approach_gripper_handle = RewardTermCfg(
+        func=mdp.approach_gripper_handle, weight=5.0, params={"offset": MISSING}
+    )
+    align_grasp_around_handle = RewardTermCfg(
+        func=mdp.align_grasp_around_handle, weight=0.125
+    )
+    grasp_handle = RewardTermCfg(
         func=mdp.grasp_handle,
         weight=0.5,
         params={
@@ -223,27 +235,31 @@ class RewardsCfg:
     )
 
     # 3. Open the drawer
-    open_drawer_bonus = RewTerm(
+    open_drawer_bonus = RewardTermCfg(
         func=mdp.open_drawer_bonus,
         weight=7.5,
-        params={"asset_cfg": SceneEntityCfg("cabinet", joint_names=["drawer_top_joint"])},
+        params={
+            "asset_cfg": SceneEntityCfg("cabinet", joint_names=["drawer_top_joint"])
+        },
     )
-    multi_stage_open_drawer = RewTerm(
+    multi_stage_open_drawer = RewardTermCfg(
         func=mdp.multi_stage_open_drawer,
         weight=1.0,
-        params={"asset_cfg": SceneEntityCfg("cabinet", joint_names=["drawer_top_joint"])},
+        params={
+            "asset_cfg": SceneEntityCfg("cabinet", joint_names=["drawer_top_joint"])
+        },
     )
 
     # 4. Penalize actions for cosmetic reasons
-    action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-1e-2)
-    joint_vel = RewTerm(func=mdp.joint_vel_l2, weight=-0.0001)
+    action_rate_l2 = RewardTermCfg(func=mdp.action_rate_l2, weight=-1e-2)
+    joint_vel = RewardTermCfg(func=mdp.joint_vel_l2, weight=-0.0001)
 
 
 @configclass
 class TerminationsCfg:
     """Termination terms for the MDP."""
 
-    time_out = DoneTerm(func=mdp.time_out, time_out=True)
+    time_out = TerminationTermCfg(func=mdp.time_out, time_out=True)
 
 
 ##

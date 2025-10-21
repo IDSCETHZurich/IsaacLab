@@ -107,13 +107,7 @@ rewards:
   player_in_goal: !!float -10.0
   goal_scored: !!float 10.0
   goal_conceded: !!float -10.0
-  distance_ball_opponent_goal:
-    weight: 1.0
-    # if per_second is True, the reward is scaled by dt (environment time step):
-    per_second: True
-    # alternatively, define start and end weight; weights are linearly interpolated during training:
-    # (see CurriculumWrapper for implementation details)
-    # weight: [0.0, 1.0]
+  distance_ball_opponent_goal: 0.02
   ball_speed: !!float 0.0
   distance_player_ball_own_half: !!float 0.0
   ball_stationary: !!float 0.0
