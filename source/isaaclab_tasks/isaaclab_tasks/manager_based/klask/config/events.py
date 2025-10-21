@@ -3,7 +3,7 @@ from isaaclab.managers import EventTermCfg, SceneEntityCfg
 from isaaclab.utils import configclass
 from isaaclab_assets.robots.klask import KLASK_PARAMS
 
-from ..utils_manager_based import reset_joints_by_offset
+from ..mdp.events import reset_joints_by_offset
 
 
 @configclass

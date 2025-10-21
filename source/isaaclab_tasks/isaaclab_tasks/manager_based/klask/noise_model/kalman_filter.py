@@ -1,8 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import torch
 from isaaclab.envs import ManagerBasedRLEnv
 from isaaclab.managers import ManagerTermBase, ObservationTermCfg, SceneEntityCfg
 
-from ..utils_manager_based import body_xy_pos_w, root_lin_xy_vel_w, root_xy_pos_w
+from ..mdp.utils import body_xy_pos_w, root_lin_xy_vel_w, root_xy_pos_w
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class KalmanFilter(ManagerTermBase):
@@ -58,8 +65,9 @@ class KalmanFilter(ManagerTermBase):
         peg_2: SceneEntityCfg,
         ball: SceneEntityCfg,
     ) -> torch.Tensor:
-        ball_pos = root_xy_pos_w(env, asset_cfg=ball)
-        ball_vel = root_lin_xy_vel_w(env, asset_cfg=ball)
+        ball_pos = root_xy_pos_w(env, asset_cfg=ball).clone()
+        ball_pos += 0.014 * torch.rand_like(ball_pos) - 0.007
+        ball_vel = root_lin_xy_vel_w(env, asset_cfg=ball).clone()
         ball_state = torch.cat([ball_pos, ball_vel], dim=1)
         peg_1_pos = body_xy_pos_w(env, asset_cfg=peg_1)
         peg_2_pos = body_xy_pos_w(env, asset_cfg=peg_2)
@@ -68,9 +76,14 @@ class KalmanFilter(ManagerTermBase):
         )
         self._predict(x_collision, y_collision)
         self._update(ball_state)
-        print(f"True ball state: {ball_pos[0]}, {ball_vel[0]}")
-        print(f"Estimated ball state: {self.ball_state[0]}")
+
         return self.ball_state
+
+    def reset(self, env_ids: Sequence[int] | None = None) -> None:
+        if env_ids is None:
+            env_ids = torch.arange(self._env.num_envs, device=self.device)
+        self.ball_state[env_ids] = 0.0
+        self.P[env_ids] = torch.eye(4, device=self.device)
 
     def _check_collision(
         self,

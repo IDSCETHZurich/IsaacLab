@@ -3,7 +3,7 @@ from isaaclab.managers import RewardTermCfg, SceneEntityCfg
 from isaaclab.utils import configclass
 from isaaclab_assets.robots.klask import KLASK_PARAMS
 
-from ..utils_manager_based import (
+from ..mdp.rewards import (
     ball_in_goal,
     ball_in_own_half,
     ball_speed,

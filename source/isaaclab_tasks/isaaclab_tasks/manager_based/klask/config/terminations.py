@@ -3,7 +3,7 @@ from isaaclab.managers import SceneEntityCfg, TerminationTermCfg
 from isaaclab.utils import configclass
 from isaaclab_assets.robots.klask import KLASK_PARAMS
 
-from ..utils_manager_based import ball_in_goal, in_goal
+from ..mdp.rewards import ball_in_goal, in_goal
 
 
 @configclass
