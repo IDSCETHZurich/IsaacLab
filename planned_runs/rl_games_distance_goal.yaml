@@ -62,7 +62,6 @@ params:
     learning_rate: 3e-4
     lr_schedule: adaptive
     kl_threshold: 0.008
-    #score_to_win: 20000
     max_epochs: -1
     max_frames: 50000000
     save_best_after: 50
@@ -79,17 +78,6 @@ params:
     seq_length: 4
     bounds_loss_coef: 0.0001
     self_play: False
-    #self_play_config:
-      #update_score: -5.0
-      #games_to_check: 1
-      #env_update_num: 4096
 
-rewards:
-  player_in_goal: !!float -10.0
-  goal_scored: !!float 10.0
-  goal_conceded: !!float -10.0
-  distance_ball_opponent_goal: !!float 1.0
-  ball_speed: !!float 0.0
-  distance_player_ball_own_half: !!float 0.0
-  ball_stationary: !!float 0.0
-  collision_player_ball: !!float 0.0
+env:
+  actuator_model: True

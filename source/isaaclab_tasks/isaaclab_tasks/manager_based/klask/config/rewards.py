@@ -56,7 +56,7 @@ class RewardsCfg:
             "goal": KLASK_PARAMS["opponent_goal"],
             "max_ball_vel": KLASK_PARAMS["max_ball_vel"],
         },
-        weight=0.0,
+        weight=10.0,
     )
 
     goal_conceded = RewardTermCfg(
@@ -84,7 +84,7 @@ class RewardsCfg:
             "ball_cfg": SceneEntityCfg("ball"),
             "goal": KLASK_PARAMS["opponent_goal"],
         },
-        weight=0.0,
+        weight=1.0,
     )
     distance_ball_own_goal = RewardTermCfg(
         func=distance_ball_goal,
