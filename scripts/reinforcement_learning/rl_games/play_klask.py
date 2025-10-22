@@ -101,7 +101,7 @@ from rl_games.common import env_configurations, vecenv
 from rl_games.common.player import BasePlayer
 from rl_games.torch_runner import Runner
 
-from .utils import set_terminations
+from utils import set_terminations
 
 
 def main():
