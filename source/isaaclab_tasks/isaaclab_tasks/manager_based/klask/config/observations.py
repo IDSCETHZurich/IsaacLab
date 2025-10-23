@@ -4,13 +4,13 @@ from isaaclab.utils import configclass
 from isaaclab_assets.robots.klask import KLASK_PARAMS
 
 from ..mdp.observations import (
+    KalmanFilter,
     angle_ball_goal,
     angle_ball_opp,
     body_xy_pos_w,
     distance_ball_to_player,
     distance_to_goal,
 )
-from ..noise_model import KalmanFilter
 
 
 @configclass
