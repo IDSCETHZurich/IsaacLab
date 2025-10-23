@@ -5,6 +5,7 @@ from isaaclab_assets.robots.klask import KLASK_PARAMS
 
 from .config import (
     ActionsCfg,
+    CurriculumCfg,
     EventCfg,
     ObservationsCfg,
     RewardsCfg,
@@ -24,6 +25,7 @@ class EnvCfg(ManagerBasedRLEnvCfg):
     actions = ActionsCfg()
     events = EventCfg()
     rewards = RewardsCfg()
+    curriculum = CurriculumCfg()
     terminations = TerminationsCfg()
     episode_length_s = KLASK_PARAMS["timeout"]
 

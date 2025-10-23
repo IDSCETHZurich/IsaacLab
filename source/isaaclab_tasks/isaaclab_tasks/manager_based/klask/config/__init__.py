@@ -1,4 +1,5 @@
 from .actions import ActionsCfg
+from .curriculum import CurriculumCfg
 from .events import EventCfg
 from .observations import ObservationsCfg
 from .rewards import RewardsCfg
