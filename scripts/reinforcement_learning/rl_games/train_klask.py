@@ -125,10 +125,8 @@ from isaaclab_rl.rl_games import RlGamesGpuEnv, RlGamesVecEnvWrapper
 from isaaclab_tasks.manager_based.klask.actuator_model import ActuatorModelWrapper
 from isaaclab_tasks.manager_based.klask.env_wrapper import (
     ActionHistoryWrapper,
-    CurriculumWrapper,
     KlaskCollisionAvoidanceWrapper,
     KlaskRandomOpponentWrapper,
-    ObservationNoiseWrapper,
     OpponentObservationWrapper,
     RlGamesGpuEnvSelfPlay,
 )
@@ -250,19 +248,6 @@ def main(
 
     if KLASK_PARAMS["action_history"] > 0:
         env = ActionHistoryWrapper(env, history_length=KLASK_PARAMS["action_history"])
-
-    obs_noise = agent_cfg["env"].get("obs_noise", 0.0)
-    if obs_noise > 0.0:
-        env = ObservationNoiseWrapper(env, obs_noise, list(range(12)))
-
-    # configure active reward terms and curricula as specified in agent_cfg:
-    if "rewards" in agent_cfg.keys():
-        env = CurriculumWrapper(
-            env,
-            agent_cfg["rewards"],
-            agent_cfg["params"]["config"]["max_frames"] / env_cfg.scene.num_envs,
-            dynamic=True,
-        )
 
     # if self-play, use opponent observation wrapper to get access to opponent player's observations:
     if agent_cfg["params"]["config"].get("self_play", False):
