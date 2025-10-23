@@ -84,11 +84,9 @@ from isaaclab_rl.rl_games import RlGamesGpuEnv, RlGamesVecEnvWrapper
 from isaaclab_tasks.manager_based.klask.actuator_model import ActuatorModelWrapper
 from isaaclab_tasks.manager_based.klask.env_wrapper import (
     ActionHistoryWrapper,
-    CurriculumWrapper,
     KlaskAgentOpponentWrapper,
     KlaskCollisionAvoidanceWrapper,
     KlaskRandomOpponentWrapper,
-    ObservationNoiseWrapper,
     RlGamesGpuEnvSelfPlay,
     find_wrapper,
 )
@@ -100,7 +98,6 @@ from isaaclab_tasks.utils import (
 from rl_games.common import env_configurations, vecenv
 from rl_games.common.player import BasePlayer
 from rl_games.torch_runner import Runner
-
 from utils import set_terminations
 
 
@@ -190,8 +187,6 @@ def main():
         env = KlaskAgentOpponentWrapper(env)
     else:
         env = KlaskRandomOpponentWrapper(env)
-    if "rewards" in agent_cfg.keys():
-        env = CurriculumWrapper(env, agent_cfg["rewards"], mode="test")
 
     # wrap around environment for rl-games
     env = RlGamesVecEnvWrapper(

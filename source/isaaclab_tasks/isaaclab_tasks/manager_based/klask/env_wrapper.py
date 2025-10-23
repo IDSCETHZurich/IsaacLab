@@ -6,8 +6,7 @@ from pathlib import Path
 import numpy as np
 import torch
 import yaml
-from gymnasium import ObservationWrapper, Wrapper
-from isaaclab_assets.robots.klask import KLASK_PARAMS
+from gymnasium import Wrapper
 from isaaclab_rl.rl_games import RlGamesGpuEnv
 from rl_games.torch_runner import Runner
 
