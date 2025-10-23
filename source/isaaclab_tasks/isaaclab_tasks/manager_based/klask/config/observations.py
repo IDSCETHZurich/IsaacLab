@@ -1,7 +1,6 @@
 import isaaclab.envs.mdp as mdp
 from isaaclab.managers import ObservationGroupCfg, ObservationTermCfg, SceneEntityCfg
 from isaaclab.utils import configclass
-from isaaclab_assets.robots.klask import KLASK_PARAMS
 
 from ..mdp.observations import (
     KalmanFilter,
@@ -11,6 +10,7 @@ from ..mdp.observations import (
     distance_ball_to_player,
     distance_to_goal,
 )
+from .parameters import KLASK_PARAMS
 
 
 @configclass
@@ -84,13 +84,13 @@ class ObservationsCfg:
             },
         )
 
-        if KLASK_PARAMS.get("additional_observations", 0):
+        if KLASK_PARAMS["observations"].get("additional_observations", 0):
             angle_pegball_pegoppgoal = ObservationTermCfg(
                 func=angle_ball_goal,
                 params={
                     "ball_cfg": SceneEntityCfg(name="ball"),
                     "player_cfg": SceneEntityCfg(name="klask", body_names=["Peg_1"]),
-                    "goal": KLASK_PARAMS["opponent_goal"],
+                    "goal": KLASK_PARAMS["scene"]["opponent_goal"],
                 },
             )
 
@@ -99,7 +99,7 @@ class ObservationsCfg:
                 params={
                     "ball_cfg": SceneEntityCfg(name="ball"),
                     "player_cfg": SceneEntityCfg(name="klask", body_names=["Peg_2"]),
-                    "goal": KLASK_PARAMS["player_goal"],
+                    "goal": KLASK_PARAMS["scene"]["player_goal"],
                 },
             )
 
@@ -125,14 +125,14 @@ class ObservationsCfg:
                 func=distance_to_goal,
                 params={
                     "ball_cfg": SceneEntityCfg(name="ball"),
-                    "goal": KLASK_PARAMS["player_goal"],
+                    "goal": KLASK_PARAMS["scene"]["player_goal"],
                 },
             )
             distance_ball_oppgoal = ObservationTermCfg(
                 func=distance_to_goal,
                 params={
                     "ball_cfg": SceneEntityCfg(name="ball"),
-                    "goal": KLASK_PARAMS["opponent_goal"],
+                    "goal": KLASK_PARAMS["scene"]["opponent_goal"],
                 },
             )
 
@@ -152,22 +152,17 @@ class ObservationsCfg:
                 },
             )
 
-        if KLASK_PARAMS.get("action_history", 0):
-            action_history_x = ObservationTermCfg(
-                func=mdp.last_action,
-                params={"action_name": "player_x"},
-                history_length=KLASK_PARAMS["action_history"],
-            )
+        action_history_x = ObservationTermCfg(
+            func=mdp.last_action,
+            params={"action_name": "player_x"},
+            history_length=KLASK_PARAMS["observations"]["action_history"],
+        )
 
-            action_history_y = ObservationTermCfg(
-                func=mdp.last_action,
-                params={"action_name": "player_y"},
-                history_length=KLASK_PARAMS["action_history"],
-            )
-
-        def __post_init__(self) -> None:
-            self.enable_corruption = False
-            self.concatenate_terms = True
+        action_history_y = ObservationTermCfg(
+            func=mdp.last_action,
+            params={"action_name": "player_y"},
+            history_length=KLASK_PARAMS["observations"]["action_history"],
+        )
 
     @configclass
     class OpponentCfg(ObservationGroupCfg):
@@ -237,13 +232,13 @@ class ObservationsCfg:
             },
         )
 
-        if KLASK_PARAMS.get("additional_observations", 0):
+        if KLASK_PARAMS["observations"].get("additional_observations", 0):
             angle_oppball_oppgoal = ObservationTermCfg(
                 func=angle_ball_goal,
                 params={
                     "ball_cfg": SceneEntityCfg(name="ball"),
                     "player_cfg": SceneEntityCfg(name="klask", body_names=["Peg_2"]),
-                    "goal": KLASK_PARAMS["player_goal"],
+                    "goal": KLASK_PARAMS["scene"]["player_goal"],
                 },
             )
 
@@ -252,7 +247,7 @@ class ObservationsCfg:
                 params={
                     "ball_cfg": SceneEntityCfg(name="ball"),
                     "player_cfg": SceneEntityCfg(name="klask", body_names=["Peg_1"]),
-                    "goal": KLASK_PARAMS["opponent_goal"],
+                    "goal": KLASK_PARAMS["scene"]["opponent_goal"],
                 },
             )
 
@@ -278,14 +273,14 @@ class ObservationsCfg:
                 func=distance_to_goal,
                 params={
                     "ball_cfg": SceneEntityCfg(name="ball"),
-                    "goal": KLASK_PARAMS["opponent_goal"],
+                    "goal": KLASK_PARAMS["scene"]["opponent_goal"],
                 },
             )
             distance_ball_goal = ObservationTermCfg(
                 func=distance_to_goal,
                 params={
                     "ball_cfg": SceneEntityCfg(name="ball"),
-                    "goal": KLASK_PARAMS["player_goal"],
+                    "goal": KLASK_PARAMS["scene"]["player_goal"],
                 },
             )
 
@@ -305,22 +300,17 @@ class ObservationsCfg:
                 },
             )
 
-        if KLASK_PARAMS.get("action_history", 0):
-            action_history_x = ObservationTermCfg(
-                func=mdp.last_action,
-                params={"action_name": "opponent_x"},
-                history_length=KLASK_PARAMS["action_history"],
-            )
+        action_history_x = ObservationTermCfg(
+            func=mdp.last_action,
+            params={"action_name": "opponent_x"},
+            history_length=KLASK_PARAMS["observations"]["action_history"],
+        )
 
-            action_history_y = ObservationTermCfg(
-                func=mdp.last_action,
-                params={"action_name": "opponent_y"},
-                history_length=KLASK_PARAMS["action_history"],
-            )
-
-        def __post_init__(self) -> None:
-            self.enable_corruption = False
-            self.concatenate_terms = True
+        action_history_y = ObservationTermCfg(
+            func=mdp.last_action,
+            params={"action_name": "opponent_y"},
+            history_length=KLASK_PARAMS["observations"]["action_history"],
+        )
 
     policy: PolicyCfg = PolicyCfg()
     opponent: OpponentCfg = OpponentCfg()

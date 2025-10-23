@@ -1,7 +1,6 @@
 import isaaclab.envs.mdp as mdp
 from isaaclab.managers import RewardTermCfg, SceneEntityCfg
 from isaaclab.utils import configclass
-from isaaclab_assets.robots.klask import KLASK_PARAMS
 
 from ..mdp.rewards import (
     ball_in_goal,
@@ -16,6 +15,7 @@ from ..mdp.rewards import (
     peg_in_defense_line_with_rebounds,
     shot_over_middle,
 )
+from .parameters import KLASK_PARAMS
 
 
 @configclass
@@ -31,11 +31,12 @@ class RewardsCfg:
         },
         weight=0.0,
     )
+
     player_in_goal = RewardTermCfg(
         func=in_goal,
         params={
             "asset_cfg": SceneEntityCfg("klask", body_names=["Peg_1"]),
-            "goal": KLASK_PARAMS["player_goal"],
+            "goal": KLASK_PARAMS["scene"]["player_goal"],
         },
         weight=0.0,
     )
@@ -44,7 +45,7 @@ class RewardsCfg:
         func=in_goal,
         params={
             "asset_cfg": SceneEntityCfg("klask", body_names=["Peg_2"]),
-            "goal": KLASK_PARAMS["opponent_goal"],
+            "goal": KLASK_PARAMS["scene"]["opponent_goal"],
         },
         weight=0.0,
     )
@@ -53,18 +54,18 @@ class RewardsCfg:
         func=ball_in_goal,
         params={
             "asset_cfg": SceneEntityCfg("ball"),
-            "goal": KLASK_PARAMS["opponent_goal"],
-            "max_ball_vel": KLASK_PARAMS["max_ball_vel"],
+            "goal": KLASK_PARAMS["scene"]["opponent_goal"],
+            "max_ball_vel": KLASK_PARAMS["scene"]["max_ball_vel_goal"],
         },
-        weight=10.0,
+        weight=10.0 / (KLASK_PARAMS["decimation"] * KLASK_PARAMS["physics_dt"]),
     )
 
     goal_conceded = RewardTermCfg(
         func=ball_in_goal,
         params={
             "asset_cfg": SceneEntityCfg("ball"),
-            "goal": KLASK_PARAMS["player_goal"],
-            "max_ball_vel": KLASK_PARAMS["max_ball_vel"],
+            "goal": KLASK_PARAMS["scene"]["player_goal"],
+            "max_ball_vel": KLASK_PARAMS["scene"]["max_ball_vel_goal"],
         },
         weight=0.0,
     )
@@ -82,15 +83,16 @@ class RewardsCfg:
         func=distance_ball_goal,
         params={
             "ball_cfg": SceneEntityCfg("ball"),
-            "goal": KLASK_PARAMS["opponent_goal"],
+            "goal": KLASK_PARAMS["scene"]["opponent_goal"],
         },
-        weight=1.0,
+        weight=0.0,
     )
+
     distance_ball_own_goal = RewardTermCfg(
         func=distance_ball_goal,
         params={
             "ball_cfg": SceneEntityCfg("ball"),
-            "goal": KLASK_PARAMS["player_goal"],
+            "goal": KLASK_PARAMS["scene"]["player_goal"],
         },
         weight=0.0,
     )
@@ -117,7 +119,7 @@ class RewardsCfg:
             "player_cfg": SceneEntityCfg("klask", body_names=["Peg_1"]),
             "ball_cfg": SceneEntityCfg("ball"),
         },
-        weight=0.0,
+        weight=1.0,
     )
 
     ball_in_own_half = RewardTermCfg(
@@ -126,7 +128,10 @@ class RewardsCfg:
 
     close_to_boundaries = RewardTermCfg(
         func=distance_to_wall,
-        params={"player_cfg": SceneEntityCfg("klask", body_names=["Peg_1"])},
+        params={
+            "player_cfg": SceneEntityCfg("klask", body_names=["Peg_1"]),
+            "edge": KLASK_PARAMS["edge"],
+        },
         weight=0.0,
     )
     player_strategically_positioned = RewardTermCfg(

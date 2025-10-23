@@ -108,21 +108,18 @@ from datetime import datetime
 
 import gymnasium as gym
 import isaaclab_tasks  # noqa: F401
-import numpy as np
 import yaml
 from isaaclab.envs import (
-    DirectMARLEnv,
     DirectMARLEnvCfg,
     DirectRLEnvCfg,
     ManagerBasedRLEnvCfg,
-    multi_agent_to_single_agent,
 )
 from isaaclab.utils.assets import retrieve_file_path
 from isaaclab.utils.dict import print_dict
 from isaaclab.utils.io import dump_pickle, dump_yaml
-from isaaclab_assets.robots.klask import KLASK_PARAMS
 from isaaclab_rl.rl_games import RlGamesGpuEnv, RlGamesVecEnvWrapper
 from isaaclab_tasks.manager_based.klask.actuator_model import ActuatorModelWrapper
+from isaaclab_tasks.manager_based.klask.config import KLASK_PARAMS
 from isaaclab_tasks.manager_based.klask.env_wrapper import (
     ActionHistoryWrapper,
     KlaskCollisionAvoidanceWrapper,
@@ -242,8 +239,10 @@ def main(
     if agent_cfg["env"].get("collision_avoidance", False):
         env = KlaskCollisionAvoidanceWrapper(env, max_vel=clip_actions)
 
-    if KLASK_PARAMS["action_history"] > 0:
-        env = ActionHistoryWrapper(env, history_length=KLASK_PARAMS["action_history"])
+    if KLASK_PARAMS["observations"]["action_history"] > 0:
+        env = ActionHistoryWrapper(
+            env, history_length=KLASK_PARAMS["observations"]["action_history"]
+        )
 
     # if self-play, use opponent observation wrapper to get access to opponent player's observations:
     if agent_cfg["params"]["config"].get("self_play", False):

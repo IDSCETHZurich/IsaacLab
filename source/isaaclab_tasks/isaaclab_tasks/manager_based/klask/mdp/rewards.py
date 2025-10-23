@@ -2,7 +2,6 @@ import torch
 from isaaclab.assets import Articulation, RigidObject
 from isaaclab.envs import ManagerBasedRLEnv
 from isaaclab.managers import SceneEntityCfg
-from isaaclab_assets.robots.klask import KLASK_PARAMS
 
 from .utils import (
     body_xy_pos_w,
@@ -209,26 +208,26 @@ def ball_in_own_half(env: ManagerBasedRLEnv, ball_cfg: SceneEntityCfg):
 
 
 def distance_to_wall(
-    env: ManagerBasedRLEnv, player_cfg: SceneEntityCfg
+    env: ManagerBasedRLEnv, player_cfg: SceneEntityCfg, edge: tuple[float]
 ) -> torch.Tensor:
     player_pos = body_xy_pos_w(env, player_cfg)
     device = player_pos.device
     cost = torch.zeros(player_pos.shape[0], device=device)
 
-    x_edge = player_pos[:, 0] < 0.03 + torch.tensor(KLASK_PARAMS["edge"][0])
-    distance = player_pos[:, 0] - torch.tensor(KLASK_PARAMS["edge"][0])
+    x_edge = player_pos[:, 0] < 0.03 + torch.tensor(edge[0])
+    distance = player_pos[:, 0] - torch.tensor(edge[0])
     cost += x_edge * torch.exp(-5 * distance)
 
-    x_edge = torch.tensor(KLASK_PARAMS["edge"][1]) - player_pos[:, 0] < 0.03
-    distance = torch.tensor(KLASK_PARAMS["edge"][1]) - player_pos[:, 0]
+    x_edge = torch.tensor(edge[1]) - player_pos[:, 0] < 0.03
+    distance = torch.tensor(edge[1]) - player_pos[:, 0]
     cost += x_edge * torch.exp(-5 * distance)
 
-    y_edge = player_pos[:, 1] - torch.tensor(KLASK_PARAMS["edge"][2]) < 0.03
-    distance = player_pos[:, 1] - torch.tensor(KLASK_PARAMS["edge"][2])
+    y_edge = player_pos[:, 1] - torch.tensor(edge[2]) < 0.03
+    distance = player_pos[:, 1] - torch.tensor(edge[2])
     cost += y_edge * torch.exp(-5 * distance)
 
-    y_edge = torch.tensor(KLASK_PARAMS["edge"][3]) - player_pos[:, 1] < 0.03
-    distance = torch.tensor(KLASK_PARAMS["edge"][3]) - player_pos[:, 1]
+    y_edge = torch.tensor(edge[3]) - player_pos[:, 1] < 0.03
+    distance = torch.tensor(edge[3]) - player_pos[:, 1]
     cost += y_edge * torch.exp(-5 * distance)
 
     return 1.0 * (cost)

@@ -79,9 +79,9 @@ import yaml
 from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
 from isaaclab.utils.assets import retrieve_file_path
 from isaaclab.utils.dict import print_dict
-from isaaclab_assets.robots.klask import KLASK_PARAMS
 from isaaclab_rl.rl_games import RlGamesGpuEnv, RlGamesVecEnvWrapper
 from isaaclab_tasks.manager_based.klask.actuator_model import ActuatorModelWrapper
+from isaaclab_tasks.manager_based.klask.config import KLASK_PARAMS
 from isaaclab_tasks.manager_based.klask.env_wrapper import (
     ActionHistoryWrapper,
     KlaskAgentOpponentWrapper,
@@ -176,8 +176,10 @@ def main():
     if agent_cfg["env"].get("collision_avoidance", False):
         env = KlaskCollisionAvoidanceWrapper(env)
 
-    if KLASK_PARAMS["action_history"] > 0:
-        env = ActionHistoryWrapper(env, history_length=KLASK_PARAMS["action_history"])
+    if KLASK_PARAMS["observations"]["action_history"] > 0:
+        env = ActionHistoryWrapper(
+            env, history_length=KLASK_PARAMS["observations"]["action_history"]
+        )
 
     obs_noise = agent_cfg["env"].get("obs_noise", 0.0)
     if obs_noise > 0.0:
