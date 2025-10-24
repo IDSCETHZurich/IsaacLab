@@ -1,1 +1,1 @@
-from .actuator_model import ActuatorModelWrapper, ActuatorNetwork
+from .actuator_model import ActuatorNetwork
