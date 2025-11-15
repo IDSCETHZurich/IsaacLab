@@ -286,6 +286,7 @@ def main(
             {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env},
         )
 
+
     # set active termination terms specified in agent_cfg:
     if "terminations" in agent_cfg.keys():
         set_terminations(env, agent_cfg["terminations"])
@@ -314,6 +315,16 @@ def main(
             monitor_gym=True,
             save_code=True,
         )
+        # --- DEBUG: inspect rl_games network before training ---
+    player = runner.create_player()
+    print("\n=== RL-Games Player Network ===")
+    print(player.network)
+
+    print("\n=== State dict keys & shapes ===")
+    for k, v in player.network.state_dict().items():
+        print(k, v.shape)
+    # --- END DEBUG ---
+
 
     # reset the agent and env
     runner.reset()
