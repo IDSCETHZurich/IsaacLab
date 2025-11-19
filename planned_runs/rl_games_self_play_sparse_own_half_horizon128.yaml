@@ -96,3 +96,7 @@ rewards:
   ball_in_own_half:
     weight: !!float -3.0
     per_second: True
+
+env:
+  actuator_model: True
+  collision_avoidance: True

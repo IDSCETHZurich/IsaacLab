@@ -221,6 +221,11 @@ def main(
     env = gym.make(
         args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None
     )
+    obs, info = env.reset()
+    print("type(obs):", type(obs))
+    print("Obs keys:", obs.keys())              # since it's a Dict space
+    print("policy obs shape:", obs["policy"].shape)
+    print("opponent obs shape:", obs["opponent"].shape)
     # wrap for video recording
     if args_cli.video:
         video_kwargs = {
@@ -232,7 +237,7 @@ def main(
         print("[INFO] Recording videos during training.")
         print_dict(video_kwargs, nesting=4)
         env = gym.wrappers.RecordVideo(env, **video_kwargs)
-
+    print(agent_cfg.keys())
     if agent_cfg["env"].get("actuator_model", False):
         env = ActuatorModelWrapper(env)
 
@@ -317,11 +322,18 @@ def main(
         )
         # --- DEBUG: inspect rl_games network before training ---
     player = runner.create_player()
-    print("\n=== RL-Games Player Network ===")
-    print(player.network)
 
-    print("\n=== State dict keys & shapes ===")
-    for k, v in player.network.state_dict().items():
+    print("=== RL-Games Player model ===")
+    print(player.model)
+
+    import torch
+    net = player.model.a2c_network    # <- MOST LIKELY correct
+
+    print("=== A2C network ===")
+    print(net)
+
+    print("=== State dict keys & shapes ===")
+    for k, v in net.state_dict().items():
         print(k, v.shape)
     # --- END DEBUG ---
 
@@ -343,7 +355,7 @@ def main(
         runner.run({"train": True, "play": False, "sigma": train_sigma})
     print(f"Total training time: {time.time() - start_time}")
 
-    # log model checkpoint to wandb:
+    # log model checkpoint to v:
     if args_cli.wandb_project_name is not None:
         model = wandb.Artifact("model", type="model")
         model.add_file(

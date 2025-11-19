@@ -158,17 +158,30 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
             self.counter = 0
 
         if self.mode == 1:
-            matching_file = str(list(self.base_folder.glob("*"))[-1])
+            files = sorted(self.base_folder.glob("*"))
+            if not files:
+                # nothing to update yet
+                return
+
+            matching_file = str(files[-1])  # latest
             if matching_file == self.current_checkpoint:
                 return
+
             self.current_checkpoint = matching_file
 
+            # Extract agent number from filename
             match = re.search(r"best_agent\((\d+)\)", self.current_checkpoint)
-            if match:
+            if not match:
+                print(f"[WARN] could not extract agent_number from {self.current_checkpoint}")
+                # either bail out cleanly...
+                return
+                # ...or set a default:
+                # agent_number = 0
+            else:
                 agent_number = match.group(1)
-            self.config_path = (
-                Path(self.base_folder) / f"klask_config_{agent_number}.yaml"
-            )
+
+            self.config_path = self.base_folder / f"klask_config_{agent_number}.yaml"
+
 
         if self.mode == 0 and self.counter > 8:
             agent_folders = [f for f in self.base_folder.iterdir() if f.is_dir()]
@@ -213,7 +226,15 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
     def step(self, action, *args, **kwargs):
         opponent_obs = self.agent.obs_to_torch(self.opponent_obs)
         opponent_action = self.agent.get_action(opponent_obs, self.is_deterministic)
+        
+        # Opponent agent was built with action_space=4, but we only need its 2D command.
+        # Take the first 2 dims as the real opponent action for the actuator.
+        if opponent_action.shape[1] > 2:
+            opponent_action = opponent_action[:, :2]
+
+
         full_action = torch.cat([action, -opponent_action], dim=1)
+
         obs, reward, dones, info = self.env.step(full_action, *args, **kwargs)
         # self.opponent_obs = self.get_opponent_obs(obs)
         self.opponent_obs = find_wrapper(

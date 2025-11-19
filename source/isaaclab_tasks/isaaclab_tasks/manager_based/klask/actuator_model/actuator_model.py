@@ -97,12 +97,14 @@ class ActuatorModelWrapper(Wrapper):
     def step(self, actions, *args, **kwargs):
         # Peg 1 command history update:
         command_1 = actions[:, :2]
+
         prev_buffer = self.command_buffer_1.clone()
         self.command_buffer_1[:, 2:] = prev_buffer[:, :-2]
         self.command_buffer_1[:, :2] = command_1
 
         # Peg 2 command history update:
         command_2 = actions[:, 2:]
+
         self.command_buffer_2[:, 2:] = self.command_buffer_2.clone()[:, :-2]
         self.command_buffer_2[:, :2] = command_2
 

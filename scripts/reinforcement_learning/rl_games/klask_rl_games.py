@@ -122,6 +122,8 @@ class KlaskRunner(Runner):
         agent = self.algo_factory.create(self.algo_name, base_name='run', params=self.params)
         _restore(agent, args)
         _override_sigma(agent, args)
+
+
         if agent.has_self_play_config:
             agent.self_play_manager = KlaskSelfPlayManager(agent.self_play_config, agent.writer)
         agent.train()

@@ -31,13 +31,13 @@ parser.add_argument(
     help="Disable fabric and use USD I/O operations.",
 )
 parser.add_argument(
-    "--num_envs", type=int, default=None, help="Number of environments to simulate."
+    "--num_envs", type=int, default=1, help="Number of environments to simulate."
 )
 parser.add_argument(
     "--task", type=str, default="Isaac-Klask-v0", help="Name of the task."
 )
 parser.add_argument(
-    "--checkpoint", type=str, default=None, help="Path to model checkpoint."
+    "--checkpoint", type=str, default="/home/student/klask_rl/IsaacLab/logs/rl_games/klask/self_play_sparse_own_half_horizon128/nn/last_klask_ep_50_rew_0.67127305.pth", help="Path to model checkpoint."
 )
 parser.add_argument(
     "--use_last_checkpoint",
@@ -47,7 +47,7 @@ parser.add_argument(
 parser.add_argument(
     "--config",
     type=str,
-    default=None,
+    default="/home/student/klask_rl/IsaacLab/planned_runs/rl_games_self_play_sparse_own_half_horizon128.yaml",
     help="config.yaml file, rl_games_cfg_entry_point used when not provided",
 )
 
@@ -110,13 +110,27 @@ def main():
         num_envs=args_cli.num_envs,
         use_fabric=not args_cli.disable_fabric,
     )
-    agent_cfg = load_cfg_from_registry(args_cli.task, "rl_games_cfg_entry_point")
-
+    
+    # Load agent config: skip registry if custom config provided
     if args_cli.config is not None:
+        print(f"[INFO]: Loading configuration from: {args_cli.config}")
         with open(args_cli.config, "r") as file:
-            config = yaml.safe_load(file)
-        agent_cfg.update(config)
+            agent_cfg = yaml.safe_load(file)
+    else:
+        agent_cfg = load_cfg_from_registry(args_cli.task, "rl_games_cfg_entry_point")
 
+    # Fix: Override num_actors with CLI argument
+    if args_cli.num_envs is not None:
+        if "params" not in agent_cfg:
+            agent_cfg["params"] = {}
+        if "config" not in agent_cfg["params"]:
+            agent_cfg["params"]["config"] = {}
+        agent_cfg["params"]["config"]["num_actors"] = args_cli.num_envs
+    
+    # Debug
+    print(f"[DEBUG] Network units: {agent_cfg.get('params', {}).get('network', {}).get('mlp', {}).get('units', 'NOT SET')}")
+    print(f"[DEBUG] Action space: {agent_cfg['params']['network']['space']}")
+    print()
     # specify directory for logging experiments
     log_root_path = os.path.join(
         "logs", "rl_games", agent_cfg["params"]["config"]["name"]
@@ -146,8 +160,10 @@ def main():
     rl_device = agent_cfg["params"]["config"]["device"]
     rl_device = args_cli.device
 
-    clip_obs = agent_cfg["params"]["env"].get("clip_observations", math.inf)
-    clip_actions = agent_cfg["params"]["env"].get("clip_actions", math.inf)
+    # Fix: these also need to read from params.env
+    env_params = agent_cfg.get("params", {}).get("env", {})
+    clip_obs = env_params.get("clip_observations", math.inf)
+    clip_actions = env_params.get("clip_actions", math.inf)
 
     # create isaac environment
     env = gym.make(
@@ -170,10 +186,13 @@ def main():
     if isinstance(env.unwrapped, DirectMARLEnv):
         env = multi_agent_to_single_agent(env)
 
-    if agent_cfg["env"].get("actuator_model", False):
+    # Remove duplicate env_params line if you added it earlier
+    # env_params = agent_cfg.get("params", {}).get("env", {})
+    
+    if env_params.get("actuator_model", False):
         env = ActuatorModelWrapper(env, device=args_cli.device)
 
-    if agent_cfg["env"].get("collision_avoidance", False):
+    if env_params.get("collision_avoidance", False):
         env = KlaskCollisionAvoidanceWrapper(env)
 
     if KLASK_PARAMS["observations"]["action_history"] > 0:
@@ -181,12 +200,13 @@ def main():
             env, history_length=KLASK_PARAMS["observations"]["action_history"]
         )
 
-    obs_noise = agent_cfg["env"].get("obs_noise", 0.0)
+    obs_noise = env_params.get("obs_noise", 0.0)
     if obs_noise > 0.0:
         env = ObservationNoiseWrapper(env, obs_noise)
 
     if agent_cfg["params"]["config"].get("self_play", False):
-        env = KlaskAgentOpponentWrapper(env)
+        # env = KlaskAgentOpponentWrapper(env)
+        env = env
     else:
         env = KlaskRandomOpponentWrapper(env)
 
@@ -195,20 +215,31 @@ def main():
         env, rl_device, clip_obs=clip_obs, clip_actions=clip_actions
     )
 
+    # set active termination terms specified in agent_cfg:
+    if "terminations" in agent_cfg.keys():
+        set_terminations(env, agent_cfg["terminations"])
+
+    # IMPORTANT: Set num_actors BEFORE registering vecenv
+    agent_cfg["params"]["config"]["num_actors"] = env.unwrapped.num_envs
+
     # register the environment to rl-games registry
     # note: in agents configuration: environment name must be "rlgpu"
+    # Use RlGamesGpuEnvSelfPlay for both training and play when self_play=True
     if agent_cfg["params"]["config"].get("self_play", False):
         vecenv.register(
             "IsaacRlgWrapper",
             lambda config_name, num_actors, **kwargs: RlGamesGpuEnvSelfPlay(
-                config_name, num_actors, agent_cfg.copy(), **kwargs
+                config_name, 
+                num_actors, 
+                agent_cfg.copy(),  # This captures agent_cfg at registration time
+                is_deterministic=True,
+                **kwargs
             ),
         )
         env_configurations.register(
             "rlgpu",
             {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env},
         )
-
     else:
         vecenv.register(
             "IsaacRlgWrapper",
@@ -221,17 +252,14 @@ def main():
             {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env},
         )
 
-    # set active termination terms specified in agent_cfg:
-    if "terminations" in agent_cfg.keys():
-        set_terminations(env, agent_cfg["terminations"])
-
     # load previously trained model
     agent_cfg["params"]["load_checkpoint"] = True
     agent_cfg["params"]["load_path"] = resume_path
     print(f"[INFO]: Loading model checkpoint from: {agent_cfg['params']['load_path']}")
 
-    # set number of actors into agent config
-    agent_cfg["params"]["config"]["num_actors"] = env.unwrapped.num_envs
+    # DON'T set num_actors here - already set above before registration
+    # agent_cfg["params"]["config"]["num_actors"] = env.unwrapped.num_envs
+    
     # create runner from rl-games
     runner = Runner()
     runner.load(agent_cfg)
@@ -255,7 +283,7 @@ def main():
     # initialize RNN states if used
     if agent.is_rnn:
         agent.init_rnn()
-
+    '''
     if agent_cfg["params"]["config"].get("self_play", False):
         opponent = runner.create_player()
         opponent.device = torch.device(args_cli.device)
@@ -264,7 +292,7 @@ def main():
         opponent.actions_high = agent.actions_high.to(args_cli.device)
         opponent.set_weights(agent.get_weights())
         find_wrapper(env, KlaskAgentOpponentWrapper).add_opponent(opponent)
-
+    '''
     # simulate environment
     # note: We simplified the logic in rl-games player.py (:func:`BasePlayer.run()`) function in an
     #   attempt to have complete control over environment stepping. However, this removes other

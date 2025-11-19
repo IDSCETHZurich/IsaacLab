@@ -151,7 +151,7 @@ class ObservationsCfg:
                     "player_cfg": SceneEntityCfg(name="klask", body_names=["Peg_2"]),
                 },
             )
-
+        '''
         action_history_x = ObservationTermCfg(
             func=mdp.last_action,
             params={"action_name": "player_x"},
@@ -163,6 +163,7 @@ class ObservationsCfg:
             params={"action_name": "player_y"},
             history_length=KLASK_PARAMS["observations"]["action_history"],
         )
+        '''
 
     @configclass
     class OpponentCfg(ObservationGroupCfg):
@@ -300,6 +301,7 @@ class ObservationsCfg:
                 },
             )
 
+        '''
         action_history_x = ObservationTermCfg(
             func=mdp.last_action,
             params={"action_name": "opponent_x"},
@@ -311,6 +313,6 @@ class ObservationsCfg:
             params={"action_name": "opponent_y"},
             history_length=KLASK_PARAMS["observations"]["action_history"],
         )
-
+        '''
     policy: PolicyCfg = PolicyCfg()
     opponent: OpponentCfg = OpponentCfg()
