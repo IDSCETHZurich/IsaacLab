@@ -37,7 +37,7 @@ parser.add_argument(
     "--task", type=str, default="Isaac-Klask-v0", help="Name of the task."
 )
 parser.add_argument(
-    "--checkpoint", type=str, default="/home/student/klask_rl/IsaacLab/logs/rl_games/klask/self_play_sparse_own_half_horizon128/nn/last_klask_ep_50_rew_0.67127305.pth", help="Path to model checkpoint."
+    "--checkpoint", type=str, default="/home/student/klask_rl/IsaacLab/logs/rl_games/klask/self_play_sparse_own_half_horizon128/nn/klask.pth", help="Path to model checkpoint."
 )
 parser.add_argument(
     "--use_last_checkpoint",
