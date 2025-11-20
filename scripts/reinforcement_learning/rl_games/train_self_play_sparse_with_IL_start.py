@@ -8,11 +8,7 @@ import re
 
 # List of config files to train with
 configs = [
-    "/home/student/klask_rl/IsaacLab/planned_runs/rl_games_self_play_sparse_own_half_horizon128.yaml",
-    "/home/student/klask_rl/IsaacLab/planned_runs/rl_games_self_play_sparse_own_half_horizon128.yaml",
-    "/home/student/klask_rl/IsaacLab/planned_runs/rl_games_self_play_sparse_own_half_horizon128.yaml",
     "/home/student/klask_rl/IsaacLab/planned_runs/rl_games_self_play_sparse_own_half_horizon128.yaml"
-
 ]
 
 checkpoint = [
@@ -32,7 +28,7 @@ MODE = 0 #either 0 --> opponent is chosen from a pool of players and periodicall
 processes = []
 
 project_folder = Path("/home/student/klask_rl/IsaacLab/logs/rl_games/klask/training_curriculum") 
-num_gpus=4
+num_gpus=1
 num_envs_per_gpu = 4096
 
 

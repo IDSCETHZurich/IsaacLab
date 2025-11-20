@@ -13,8 +13,12 @@ from rl_games.torch_runner import Runner
 
 def find_wrapper(env, wrapper_type):
     """Recursively searches for a wrapper of a given type."""
-    while not isinstance(env, wrapper_type):
-        env = env.env  # Move to the next layer
+    while env is not None and not isinstance(env, wrapper_type):
+        if hasattr(env, 'env'):
+            env = env.env  # Move to the next layer
+        else:
+            return None  # Reached base env without finding wrapper
+    
     if isinstance(env, wrapper_type):
         return env  # Found the wrapper
     return None  # Wrapper not found
@@ -82,6 +86,12 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
         self.sum_rewards = 0
         self.training_curriculum = training_curriculum
 
+                # DEBUG: Print what config was passed
+        print("[DEBUG __init__] RlGamesGpuEnvSelfPlay config received:")
+        print(f"  network.space: {config.get('params', {}).get('network', {}).get('space', {})}")
+        print(f"  network.mlp.units: {config.get('params', {}).get('network', {}).get('mlp', {}).get('units', [])}")
+        
+
         if training_curriculum:
             self.mode = mode
             self.base_folder = Path(folder)
@@ -112,10 +122,13 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
         return obs
 
     def create_agent(self):
+        print("create_agent_called")
         runner = Runner()
         from rl_games.common.env_configurations import get_env_info
+        env_info = get_env_info(self.env)
 
-        self.config["params"]["config"]["env_info"] = get_env_info(self.env)
+        self.config["params"]["config"]["env_info"] = env_info     
+
         runner.load(self.current_config)
 
         # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
@@ -125,6 +138,10 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
         self.agent = runner.create_player()
         if restore_checkpoint:
             self.agent.restore(self.current_checkpoint)
+
+
+        # DEBUG: Print the actual network that was created
+        print(f"[DEBUG] Created agent action network output size: {self.agent.model.a2c_network.mu.out_features}")
 
         self.agent.has_batch_dimension = True
 
@@ -229,9 +246,10 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
         
         # Opponent agent was built with action_space=4, but we only need its 2D command.
         # Take the first 2 dims as the real opponent action for the actuator.
-        if opponent_action.shape[1] > 2:
-            opponent_action = opponent_action[:, :2]
-
+        # if opponent_action.shape[1] > 2:
+        #    opponent_action = opponent_action[:, :2]
+        action = action[:, :2] # <- added this (wasnt there before)
+        opponent_action = opponent_action[:, 2:]
 
         full_action = torch.cat([action, -opponent_action], dim=1)
 

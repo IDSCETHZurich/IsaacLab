@@ -252,12 +252,20 @@ def main(
     # if self-play, use opponent observation wrapper to get access to opponent player's observations:
     if agent_cfg["params"]["config"].get("self_play", False):
         env = OpponentObservationWrapper(env)
+        print("[DEBUG] Applied OpponentObservationWrapper for self-play")
+
     # if no self-play, pick random actions for the opponent:
     else:
         env = KlaskRandomOpponentWrapper(env)
+        print("[DEBUG] Applied KlaskRandomOpponentWrapper")
 
     # wrap around environment for rl-games
     env = RlGamesVecEnvWrapper(env, rl_device, clip_obs, clip_actions)
+
+        # DEBUG: Print final action space seen by RL-Games
+    print("[DEBUG train_klask] Final env action space before runner:")
+    print(f"  env.action_space: {env.action_space}")
+    print(f"  env.action_space.shape: {env.action_space.shape}")
 
     # register the environment to rl-games registry
     # note: in agents configuration: environment name must be "rlgpu"
@@ -267,7 +275,7 @@ def main(
             lambda config_name, num_actors, **kwargs: RlGamesGpuEnvSelfPlay(
                 config_name,
                 num_actors,
-                agent_cfg.copy(),
+                agent_cfg.copy(), 
                 training_curriculum=args_cli.training_curriculum,
                 mode=args_cli.mode,
                 folder=args_cli.project_folder,
@@ -300,6 +308,17 @@ def main(
     agent_cfg["params"]["config"]["num_actors"] = env.unwrapped.num_envs
     # create runner from rl-games
     runner = KlaskRunner(KlaskAlgoObserver())
+
+
+        # CRITICAL FIX: Set env_info before runner.load()
+    #from rl_games.common.env_configurations import get_env_info
+    #env_info = get_env_info(env)
+    #agent_cfg["params"]["config"]["env_info"] = env_info
+
+        # DEBUG: Check what's in agent_cfg before load
+    print("[DEBUG] agent_cfg['params']['network']['space']:", agent_cfg['params']['network']['space'])
+    print("[DEBUG] agent_cfg['params']['config'].get('env_info'):", agent_cfg['params']['config'].get('env_info'))
+    
     runner.load(agent_cfg)
 
     # create complete config and log to wandb:

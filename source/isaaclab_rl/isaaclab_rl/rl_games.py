@@ -224,7 +224,7 @@ class RlGamesVecEnvWrapper(IVecEnv):
     def get_number_of_agents(self) -> int:
         """Returns number of actors in the environment."""
         return getattr(self, "num_agents", 1)
-
+    '''
     def get_env_info(self) -> dict:
         """Returns the Gym spaces for the environment."""
         original_space = self.action_space
@@ -233,7 +233,21 @@ class RlGamesVecEnvWrapper(IVecEnv):
             high=original_space.high[:2],
             dtype=original_space.dtype
         )
-
+    '''
+    def get_env_info(self) -> dict:
+        """Returns the Gym spaces for the environment."""
+        # Don't slice action space - return full 4D space for self-play
+        if self.evaluation_mode:
+            return {
+                "observation_space": self.observation_space,
+                "action_space": self.action_space,  # Full 4D
+                "state_space": self.state_space,
+            }
+        return {
+            "observation_space": self.observation_space,
+            "action_space": self.action_space,  # Full 4D (was sliced to [:2])
+            "state_space": self.state_space,
+        }
         if self.evaluation_mode:
             return {
                 "observation_space": self.observation_space,
