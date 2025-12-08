@@ -82,6 +82,12 @@ parser.add_argument(
 parser.add_argument(
     "--project_folder", type=str, default=None, help="mode for training curriculum"
 )
+parser.add_argument(
+    "--fixed_opponent_checkpoint", 
+    type=str, 
+    default=None, 
+    help="Path to fixed opponent checkpoint (for MODE 3)"
+)
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
@@ -183,6 +189,12 @@ def main(
         agent_cfg["params"]["config"]["multi_gpu"] = True
         # update env config device
         env_cfg.sim.device = f"cuda:{app_launcher.local_rank}"
+    else:
+        # SINGLE-GPU: Ensure device is set from CLI
+        device = args_cli.device if args_cli.device is not None else "cuda:0"
+        agent_cfg["params"]["config"]["device"] = device
+        agent_cfg["params"]["config"]["device_name"] = device
+        env_cfg.sim.device = device
 
     # set the environment seed (after multi-gpu config for updated rank from agent seed)
     # note: certain randomizations occur in the environment initialization so we set the seed here
@@ -210,12 +222,13 @@ def main(
     dump_pickle(os.path.join(log_root_path, log_dir, "params", "agent.pkl"), agent_cfg)
 
     # read configurations about the agent-training
-    if args_cli.device is not None:
-        agent_cfg["params"]["config"]["device"] = args_cli.device
-        agent_cfg["params"]["config"]["device_name"] = args_cli.device
     rl_device = agent_cfg["params"]["config"]["device"]
-    clip_actions = agent_cfg["params"]["env"].get("clip_actions", math.inf)
-    clip_obs = agent_cfg["params"]["env"].get("clip_observations", math.inf)
+
+    # ADD DEBUG PRINT BEFORE ENV CREATION
+    print(f"[INFO] 🔍 Device configuration:")
+    print(f"   env_cfg.sim.device: {env_cfg.sim.device}")
+    print(f"   agent device: {agent_cfg['params']['config']['device']}")
+    print(f"   rl_device: {rl_device}")
 
     # create isaac environment
     env = gym.make(
@@ -238,10 +251,14 @@ def main(
         print_dict(video_kwargs, nesting=4)
         env = gym.wrappers.RecordVideo(env, **video_kwargs)
     print(agent_cfg.keys())
-    if agent_cfg["env"].get("actuator_model", False):
+    if agent_cfg["env"].get("actuator_model", True):
         env = ActuatorModelWrapper(env)
+        
+    # Get clip values from config
+    clip_obs = agent_cfg["env"].get("clip_observations", math.inf)
+    clip_actions = agent_cfg["env"].get("clip_actions", 0.2)  # ADD THIS LINE
 
-    if agent_cfg["env"].get("collision_avoidance", False):
+    if agent_cfg["env"].get("collision_avoidance", True):
         env = KlaskCollisionAvoidanceWrapper(env, max_vel=clip_actions)
 
     if KLASK_PARAMS["observations"]["action_history"] > 0:
@@ -279,6 +296,7 @@ def main(
                 training_curriculum=args_cli.training_curriculum,
                 mode=args_cli.mode,
                 folder=args_cli.project_folder,
+                fixed_opponent_checkpoint=args_cli.fixed_opponent_checkpoint,  # NEW
                 **kwargs,
             ),
         )

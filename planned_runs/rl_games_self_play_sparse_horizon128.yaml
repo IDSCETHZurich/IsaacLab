@@ -6,7 +6,9 @@ params:
     # added to the wrapper
     clip_observations: 5.0
     # can make custom wrapper?
-    clip_actions: 1.0
+    clip_actions: 0.2
+    collision_avoidance: false
+    actuator_model: true
 
   algo:
     name: a2c_continuous

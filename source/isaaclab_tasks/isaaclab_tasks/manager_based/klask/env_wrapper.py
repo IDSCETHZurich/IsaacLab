@@ -77,6 +77,7 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
         mode=None,
         folder=None,
         is_deterministic=False,
+        fixed_opponent_checkpoint=None,  # NEW: Path to Maurus's checkpoint
         **kwargs,
     ):
         self.agent = None
@@ -85,36 +86,41 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
         self.is_deterministic = is_deterministic
         self.sum_rewards = 0
         self.training_curriculum = training_curriculum
+        self.fixed_opponent_checkpoint = fixed_opponent_checkpoint  # NEW
 
-                # DEBUG: Print what config was passed
+        # DEBUG: Print what config was passed
         print("[DEBUG __init__] RlGamesGpuEnvSelfPlay config received:")
         print(f"  network.space: {config.get('params', {}).get('network', {}).get('space', {})}")
         print(f"  network.mlp.units: {config.get('params', {}).get('network', {}).get('mlp', {}).get('units', [])}")
         
-
         if training_curriculum:
             self.mode = mode
             self.base_folder = Path(folder)
             self.current_checkpoint = None
             self.config_path = None
             self.counter = 0
-            # self.folder_path_checkpoint = Path("/home/student/klask_rl/IsaacLab/logs/rl_games/klask/training_curriculum/best_agent")
-            # self.folder_path_config = Path("/home/student/klask_rl/IsaacLab/planned_runs/training_curriculum")
-            # self.current_checkpoint = str(list(self.folder_path_checkpoint.glob("*"))[-1])
-        # elif random_pool_curriculum:
-        #    self.folder_path_checkpoint = Path("/home/student/klask_rl/IsaacLab/logs/rl_games/klask/pool_of_players")
+            
+            # MODE 3: Fixed opponent (Maurus)
+            if self.mode == 3:
+                if fixed_opponent_checkpoint is None:
+                    raise ValueError("MODE 3 requires fixed_opponent_checkpoint path")
+                self.current_checkpoint = fixed_opponent_checkpoint
+                print(f"[INFO] MODE 3: Using fixed opponent: {self.current_checkpoint}")
+
         self.current_config = self.config
         super().__init__(config_name, num_actors, **kwargs)
 
     def reset(self):
-        if self.training_curriculum:
+        # MODE 3: Load fixed opponent only once
+        if self.training_curriculum and self.mode == 3 and self.agent is None:
+            self.create_agent()
+        elif self.training_curriculum and self.mode != 3:
             self.should_update_agents()
+        
         if self.agent == None:
             self.create_agent()
-        # if self.training_curriculum and new_file:
 
         obs = self.env.reset()
-        # self.opponent_obs = self.get_opponent_obs(obs)
         self.opponent_obs = find_wrapper(
             self.env, OpponentObservationWrapper
         ).opponent_obs
@@ -146,6 +152,10 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
         self.agent.has_batch_dimension = True
 
     def should_update_agents(self, weights=None):
+        # MODE 3: Never update (fixed opponent)
+        if self.mode == 3:
+            return
+        
         if self.mode == 2 and self.counter > 15:
             use_old_opp = random.random() < 0.3
             if not use_old_opp and weights is not None:
@@ -244,17 +254,22 @@ class RlGamesGpuEnvSelfPlay(RlGamesGpuEnv):
         opponent_obs = self.agent.obs_to_torch(self.opponent_obs)
         opponent_action = self.agent.get_action(opponent_obs, self.is_deterministic)
         
-        # Opponent agent was built with action_space=4, but we only need its 2D command.
-        # Take the first 2 dims as the real opponent action for the actuator.
-        # if opponent_action.shape[1] > 2:
-        #    opponent_action = opponent_action[:, :2]
-        action = action[:, :2] # <- added this (wasnt there before)
-        opponent_action = opponent_action[:, 2:]
+        # Handle 2D opponent (Maurus) vs 4D training agent
+        if self.mode == 3:
+            # Maurus outputs 2D, mirror to 4D (or pad with zeros)
+            if opponent_action.shape[1] == 2:
+                # Option A: Mirror left peg to right peg
+                opponent_action = torch.cat([opponent_action, opponent_action], dim=1)
+                # Option B: Only left peg moves, right peg stationary
+                # opponent_action = torch.cat([opponent_action, torch.zeros_like(opponent_action)], dim=1)
+        
+        # Training agent action is 2D, opponent is now 4D
+        action = action[:, :2]  # Player's 2D action
+        opponent_action_2d = opponent_action[:, :2]  # Take opponent's left peg only
 
-        full_action = torch.cat([action, -opponent_action], dim=1)
+        full_action = torch.cat([action, -opponent_action_2d], dim=1)
 
         obs, reward, dones, info = self.env.step(full_action, *args, **kwargs)
-        # self.opponent_obs = self.get_opponent_obs(obs)
         self.opponent_obs = find_wrapper(
             self.env, OpponentObservationWrapper
         ).opponent_obs
