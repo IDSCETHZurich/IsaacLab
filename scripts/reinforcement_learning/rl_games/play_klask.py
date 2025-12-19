@@ -37,7 +37,10 @@ parser.add_argument(
     "--task", type=str, default="Isaac-Klask-v0", help="Name of the task."
 )
 parser.add_argument(
-    "--checkpoint", type=str, default="/home/student/klask_rl/IsaacLab/logs/rl_games/klask/self_play_sparse_own_half_horizon128/nn/last_klask_ep_125_rew_1.1602331.pth", help="Path to model checkpoint."
+    "--checkpoint",
+    type=str,
+    default="/home/student/klask_rl/IsaacLab/logs/rl_games/klask/demo_agents/best_one/last_klask_ep_2150_rew_0.7395924.pth",
+    help="Path to model checkpoint.",
 )
 parser.add_argument(
     "--use_last_checkpoint",
@@ -47,7 +50,7 @@ parser.add_argument(
 parser.add_argument(
     "--config",
     type=str,
-    default="/home/student/klask_rl/IsaacLab/planned_runs/rl_games_self_play_sparse_own_half_horizon128.yaml",
+    default="/home/student/klask_rl/IsaacLab/logs/rl_games/klask/demo_agents/best_one/agent.yaml",
     help="config.yaml file, rl_games_cfg_entry_point used when not provided",
 )
 
@@ -82,6 +85,8 @@ from isaaclab.utils.dict import print_dict
 from isaaclab_rl.rl_games import RlGamesGpuEnv, RlGamesVecEnvWrapper
 from isaaclab_tasks.manager_based.klask.actuator_model import ActuatorModelWrapper
 from isaaclab_tasks.manager_based.klask.config import KLASK_PARAMS
+
+KLASK_PARAMS["observations"]["action_history"] = 2  # Override for this checkpoint
 from isaaclab_tasks.manager_based.klask.env_wrapper import (
     ActionHistoryWrapper,
     KlaskAgentOpponentWrapper,
@@ -110,7 +115,7 @@ def main():
         num_envs=args_cli.num_envs,
         use_fabric=not args_cli.disable_fabric,
     )
-    
+
     # Load agent config: skip registry if custom config provided
     if args_cli.config is not None:
         print(f"[INFO]: Loading configuration from: {args_cli.config}")
@@ -126,9 +131,11 @@ def main():
         if "config" not in agent_cfg["params"]:
             agent_cfg["params"]["config"] = {}
         agent_cfg["params"]["config"]["num_actors"] = args_cli.num_envs
-    
+
     # Debug
-    print(f"[DEBUG] Network units: {agent_cfg.get('params', {}).get('network', {}).get('mlp', {}).get('units', 'NOT SET')}")
+    print(
+        f"[DEBUG] Network units: {agent_cfg.get('params', {}).get('network', {}).get('mlp', {}).get('units', 'NOT SET')}"
+    )
     print(f"[DEBUG] Action space: {agent_cfg['params']['network']['space']}")
     print()
     # specify directory for logging experiments
@@ -188,7 +195,7 @@ def main():
 
     # Remove duplicate env_params line if you added it earlier
     # env_params = agent_cfg.get("params", {}).get("env", {})
-    
+
     if env_params.get("actuator_model", False):
         env = ActuatorModelWrapper(env, device=args_cli.device)
 
@@ -229,11 +236,11 @@ def main():
         vecenv.register(
             "IsaacRlgWrapper",
             lambda config_name, num_actors, **kwargs: RlGamesGpuEnvSelfPlay(
-                config_name, 
-                num_actors, 
+                config_name,
+                num_actors,
                 agent_cfg.copy(),  # This captures agent_cfg at registration time
                 is_deterministic=True,
-                **kwargs
+                **kwargs,
             ),
         )
         env_configurations.register(
@@ -259,7 +266,7 @@ def main():
 
     # DON'T set num_actors here - already set above before registration
     # agent_cfg["params"]["config"]["num_actors"] = env.unwrapped.num_envs
-    
+
     # create runner from rl-games
     runner = Runner()
     runner.load(agent_cfg)
@@ -283,7 +290,7 @@ def main():
     # initialize RNN states if used
     if agent.is_rnn:
         agent.init_rnn()
-    '''
+    """
     if agent_cfg["params"]["config"].get("self_play", False):
         opponent = runner.create_player()
         opponent.device = torch.device(args_cli.device)
@@ -292,7 +299,7 @@ def main():
         opponent.actions_high = agent.actions_high.to(args_cli.device)
         opponent.set_weights(agent.get_weights())
         find_wrapper(env, KlaskAgentOpponentWrapper).add_opponent(opponent)
-    '''
+    """
     # simulate environment
     # note: We simplified the logic in rl-games player.py (:func:`BasePlayer.run()`) function in an
     #   attempt to have complete control over environment stepping. However, this removes other

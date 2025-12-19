@@ -224,11 +224,6 @@ def main(
     # read configurations about the agent-training
     rl_device = agent_cfg["params"]["config"]["device"]
 
-    # ADD DEBUG PRINT BEFORE ENV CREATION
-    print(f"[INFO] 🔍 Device configuration:")
-    print(f"   env_cfg.sim.device: {env_cfg.sim.device}")
-    print(f"   agent device: {agent_cfg['params']['config']['device']}")
-    print(f"   rl_device: {rl_device}")
 
     # create isaac environment
     env = gym.make(
